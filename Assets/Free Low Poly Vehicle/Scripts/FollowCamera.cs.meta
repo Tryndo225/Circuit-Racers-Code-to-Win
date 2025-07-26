@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 78f0636ae86fb8849a7da06a6e7004b9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 265813
+  packageName: Free Low Poly Vehicle
+  packageVersion: 2.00
+  assetPath: Assets/Free Low Poly Vehicle/Scripts/FollowCamera.cs
+  uploadId: 770967

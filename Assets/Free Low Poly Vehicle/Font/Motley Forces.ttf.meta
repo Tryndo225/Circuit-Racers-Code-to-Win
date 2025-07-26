@@ -1,0 +1,28 @@
+fileFormatVersion: 2
+guid: 17c0193a44f346b479526bae04cdf764
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Motley Forces
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 265813
+  packageName: Free Low Poly Vehicle
+  packageVersion: 2.00
+  assetPath: Assets/Free Low Poly Vehicle/Font/Motley Forces.ttf
+  uploadId: 770967
