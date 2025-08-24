@@ -126,7 +126,7 @@ public class LightsController : MonoBehaviour
         {
             if (light != null)
             {
-                if (rearLights.Contains(light) && !active)
+                if (rearLights.Contains(light) && _lightsToggle && !active)
                 {
                     light.color = rearLightsColor;
                     light.intensity = rearLightsIntensity;
@@ -153,7 +153,7 @@ public class LightsController : MonoBehaviour
         {
             if (light != null)
             {
-                if (rearLights.Contains(light) && !active)
+                if (rearLights.Contains(light) && _lightsToggle && !active)
                 {
                     light.color = rearLightsColor;
                     light.intensity = rearLightsIntensity;

@@ -30,10 +30,27 @@ public class SceneManagement : MonoBehaviour
 
     public void ChangeScene(SceneAssetHelper scene)
     {
+        Debug.Log($"Changing scene to: {scene.Name}");
+
+        if (scene.Name == "Quit Game")
+        {
+            Debug.Log("Quitting game...");
+            QuitGame();
+            return;
+        }
+
         SceneManager.LoadScene(scene.Name);
         Time.timeScale = 1;
 
         MatchMusicClip(scene);
+    }
+
+    public void ChangeScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+        Time.timeScale = 1;
+
+        MatchMusicClip(new SceneAssetHelper(sceneName, sceneName));
     }
 
     private void MatchMusicClip(SceneAssetHelper scene)
@@ -45,5 +62,11 @@ public class SceneManagement : MonoBehaviour
                 SoundManager.instance.PlayMusic(sceneAudioClipPairs[i].AudioClip);
             }
         }
+    }
+
+    private void QuitGame()
+    {
+        Debug.Log("Quitting game...");
+        Application.Quit();
     }
 }

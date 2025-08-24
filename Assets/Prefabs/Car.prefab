@@ -276,16 +276,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
   slipThreshold: 0.4
-  maxEmissionRate: 1
-  minSpeedForSmoke: 0
+  maxEmissionRatePerSecond: 100
+  maxEmissionRateAtSlip: 4
   groundOffset: 0.02
-  trailMaterial: {fileID: 2100000, guid: bcad4ae70f06e5843aefebb87625f4e6, type: 2}
-  trailTime: 8
-  trailWidth: 0.5
-  trailMinVertexDistance: 0.03
 --- !u!1 &2748931089282733605
 GameObject:
   m_ObjectHideFlags: 0
@@ -699,16 +696,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
   slipThreshold: 0.4
-  maxEmissionRate: 1
-  minSpeedForSmoke: 0
+  maxEmissionRatePerSecond: 100
+  maxEmissionRateAtSlip: 4
   groundOffset: 0.02
-  trailMaterial: {fileID: 2100000, guid: bcad4ae70f06e5843aefebb87625f4e6, type: 2}
-  trailTime: 8
-  trailWidth: 0.5
-  trailMinVertexDistance: 0.03
 --- !u!1 &4286459135078016575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1350,16 +1344,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
   slipThreshold: 0.4
-  maxEmissionRate: 1
-  minSpeedForSmoke: 0
+  maxEmissionRatePerSecond: 100
+  maxEmissionRateAtSlip: 4
   groundOffset: 0.02
-  trailMaterial: {fileID: 2100000, guid: bcad4ae70f06e5843aefebb87625f4e6, type: 2}
-  trailTime: 8
-  trailWidth: 0.5
-  trailMinVertexDistance: 0.03
 --- !u!1 &7107813715564438500
 GameObject:
   m_ObjectHideFlags: 0
@@ -1381,7 +1372,7 @@ GameObject:
   - component: {fileID: 4914465325961809822}
   m_Layer: 6
   m_Name: Car
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1543,12 +1534,12 @@ MonoBehaviour:
       m_Name: Throttle
       m_Type: 0
       m_ExpectedControlType: Axis
-      m_Id: 84b3c3d4-7b6c-426b-9156-21c23a73b1e8
+      m_Id: d830c820-2cf6-463b-8e6c-e26c5ad63c9c
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 1DAxis
-        m_Id: 65e40cd4-5299-49da-82b9-5eda500af409
+        m_Id: 8c1e9e73-5f17-40ad-9c48-919794741879
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1556,7 +1547,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 4
       - m_Name: negative
-        m_Id: 2716734b-3727-4054-a734-74091eb17498
+        m_Id: 25be473d-1c9f-4e03-ac46-2ca170285269
         m_Path: <Keyboard>/s
         m_Interactions: 
         m_Processors: 
@@ -1564,7 +1555,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: positive
-        m_Id: d496ef40-ecf2-476d-94a6-4e3affb2fdd0
+        m_Id: cd28468e-c3c1-4451-a51c-aaa40dcb4a0b
         m_Path: <Keyboard>/w
         m_Interactions: 
         m_Processors: 
@@ -1572,7 +1563,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: 1DAxis
-        m_Id: d19e9053-a6ae-4395-b11a-5800e1b73e53
+        m_Id: e9e00390-04f4-4ee4-8a8b-9a68ea12e8f5
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1580,7 +1571,31 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 4
       - m_Name: negative
-        m_Id: 0aa1b8b7-6e88-4164-ab9d-c53bfcf2d1c6
+        m_Id: d9ea70ef-70f3-40a9-ad37-854e0918b832
+        m_Path: <Keyboard>/downArrow
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Throttle
+        m_Flags: 8
+      - m_Name: positive
+        m_Id: c15b8c2d-13e1-4b61-8cc3-0b25b9dbbfcd
+        m_Path: <Keyboard>/upArrow
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Throttle
+        m_Flags: 8
+      - m_Name: 1DAxis
+        m_Id: 2c8ac41d-a810-464d-980a-461e088f6c3e
+        m_Path: 1DAxis
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Throttle
+        m_Flags: 4
+      - m_Name: negative
+        m_Id: 93d47f9c-da3c-4d44-b789-3335b33642a6
         m_Path: <DualShockGamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
@@ -1588,7 +1603,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: positive
-        m_Id: 84490eb5-5224-4085-b4df-d428100eb2de
+        m_Id: 6879608d-8e42-4ece-b1ca-82289868e57c
         m_Path: <DualShockGamepad>/rightTrigger
         m_Interactions: 
         m_Processors: 
@@ -1596,7 +1611,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: 1DAxis
-        m_Id: 5b5d384f-9943-4a8f-a60f-7fc0b082677e
+        m_Id: a4cf081f-c2c2-4e63-aa4a-614cb4f0c52e
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1604,7 +1619,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 4
       - m_Name: negative
-        m_Id: 44cdc168-2ed9-4c6f-8871-ce54590667ff
+        m_Id: 25337edb-52fd-4443-a4a3-4e6fcd35a159
         m_Path: <Gamepad>/rightTrigger
         m_Interactions: 
         m_Processors: 
@@ -1612,7 +1627,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: positive
-        m_Id: 844da054-020e-4b7e-94ed-34ee131ff61e
+        m_Id: 77c66bf7-97e2-4727-8183-9f9b5696e71d
         m_Path: <Gamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
@@ -1627,12 +1642,12 @@ MonoBehaviour:
       m_Name: Steer
       m_Type: 0
       m_ExpectedControlType: Axis
-      m_Id: 8f35c95f-b009-4206-bd56-0e92c2211973
+      m_Id: 2fbab1b0-8195-4e29-b528-ff7fe48cd9e7
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 1DAxis
-        m_Id: 089c4a88-0535-40a4-999f-5bd5e7ed155a
+        m_Id: d726841f-ef2f-44f2-b04d-94e5527fb243
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1640,7 +1655,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 4
       - m_Name: negative
-        m_Id: 3f47d922-2a18-4509-8297-94e7523ac350
+        m_Id: 454630ce-adeb-4496-b66a-d60fc7e65602
         m_Path: <Keyboard>/a
         m_Interactions: 
         m_Processors: 
@@ -1648,15 +1663,39 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 8
       - m_Name: positive
-        m_Id: 53ca2822-4e30-467c-a494-8f131fc9da9e
+        m_Id: 59b378a3-4988-4703-9228-3209aeed5600
         m_Path: <Keyboard>/d
         m_Interactions: 
         m_Processors: 
         m_Groups: 
         m_Action: Steer
         m_Flags: 8
+      - m_Name: 1DAxis
+        m_Id: 91055e16-18a5-4269-992c-4196cfe5fd79
+        m_Path: 1DAxis
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Steer
+        m_Flags: 4
+      - m_Name: negative
+        m_Id: 6df254e2-93d0-4f38-a6bd-fb2e35986d4a
+        m_Path: <Keyboard>/leftArrow
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Steer
+        m_Flags: 8
+      - m_Name: positive
+        m_Id: 2afcdc94-5ee3-44b2-b06f-fe465f27b457
+        m_Path: <Keyboard>/rightArrow
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Steer
+        m_Flags: 8
       - m_Name: 
-        m_Id: f44e7d99-899e-49b2-b1f7-16c831b06145
+        m_Id: 76ee3839-71af-4d71-9fcf-3f09dd257a4a
         m_Path: <DualShockGamepad>/leftStick/x
         m_Interactions: 
         m_Processors: stickDeadzone(min=0.1)
@@ -1664,7 +1703,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 0
       - m_Name: 
-        m_Id: 439b583b-2133-4e43-91d8-1c1cf3f2afd9
+        m_Id: 688b1e6b-8c18-4da4-8353-fbe949c54450
         m_Path: <Gamepad>/leftStick/x
         m_Interactions: 
         m_Processors: stickDeadzone(min=0.1)
@@ -1679,12 +1718,12 @@ MonoBehaviour:
       m_Name: Brake
       m_Type: 0
       m_ExpectedControlType: Button
-      m_Id: f1637d33-611b-41f6-91c6-37a577bb2d2c
+      m_Id: 46ba8b42-544f-4072-bfe4-f3d79ef4eb2b
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: dec9b3c4-0adc-44dd-b70b-6f6c0eb5b2ea
+        m_Id: 8197a7c9-aa87-4a94-bf6d-974ceba2d962
         m_Path: <Keyboard>/s
         m_Interactions: 
         m_Processors: 
@@ -1692,7 +1731,15 @@ MonoBehaviour:
         m_Action: Brake
         m_Flags: 0
       - m_Name: 
-        m_Id: aa3e4ad1-2c5f-4408-ba95-bfa9d254f34c
+        m_Id: ff7058ca-db88-4de6-be01-0a871fc1f15e
+        m_Path: <Keyboard>/downArrow
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Brake
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 97cd2fa1-1dd3-4342-a9aa-8d7d31c687aa
         m_Path: <DualShockGamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
@@ -1700,7 +1747,7 @@ MonoBehaviour:
         m_Action: Brake
         m_Flags: 0
       - m_Name: 
-        m_Id: 6d4a2a66-761b-4b7b-9ab5-0532609003d7
+        m_Id: ab10c590-9669-4759-80d5-dab27990e82e
         m_Path: <Gamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
@@ -1715,12 +1762,12 @@ MonoBehaviour:
       m_Name: Handbrake
       m_Type: 1
       m_ExpectedControlType: Button
-      m_Id: 7d528b38-591a-4e6b-8b63-020f3c7b68f9
+      m_Id: f739fc13-9e04-46c6-9fa4-31763cf1de23
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: 43f14c4c-e3e3-448b-9c67-40bd07cb4514
+        m_Id: 6e574ea9-a328-4754-a73d-1445877893b5
         m_Path: <Keyboard>/space
         m_Interactions: 
         m_Processors: 
@@ -1728,7 +1775,7 @@ MonoBehaviour:
         m_Action: Handbrake
         m_Flags: 0
       - m_Name: 
-        m_Id: de0d60d6-314f-4bbf-847d-16831fbc8810
+        m_Id: 7cc714a8-c0e5-41cb-846b-1ae58e18f262
         m_Path: <DualShockGamepad>/crossButton
         m_Interactions: 
         m_Processors: 
@@ -1736,7 +1783,7 @@ MonoBehaviour:
         m_Action: Handbrake
         m_Flags: 0
       - m_Name: 
-        m_Id: 170adc60-63d8-4b03-a667-deb1f88cf934
+        m_Id: 635ea18c-2d22-4cb5-b774-60c210cb8847
         m_Path: <Gamepad>/buttonSouth
         m_Interactions: 
         m_Processors: 
@@ -1751,12 +1798,12 @@ MonoBehaviour:
       m_Name: LightsToggle
       m_Type: 1
       m_ExpectedControlType: Button
-      m_Id: 7bd984c1-0ed6-4e71-a2f0-be89a1a47442
+      m_Id: 80f6a0c9-0d1a-4a64-aa01-d6b55e4297fb
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: 421bfe40-dc3a-45ac-9250-36ab8a3465c6
+        m_Id: 809a283b-3a26-4ae1-af70-ccdbe7e8943c
         m_Path: <Keyboard>/l
         m_Interactions: Press
         m_Processors: 
@@ -1764,7 +1811,7 @@ MonoBehaviour:
         m_Action: LightsToggle
         m_Flags: 0
       - m_Name: 
-        m_Id: 14ee6b1b-2a4f-4427-8be2-7d16092f9db1
+        m_Id: 6f2eaa09-cf27-4486-8c82-018a13ef5a89
         m_Path: <DualShockGamepad>/dpad/up
         m_Interactions: Press
         m_Processors: 
@@ -1772,7 +1819,7 @@ MonoBehaviour:
         m_Action: LightsToggle
         m_Flags: 0
       - m_Name: 
-        m_Id: 07d4b2d3-469e-4ec8-b42e-24178b40acf0
+        m_Id: 03980ee6-e453-4ded-a87b-2cd0ccb050f6
         m_Path: <Gamepad>/dpad/up
         m_Interactions: Press
         m_Processors: 
@@ -1781,6 +1828,7 @@ MonoBehaviour:
         m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 0}
+  autoCreateDefaultBindingsIfMissing: 1
   maxSpeed: 300
   maxReverseSpeed: 40
   maxSteerAngleAtTopSpeed: 10
@@ -1855,7 +1903,7 @@ MonoBehaviour:
   - {fileID: 6718454699699519557}
   - {fileID: 3696832304992124790}
   - {fileID: 4217905217736014513}
-  fadeDuration: 0.1
+  fadeDuration: 0.3
   startLightsOn: 0
   outputGroup: {fileID: 5835183508414100833, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
   masterVolume: 0.5
@@ -1907,7 +1955,6 @@ MonoBehaviour:
   limiterDepth: 0.25
   comYOffset: -0.4
   ackermannFactor: 1
-  autoCreateDefaultBindingsIfMissing: 1
   _engineSound: {fileID: 5877857321910121407}
   _driveTrainController: {fileID: 7486225427794663479}
   _transmissionController: {fileID: 8633431643041831171}
@@ -2068,7 +2115,7 @@ MonoBehaviour:
   crashClips:
   - {fileID: 8300000, guid: b0a7cc32db8c7114db5cac17d1ac98b3, type: 3}
   minimumVolume: 0.1
-  minImpulse: 1000
+  minImpulse: 500
   maxImpulse: 150000
   baseVolume: 1
   volumeCurve:
@@ -2140,7 +2187,7 @@ MonoBehaviour:
   - {fileID: 6718454699699519557}
   - {fileID: 3696832304992124790}
   - {fileID: 4217905217736014513}
-  fadeDuration: 0.1
+  fadeDuration: 0.3
   startLightsOn: 0
 --- !u!1 &7452889765530861319
 GameObject:
@@ -2399,16 +2446,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
   slipThreshold: 0.4
-  maxEmissionRate: 1
-  minSpeedForSmoke: 0
+  maxEmissionRatePerSecond: 100
+  maxEmissionRateAtSlip: 4
   groundOffset: 0.02
-  trailMaterial: {fileID: 2100000, guid: bcad4ae70f06e5843aefebb87625f4e6, type: 2}
-  trailTime: 8
-  trailWidth: 0.5
-  trailMinVertexDistance: 0.03
 --- !u!1 &8967093696091482235
 GameObject:
   m_ObjectHideFlags: 0

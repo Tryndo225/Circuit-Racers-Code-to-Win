@@ -1,7 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -33,6 +30,8 @@ public class VehicleController : MonoBehaviour
 
     [Tooltip("Button for Lights can be used for toggling lights on/off.")]
     [SerializeField] private InputActionProperty lightsToggleAction;
+
+    [SerializeField] private bool autoCreateDefaultBindingsIfMissing = false;
 
     [Header("Vehicle")]
     [Tooltip("Maximum speed in km/h. Vehicle will not exceed this speed.")]
@@ -236,7 +235,6 @@ public class VehicleController : MonoBehaviour
     [SerializeField] private float comYOffset = -0.4f;
 
     [SerializeField] private float ackermannFactor = 1f;
-    [SerializeField] private bool autoCreateDefaultBindingsIfMissing = false;
 
     [SerializeField, ReadOnly] private EngineSound _engineSound;
     [SerializeField, ReadOnly] private DriveTrainContoller _driveTrainController;
@@ -320,22 +318,10 @@ public class VehicleController : MonoBehaviour
 
     private void Reset()
     {
-        if (_engineSound == null)
-            _engineSound = gameObject.GetComponent<EngineSound>();
-        if (_engineSound == null)
-            _engineSound = gameObject.AddComponent<EngineSound>();
-        if (_transmissionController == null)
-            _transmissionController = gameObject.GetComponent<TransmissionController>();
-        if (_transmissionController == null)
-            _transmissionController = gameObject.AddComponent<TransmissionController>();
-        if (_driveTrainController == null)
-            _driveTrainController = gameObject.GetComponent<DriveTrainContoller>();
-        if (_driveTrainController == null)
-            gameObject.AddComponent<DriveTrainContoller>();
-        if (_lightsController == null)
-            _lightsController = gameObject.GetComponent<LightsController>();
-        if (_lightsController == null)
-            _lightsController = gameObject.AddComponent<LightsController>();
+        _engineSound ??= gameObject.GetComponent<EngineSound>() ?? gameObject.AddComponent<EngineSound>();
+        _transmissionController ??= gameObject.GetComponent<TransmissionController>() ?? gameObject.AddComponent<TransmissionController>();
+        _driveTrainController ??= gameObject.GetComponent<DriveTrainContoller>() ?? gameObject.AddComponent<DriveTrainContoller>();
+        _lightsController ??= gameObject.GetComponent<LightsController>() ?? gameObject.AddComponent<LightsController>();
 
         SetUp();
     }
@@ -354,14 +340,10 @@ public class VehicleController : MonoBehaviour
         if (!carRigidbody)
             Debug.LogError("VehicleController requires a Rigidbody component on the same GameObject.");
 
-        if (_engineSound == null)
-            _engineSound = gameObject.GetComponent<EngineSound>();
-        if (_transmissionController == null)
-            _transmissionController = gameObject.GetComponent<TransmissionController>();
-        if (_driveTrainController == null)
-            _driveTrainController = gameObject.GetComponent<DriveTrainContoller>();
-        if (_lightsController == null)
-            _lightsController = gameObject.GetComponent<LightsController>();
+        _engineSound ??= gameObject.GetComponent<EngineSound>();
+        _transmissionController ??= gameObject.GetComponent<TransmissionController>();
+        _driveTrainController ??= gameObject.GetComponent<DriveTrainContoller>();
+        _lightsController ??= gameObject.GetComponent<LightsController>();
 
         SetUpLightsController();
         SetUpEngineSoundController();
@@ -548,7 +530,6 @@ public class VehicleController : MonoBehaviour
     // --- Input helpers ---
     private void DetectDevice(InputAction.CallbackContext ctx)
     {
-        // For composites, ctx.control is the exact part that changed (e.g., <Keyboard>/w or <Gamepad>/leftTrigger)
         var control = ctx.control ?? ctx.action.activeControl;
         if (control == null) return;
 
@@ -602,6 +583,9 @@ public class VehicleController : MonoBehaviour
             .With("negative", "<Keyboard>/s")
             .With("positive", "<Keyboard>/w");
         throttle.AddCompositeBinding("1DAxis")
+            .With("negative", "<Keyboard>/downArrow")
+            .With("positive", "<Keyboard>/upArrow");
+        throttle.AddCompositeBinding("1DAxis")
             .With("negative", "<DualShockGamepad>/leftTrigger")
             .With("positive", "<DualShockGamepad>/rightTrigger");
         throttle.AddCompositeBinding("1DAxis")
@@ -617,6 +601,9 @@ public class VehicleController : MonoBehaviour
         steer.AddCompositeBinding("1DAxis")
             .With("negative", "<Keyboard>/a")
             .With("positive", "<Keyboard>/d");
+        steer.AddCompositeBinding("1DAxis")
+            .With("negative", "<Keyboard>/leftArrow")
+            .With("positive", "<Keyboard>/rightArrow");
         steer.AddBinding("<DualShockGamepad>/leftStick/x").WithProcessor("stickDeadzone(min=0.1)");
         steer.AddBinding("<Gamepad>/leftStick/x").WithProcessor("stickDeadzone(min=0.1)");
         return steer;
@@ -625,27 +612,28 @@ public class VehicleController : MonoBehaviour
     private InputAction CreateDefaultBrakeBind()
     {
         var brake = new InputAction("Brake", InputActionType.Value, expectedControlType: "Button");
-        brake.AddBinding("<Keyboard>/s");                               // 0..1
-        brake.AddBinding("<DualShockGamepad>/leftTrigger");             // PS L2 (0..1)
-        brake.AddBinding("<Gamepad>/leftTrigger");                      // fallback
+        brake.AddBinding("<Keyboard>/s");
+        brake.AddBinding("<Keyboard>/downArrow");
+        brake.AddBinding("<DualShockGamepad>/leftTrigger");
+        brake.AddBinding("<Gamepad>/leftTrigger");
         return brake;
     }
 
     private InputAction CreateDefaultHandbrakeBind()
     {
         var handbrake = new InputAction("Handbrake", InputActionType.Button, expectedControlType: "Button");
-        handbrake.AddBinding("<Keyboard>/space");                       // space key
-        handbrake.AddBinding("<DualShockGamepad>/crossButton");         // PS Cross (X)
-        handbrake.AddBinding("<Gamepad>/buttonSouth");                  // fallback
+        handbrake.AddBinding("<Keyboard>/space");
+        handbrake.AddBinding("<DualShockGamepad>/crossButton");
+        handbrake.AddBinding("<Gamepad>/buttonSouth");
         return handbrake;
     }
 
     private InputAction CreateDefaultLightsBind()
     {
         var lights = new InputAction("LightsToggle", InputActionType.Button, expectedControlType: "Button");
-        lights.AddBinding("<Keyboard>/l").WithInteraction("Press");        // PC
-        lights.AddBinding("<DualShockGamepad>/dpad/up").WithInteractions("Press"); // PS pads
-        lights.AddBinding("<Gamepad>/dpad/up").WithInteraction("Press");   // fallback
+        lights.AddBinding("<Keyboard>/l").WithInteraction("Press");
+        lights.AddBinding("<DualShockGamepad>/dpad/up").WithInteractions("Press");
+        lights.AddBinding("<Gamepad>/dpad/up").WithInteraction("Press");
 
         return lights;
     }

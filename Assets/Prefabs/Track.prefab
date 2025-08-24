@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7057568684675138322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4655496815021022501}
+  - component: {fileID: 1548257931340314316}
+  m_Layer: 0
+  m_Name: Track
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4655496815021022501
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7057568684675138322}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 711.86, y: 25.2, z: 380}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1548257931340314316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7057568684675138322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa94a2457f77a24f83ebbd9ce7ea242, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  checkPoints: []
+  respawnLastCheckPoint:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Respawn
+      m_Type: 1
+      m_ExpectedControlType: Button
+      m_Id: 466edc87-07ff-4854-8791-8bc9eb5dbb37
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 8e78e632-1027-4dc0-9da3-c040ea78d811
+        m_Path: <Keyboard>/backspace
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Respawn
+        m_Flags: 0
+      - m_Name: 
+        m_Id: cd778205-9e4a-4e96-88d4-49018d42a8ac
+        m_Path: <DualShockGamepad>/triangle
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Respawn
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 4c7543fe-4595-4167-ada1-54a2185fea66
+        m_Path: <Gamepad>/buttonNorth
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Respawn
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  restartRace:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Restart
+      m_Type: 1
+      m_ExpectedControlType: Button
+      m_Id: 0fdc30e5-bbc0-4473-8ffd-28b177fca177
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 2d6043ad-ca30-43c3-92a0-b00822400386
+        m_Path: <Keyboard>/delete
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Restart
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 68c7b4c7-65c1-449d-99b2-6fd4009b5fe7
+        m_Path: <DualShockGamepad>/start
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Restart
+        m_Flags: 0
+      - m_Name: 
+        m_Id: afbe29fc-4a72-4f81-892c-00cc4fc76970
+        m_Path: <Gamepad>/start
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Restart
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  defaultBindings: 1
+  carPrefab: {fileID: 0}
+  isCircuit: 0
+  laps: 3

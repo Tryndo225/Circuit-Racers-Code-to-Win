@@ -1,10 +1,10 @@
 using System;
-using Unity.VisualScripting;
+using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [Serializable]
-public class SceneAssetHelper : ISerializationCallbackReceiver
+public class SceneAssetHelper : SerializableRunnable
 {
     [SerializeField, ReadOnly] protected string sceneName;
     [SerializeField, ReadOnly] protected string scenePath;
@@ -13,7 +13,8 @@ public class SceneAssetHelper : ISerializationCallbackReceiver
     [SerializeField] private UnityEditor.SceneAsset sceneAsset;
 #endif
 
-    public string Name => sceneAsset.name;
+    public string Name => sceneName;
+
     public string Path => scenePath;
 
     public SceneAssetHelper()
@@ -34,20 +35,25 @@ public class SceneAssetHelper : ISerializationCallbackReceiver
         this.scenePath = scenePath;
     }
 
+    public override void Run()
+    {
+        SceneManagement.instance.ChangeScene(this);
+    }
+
 #if UNITY_EDITOR
 
-    public void OnBeforeSerialize()
+    public override void OnBeforeSerialize()
     {
         ConsistencyKeep();
     }
 
-    public void OnAfterDeserialize()
+    public override void OnAfterDeserialize()
     { }
 
 #else
-    public void OnBeforeSerialize()
+    public override void OnBeforeSerialize()
     { }
-    public void OnAfterDeserialize()
+    public override void OnAfterDeserialize()
     { }
 #endif
 
@@ -77,12 +83,16 @@ public class SceneAssetHelper : ISerializationCallbackReceiver
 
     public static bool operator ==(SceneAssetHelper a, SceneAssetHelper b)
     {
-        return a.scenePath == b.scenePath;
+        if (a is not null && b is not null)
+        {
+            return a.scenePath == b.scenePath;
+        }
+        return a is null && b is null;
     }
 
     public static bool operator !=(SceneAssetHelper a, SceneAssetHelper b)
     {
-        return a.scenePath != b.scenePath;
+        return !(a == b);
     }
 
     public override bool Equals(object obj)
@@ -97,6 +107,12 @@ public class SceneAssetHelper : ISerializationCallbackReceiver
     public override int GetHashCode()
     {
         return scenePath != null ? scenePath.GetHashCode() : 0;
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("sceneName", sceneName);
+        info.AddValue("scenePath", scenePath);
     }
 
 #if UNITY_EDITOR

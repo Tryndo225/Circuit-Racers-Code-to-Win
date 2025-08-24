@@ -7,6 +7,8 @@ public class TyreEffects : MonoBehaviour
     [Header("References")]
     [SerializeField] private ParticleSystem smokePrefab;
 
+    [SerializeField] private TrailRenderer skidTrailPrefab;
+
     [SerializeField] private AudioClip skidAudioClip;
     [SerializeField] private AudioMixerGroup skidAudioMixerGroup;
 
@@ -15,28 +17,20 @@ public class TyreEffects : MonoBehaviour
     [SerializeField][Range(0f, 5f)] private float slipThreshold = 0.25f;
 
     [Tooltip("Particles per second at max slip.")]
-    [SerializeField] private float maxEmissionRate = 60f;
+    [SerializeField] private float maxEmissionRatePerSecond = 60f;
 
-    [Tooltip("Don’t smoke when basically stationary (m/s).")]
-    [SerializeField] private float minSpeedForSmoke = 0f;
+    [SerializeField] private float maxEmissionRateAtSlip = 4f;
 
     [Tooltip("Offsets smoke slightly above the ground to avoid z-fighting.")]
     [SerializeField] private float groundOffset = 0.02f;
 
-    [Header("Skid Trail Settings")]
-    [SerializeField] private Material trailMaterial;
-
-    [SerializeField] private float trailTime = 10f;
-    [SerializeField] private float trailWidth = 0.08f;
-    [SerializeField] private float trailMinVertexDistance = 0.03f;
-
     private WheelCollider wheel;
-    private TrailRenderer skidTrail;
     private Rigidbody carRb;
     private ParticleSystem smokeInstance;
-    private ParticleSystem.Particle[] singleParticleBuffer = new ParticleSystem.Particle[1];
-
+    private TrailRenderer trailInstance;
     private AudioSource skidAudio;
+
+    private float particlesLeftOver;
 
     private void Awake()
     {
@@ -53,17 +47,13 @@ public class TyreEffects : MonoBehaviour
         if (smokePrefab != null)
         {
             smokeInstance = Instantiate(smokePrefab, transform);
-            var emission = smokeInstance.emission;
-            emission.rateOverTime = 0f;
         }
 
-        if (skidTrail == null)
+        if (skidTrailPrefab != null)
         {
-            var go = new GameObject("SkidTrail");
-            go.transform.SetParent(transform, false);
-            skidTrail = go.AddComponent<TrailRenderer>();
+            trailInstance = Instantiate(skidTrailPrefab, transform);
+            trailInstance.emitting = false;
         }
-        ConfigureSkidTrail();
 
         if (skidAudio != null)
         {
@@ -72,37 +62,13 @@ public class TyreEffects : MonoBehaviour
         }
     }
 
-    private void ConfigureSkidTrail()
-    {
-        skidTrail.time = trailTime;
-        skidTrail.minVertexDistance = trailMinVertexDistance;
-        skidTrail.widthCurve = AnimationCurve.Constant(0f, 1f, trailWidth);
-        skidTrail.textureMode = LineTextureMode.Tile;
-        skidTrail.alignment = LineAlignment.View;
-        skidTrail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        skidTrail.receiveShadows = false;
-        skidTrail.sortingOrder = 10;
-
-        if (trailMaterial != null) skidTrail.material = trailMaterial;
-
-        var grad = new Gradient();
-        grad.SetKeys(
-            new[] { new GradientColorKey(Color.black, 0f), new GradientColorKey(Color.black, 1f) },
-            new[] { new GradientAlphaKey(0.7f, 0f), new GradientAlphaKey(0f, 1f) }
-        );
-        skidTrail.colorGradient = grad;
-
-        skidTrail.emitting = false;
-    }
-
     private void FixedUpdate()
     {
-        if (smokeInstance == null && skidTrail == null && skidAudio == null) return;
+        if (smokeInstance == null && trailInstance == null && skidAudio == null) return;
 
         bool grounded = wheel.isGrounded;
-        float speed = carRb ? carRb.linearVelocity.magnitude : 0f;
 
-        if (!grounded || speed < minSpeedForSmoke)
+        if (!grounded)
         {
             StopEffects();
             return;
@@ -124,21 +90,29 @@ public class TyreEffects : MonoBehaviour
 
                     smokeInstance.transform.rotation = Quaternion.LookRotation(forward, hit.normal);
 
-                    float t = Mathf.InverseLerp(slipThreshold, 1f, Mathf.Clamp01(slipMag));
-                    int emitCount = Mathf.CeilToInt(t * maxEmissionRate * Time.fixedDeltaTime);
-                    if (emitCount > 0) smokeInstance.Emit(emitCount);
+                    float emissionRate = Mathf.InverseLerp(slipThreshold, maxEmissionRateAtSlip, slipMag);
+                    particlesLeftOver += emissionRate * maxEmissionRatePerSecond * Time.fixedDeltaTime;
+
+                    int emitCount = Mathf.FloorToInt(particlesLeftOver);
+
+                    particlesLeftOver -= emitCount;
+
+                    if (emitCount > 0)
+                        smokeInstance.Emit(emitCount);
                 }
 
-                if (skidTrail != null)
+                if (trailInstance != null)
                 {
-                    skidTrail.transform.position = at;
-                    skidTrail.emitting = true;
+                    trailInstance.transform.position = at;
+                    trailInstance.emitting = true;
                 }
 
                 if (skidAudio != null)
                 {
-                    if (!skidAudio.isPlaying) skidAudio.Play();
-                    skidAudio.volume = Mathf.Clamp01(slipMag);
+                    skidAudio.volume = Mathf.Clamp01(slipMag / maxEmissionRateAtSlip);
+
+                    if (!skidAudio.isPlaying)
+                        skidAudio.Play();
                 }
 
                 return;
@@ -150,7 +124,10 @@ public class TyreEffects : MonoBehaviour
 
     private void StopEffects()
     {
-        if (skidTrail != null) skidTrail.emitting = false;
-        if (skidAudio != null && skidAudio.isPlaying) skidAudio.Stop();
+        if (trailInstance != null)
+            trailInstance.emitting = false;
+
+        if (skidAudio != null && skidAudio.isPlaying)
+            skidAudio.Stop();
     }
 }
