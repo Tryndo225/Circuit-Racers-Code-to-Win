@@ -62,12 +62,10 @@ public class EngineSound : MonoBehaviour
     public float onThrottleBoost;
 
     [Header("Shift & Limiter")]
-    public bool enableShiftFlare;
-
     public float shiftFlareAmount;
+
     public float shiftFlareTime;
 
-    public bool enableSoftLimiter;
     public float limiterStart;
     public float limiterDepth;
 
@@ -107,7 +105,7 @@ public class EngineSound : MonoBehaviour
 
         // Limiter gating near redline
         float limiterGate = 1f;
-        if (enableSoftLimiter && n > limiterStart)
+        if (n > limiterStart)
         {
             float t = Mathf.InverseLerp(limiterStart, 1f, n);
             float blink = Mathf.PingPong(Time.time * 18f, 1f);
@@ -121,7 +119,7 @@ public class EngineSound : MonoBehaviour
 
         // Shift flare
         float flare = 1f;
-        if (enableShiftFlare && _shiftFlareT > 0f)
+        if (_shiftFlareT > 0f)
         {
             float u = 1f - (_shiftFlareT / shiftFlareTime);
             flare = 1f + shiftFlareAmount * Mathf.SmoothStep(1f, 0f, u);
@@ -150,7 +148,6 @@ public class EngineSound : MonoBehaviour
 
     public void OnShift()
     {
-        if (!enableShiftFlare) return;
         _shiftFlareT = shiftFlareTime;
     }
 

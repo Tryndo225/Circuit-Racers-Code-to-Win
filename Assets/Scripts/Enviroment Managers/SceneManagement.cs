@@ -3,25 +3,10 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
 
-public class SceneManagement : MonoBehaviour
+public class SceneManagement : Generic.Singleton<SceneManagement>
 {
-    public static SceneManagement instance { get; private set; }
-
     [Tooltip("List of scene and corresponding audio clip pairs. The audio clip will be played when the scene is loaded.")]
     [SerializeField] private List<SceneAssetHelperAudioClipPair> sceneAudioClipPairs = new List<SceneAssetHelperAudioClipPair>();
-
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     private void Start()
     {
@@ -59,7 +44,7 @@ public class SceneManagement : MonoBehaviour
         {
             if (scene == sceneAudioClipPairs[i])
             {
-                SoundManager.instance.PlayMusic(sceneAudioClipPairs[i].AudioClip);
+                SoundManager.Instance.PlayMusic(sceneAudioClipPairs[i].AudioClip);
             }
         }
     }

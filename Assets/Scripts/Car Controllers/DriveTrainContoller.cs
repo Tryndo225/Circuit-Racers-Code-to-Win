@@ -55,7 +55,7 @@ public class DriveTrainContoller : MonoBehaviour
     public float[] rearSidewaysFriction;
 
     [Header("Miscellaneous")]
-    public float comYOffset;
+    public Vector3 coMPosition;
 
     public float ackermannFactor;
 
@@ -96,12 +96,13 @@ public class DriveTrainContoller : MonoBehaviour
             SetupFriction(_wheelColliders[i], i < 2);
         }
 
-        _carRigidBody.centerOfMass = new Vector3(0f, comYOffset, 0f);
+        _carRigidBody.centerOfMass = coMPosition;
     }
 
-    private float AverageWheelRPM()
+    private float AverageDrivenWheelRPM()
     {
-        float sum = 0f; int count = 0;
+        float sum = 0f;
+        int count = 0;
         for (int i = 0; i < _wheelColliders.Length; i++)
         {
             if (!_driven[i]) continue;
@@ -114,6 +115,24 @@ public class DriveTrainContoller : MonoBehaviour
             }
         }
 
+        return (count > 0) ? (sum / count) : 0f;
+    }
+
+    private float AverageDrivenWheelSlip()
+    {
+        float sum = 0f;
+        int count = 0;
+        for (int i = 0; i < _wheelColliders.Length; i++)
+        {
+            if (!_driven[i]) continue;
+            WheelHit hit;
+
+            if (_wheelColliders[i].GetGroundHit(out hit)) // trust only grounded wheels
+            {
+                sum += Mathf.Abs(hit.forwardSlip + hit.sidewaysSlip);
+                count++;
+            }
+        }
         return (count > 0) ? (sum / count) : 0f;
     }
 
@@ -202,7 +221,7 @@ public class DriveTrainContoller : MonoBehaviour
 
     private void ApplyDrive(float throttle)
     {
-        if (CalculateSpeed() > maxSpeed || (_isReversing && CalculateSpeed() > maxReverseSpeed) || _transmissionController.HandleShifting(AverageWheelRPM()))
+        if (CalculateSpeed() > maxSpeed || (_isReversing && CalculateSpeed() > maxReverseSpeed) || _transmissionController.HandleShifting(AverageDrivenWheelRPM(), AverageDrivenWheelSlip()))
         {
             throttle = 0f; // limit speed to maxSpeed
         }

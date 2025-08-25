@@ -1,10 +1,9 @@
+using Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class SoundManager : MonoBehaviour
+public class SoundManager : Singleton<SoundManager>
 {
-    public static SoundManager instance { get; private set; }
-
     [Header("Audio Settings")]
     [Tooltip("Volume for background music (0.0 to 1.0)")]
     [SerializeField, Range(0f, 1f)] private float musicVolume = 0.5f;
@@ -22,29 +21,14 @@ public class SoundManager : MonoBehaviour
     private Camera _camera;
 
     // Singleton pattern to ensure only one instance of SoundManager exists
-    private void Awake()
+    protected override void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            _musicSource = gameObject.AddComponent<AudioSource>();
-            _musicSource.loop = true;
-            _musicSource.volume = musicVolume;
-            _musicSource.outputAudioMixerGroup = musicMixerGroup;
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
-    }
+        base.Awake();
 
-    private void OnDestroy()
-    {
-        if (instance == this)
-        {
-            instance = null;
-        }
+        _musicSource = gameObject.AddComponent<AudioSource>();
+        _musicSource.loop = true;
+        _musicSource.volume = musicVolume;
+        _musicSource.outputAudioMixerGroup = musicMixerGroup;
     }
 
     public void PlayMusic(AudioClip clip)
@@ -77,9 +61,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySFXClip(AudioClip clip, Transform transform, float volume, float pitch)
     {
-        Debug.Log($"Request to play SFX: {clip?.name} at volume: {volume}, pitch: {pitch} from position: {transform.position}");
         if (clip == null) return;
-        Debug.Log($"Playing SFX: {clip.name} at volume: {volume}, pitch: {pitch} from position: {transform.position}");
 
         GameObject sfxObject = new GameObject("SFX_" + clip.name);
         sfxObject.transform.position = transform.position;

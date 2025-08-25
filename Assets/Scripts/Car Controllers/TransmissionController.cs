@@ -25,6 +25,9 @@ public class TransmissionController : MonoBehaviour
     [Tooltip("Seconds torque is cut during a shift")]
     public float shiftDuration;
 
+    [Tooltip("Slip threshold for shifting")]
+    public float slipThreshold;
+
     [Tooltip("Delegetes for shifting event")]
     public List<System.Action> OnShift;
 
@@ -33,7 +36,7 @@ public class TransmissionController : MonoBehaviour
     public int CurrentGear { get; private set; } = 0;
     public float EngineRPM { get; private set; } = 0f;
 
-    public bool HandleShifting(float wheelRPM)
+    public bool HandleShifting(float wheelRPM, float wheelSlip)
 
     {
         if (_isShifting)
@@ -41,15 +44,19 @@ public class TransmissionController : MonoBehaviour
             return true;
         }
 
-        float rpm = CalculateRPM(wheelRPM);
-        EngineRPM = rpm;
+        EngineRPM = CalculateRPM(wheelRPM);
 
-        if (rpm >= shiftUpRPM && CurrentGear < forwardGears.Length - 1)
+        if (wheelSlip > slipThreshold)
+        {
+            return false;
+        }
+
+        if (EngineRPM >= shiftUpRPM && CurrentGear < forwardGears.Length - 1)
         {
             StartCoroutine(ShiftUp());
             return true;
         }
-        else if (rpm <= shiftDownRPM && CurrentGear > 0)
+        else if (EngineRPM <= shiftDownRPM && CurrentGear > 0)
         {
             StartCoroutine(ShiftDown());
             return true;

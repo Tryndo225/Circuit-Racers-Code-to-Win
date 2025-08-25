@@ -14,7 +14,7 @@ public class CheckPointListener : MonoBehaviour
     [SerializeField, ReadOnly] private Renderer checkPointRenderer;
 
     private bool _isActive = false;
-    private List<Action> _listeners;
+    private List<Action> _listeners = new List<Action>();
 
     public Vector3 cPClaimedPosition { get; private set; }
     public Quaternion cPClaimedRotation { get; private set; }
@@ -28,7 +28,6 @@ public class CheckPointListener : MonoBehaviour
 
     private void Awake()
     {
-        _listeners = new List<Action>();
         GetReferences();
     }
 

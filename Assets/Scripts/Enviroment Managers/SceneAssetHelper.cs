@@ -37,7 +37,7 @@ public class SceneAssetHelper : SerializableRunnable
 
     public override void Run()
     {
-        SceneManagement.instance.ChangeScene(this);
+        SceneManagement.Instance.ChangeScene(this);
     }
 
 #if UNITY_EDITOR

@@ -52,7 +52,7 @@ public class CollisionDetection : MonoBehaviour
         volume = Mathf.Max(volume, minimumVolume);
         float pitch = Mathf.Lerp(minPitch, maxPitch, severity) * Random.Range(0.98f, 1.02f);
 
-        SoundManager.instance.PlaySFXClip(clip, transform, volume, pitch);
+        SoundManager.Instance.PlaySFXClip(clip, transform, volume, pitch);
 
         nextAllowedTime = Time.time + cooldown;
     }

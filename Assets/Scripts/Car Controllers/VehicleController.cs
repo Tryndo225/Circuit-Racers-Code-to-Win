@@ -34,6 +34,12 @@ public class VehicleController : MonoBehaviour
     [SerializeField] private bool autoCreateDefaultBindingsIfMissing = false;
 
     [Header("Vehicle")]
+    [Tooltip("Center of Mass position relative to the vehicle's transform. Adjust for better handling.")]
+    [SerializeField] private Vector3 coMPosition = new Vector3(0f, -0.4f, 0.5f);
+
+    [Tooltip("Ackermann steering factor. Adjust for better cornering. 1 = perfect Ackermann, < 1 = understeer, > 1 = oversteer.")]
+    [SerializeField] private float ackermannFactor = 1.1f;
+
     [Tooltip("Maximum speed in km/h. Vehicle will not exceed this speed.")]
     [SerializeField] private float maxSpeed = 200f;  // km/h
 
@@ -82,6 +88,9 @@ public class VehicleController : MonoBehaviour
     [Tooltip("Seconds torque is cut during a shift")]
     [SerializeField] private float shiftDuration = 0.2f;
 
+    [Tooltip("Slip threshold for shifting")]
+    [SerializeField] private float shiftSlipThreshold = 0.5f;
+
     [Header("Stability")]
     [SerializeField] private float antiRollStiffnessFront = 400f;
 
@@ -122,7 +131,7 @@ public class VehicleController : MonoBehaviour
     [SerializeField] private float rearSidewaysAsymptoteSlip = 0.7f;
     [SerializeField] private float rearSidewaysAsymptoteValue = 0.5f;
 
-    [Header("Lights Configuration")]
+    [Header("Lights")]
     [Tooltip("Intensity of the front lights when turned on.")]
     [SerializeField] private float frontLightsIntensity = 1000;
 
@@ -168,73 +177,64 @@ public class VehicleController : MonoBehaviour
     [Tooltip("List of brake lights")]
     [SerializeField] private List<Light> brakeLights;
 
-    [Header("Fade Settings")]
+    [Header("Lights : Fade Settings")]
     [Tooltip("Duration for fading lights on and off.")]
     [SerializeField] private float fadeDuration = 0.1f;
 
-    [Header("Initial State")]
+    [Header("Lights : Initial State")]
     [SerializeField] private bool startLightsOn = false;
 
-    [Header("EngineSound")]
-    [Header("Main Output")]
+    [Header("Engine Sound")]
+    [Tooltip("Main Output")]
     [SerializeField] private AudioMixerGroup outputGroup;
 
     [SerializeField, Range(0f, 1f)] private float masterVolume = 1f;
     [SerializeField, Range(0f, 1f)] private float spatialBlend = 1f;
     [SerializeField, Range(0f, 5f)] private float dopplerLevel = 0f;
 
-    [Header("Clips (On-Throttle)")]
+    [Header("Engine Sound : Clips (On-Throttle)")]
     [SerializeField] private AudioClip on_Idle;
 
     [SerializeField] private AudioClip on_Low;
     [SerializeField] private AudioClip on_Mid;
     [SerializeField] private AudioClip on_High;
 
-    [Header("Clips (Off-Throttle)")]
+    [Header("Engine Sound : Clips (Off-Throttle)")]
     [SerializeField] private AudioClip off_Idle;
 
     [SerializeField] private AudioClip off_Low;
     [SerializeField] private AudioClip off_Mid;
     [SerializeField] private AudioClip off_High;
 
-    [Header("Smoothing")]
+    [Header("Engine Sound : Smoothing")]
     [Tooltip("Higher = Faster response")]
     [SerializeField] private float rpmLerpSpeed = 6f;
 
     [SerializeField] private float throttleLerpSpeed = 8f;
 
-    [Header("Pitch Mapping")]
+    [Header("Engine Sound : Pitch Mapping")]
     [Tooltip("AnimationCurve maps normalized RPM [0..1] to pitch multiplier.")]
     [SerializeField] private AnimationCurve pitchVsRpm = AnimationCurve.EaseInOut(0f, 0.7f, 1f, 2.0f);
 
-    [Header("Band Crossfade")]
+    [Header("Engine Sound : Band Crossfade")]
     [Tooltip("Center points of the four bands over normalized RPM")]
     [SerializeField] private Vector4 bandCenters = new Vector4(0f, 0.33f, 0.66f, 1.0f);
 
     [Tooltip("How sharp the crossfade between bands is (bigger = narrower band).")]
     [SerializeField] private float bandSharpness = 6f;
 
-    [Header("On/Off Balance")]
+    [Header("Engine Sound : On/Off Balance")]
     [Tooltip("Exponent shaping for throttle : On-throttle weight (1=linear, > 1 favors off at mid throttle).")]
     [SerializeField] private float throttleShape = 1.25f;
 
     [Tooltip("Extra volume on-throttle compared to off-throttle.")]
     [SerializeField] private float onThrottleBoost = 1f;
 
-    [Header("Shift & Limiter")]
-    [SerializeField] private bool enableShiftFlare = true;
-
+    [Header("Engine Sound : Shift & Limiter")]
     [SerializeField] private float shiftFlareAmount = 0.06f;
-    [SerializeField] private float shiftFlareTime = 0.2f;
 
-    [SerializeField] private bool enableSoftLimiter = true;
     [SerializeField] private float limiterStart = 0.96f;
     [SerializeField] private float limiterDepth = 0.25f;
-
-    [Header("Miscellaneous")]
-    [SerializeField] private float comYOffset = -0.4f;
-
-    [SerializeField] private float ackermannFactor = 1f;
 
     [SerializeField, ReadOnly] private EngineSound _engineSound;
     [SerializeField, ReadOnly] private DriveTrainContoller _driveTrainController;
@@ -402,10 +402,8 @@ public class VehicleController : MonoBehaviour
         _engineSound.bandSharpness = bandSharpness;
         _engineSound.throttleShape = throttleShape;
         _engineSound.onThrottleBoost = onThrottleBoost;
-        _engineSound.enableShiftFlare = enableShiftFlare;
         _engineSound.shiftFlareAmount = shiftFlareAmount;
-        _engineSound.shiftFlareTime = shiftFlareTime;
-        _engineSound.enableSoftLimiter = enableSoftLimiter;
+        _engineSound.shiftFlareTime = shiftDuration;
         _engineSound.limiterStart = limiterStart;
         _engineSound.limiterDepth = limiterDepth;
 
@@ -421,6 +419,7 @@ public class VehicleController : MonoBehaviour
         _transmissionController.shiftUpRPM = shiftUpRPM;
         _transmissionController.shiftDownRPM = shiftDownRPM;
         _transmissionController.shiftDuration = shiftDuration;
+        _transmissionController.slipThreshold = shiftSlipThreshold;
         _transmissionController.OnShift = new List<System.Action>();
         _transmissionController.OnShift.Add(_engineSound.OnShift);
     }
@@ -496,7 +495,7 @@ public class VehicleController : MonoBehaviour
         };
         _driveTrainController.rearSidewaysFriction = rearSidewaysFriction;
 
-        _driveTrainController.comYOffset = comYOffset;
+        _driveTrainController.coMPosition = coMPosition;
         _driveTrainController.ackermannFactor = ackermannFactor;
 
         _driveTrainController.SetUp();

@@ -17,6 +17,6 @@ public class ButtonScript : MonoBehaviour
 
     public void SceneChange(SceneAssetHelper scene)
     {
-        SceneManagement.instance.ChangeScene(scene);
+        SceneManagement.Instance.ChangeScene(scene);
     }
 }
