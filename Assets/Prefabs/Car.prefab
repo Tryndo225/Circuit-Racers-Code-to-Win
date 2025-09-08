@@ -279,9 +279,9 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.4
+  slipThreshold: 0.5
   maxEmissionRatePerSecond: 100
-  maxEmissionRateAtSlip: 4
+  maxEmissionRateAtSlip: 2
   groundOffset: 0.02
 --- !u!1 &2748931089282733605
 GameObject:
@@ -699,9 +699,9 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.4
+  slipThreshold: 0.5
   maxEmissionRatePerSecond: 100
-  maxEmissionRateAtSlip: 4
+  maxEmissionRateAtSlip: 2
   groundOffset: 0.02
 --- !u!1 &4286459135078016575
 GameObject:
@@ -1347,9 +1347,9 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.4
+  slipThreshold: 0.5
   maxEmissionRatePerSecond: 100
-  maxEmissionRateAtSlip: 4
+  maxEmissionRateAtSlip: 2
   groundOffset: 0.02
 --- !u!1 &7107813715564438500
 GameObject:
@@ -1837,9 +1837,9 @@ MonoBehaviour:
   maxSteerAngle: 25
   steerSpeedDegPerSec: 180
   inputExponent: 1.8
-  maxMotorPower: 14000
-  maxBrakeTorque: 15000
-  handbrakeTorque: 20000
+  maxMotorPower: 10000
+  maxBrakeTorque: 12500
+  handbrakeTorque: 15000
   forwardGears:
   - 3.2
   - 2.1
@@ -1852,7 +1852,7 @@ MonoBehaviour:
   shiftUpRPM: 6000
   shiftDownRPM: 2000
   shiftDuration: 0.2
-  shiftSlipThreshold: 0.5
+  shiftSlipThreshold: 1
   antiRollStiffnessFront: 400
   antiRollStiffnessRear: 500
   tractionControlEnabled: 1
@@ -2037,9 +2037,9 @@ MonoBehaviour:
   maxSteerAngle: 25
   steerSpeedDegPerSec: 180
   inputExponent: 1.8
-  maxMotorPower: 14000
-  maxBrakeTorque: 15000
-  handbrakeTorque: 20000
+  maxMotorPower: 10000
+  maxBrakeTorque: 12500
+  handbrakeTorque: 15000
   antiRollStiffnessFront: 400
   antiRollStiffnessRear: 500
   tractionControlEnabled: 1
@@ -2096,7 +2096,7 @@ MonoBehaviour:
   shiftUpRPM: 6000
   shiftDownRPM: 2000
   shiftDuration: 0.2
-  slipThreshold: 0.5
+  slipThreshold: 1
 --- !u!114 &4071285767021976057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2446,9 +2446,9 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.4
+  slipThreshold: 0.5
   maxEmissionRatePerSecond: 100
-  maxEmissionRateAtSlip: 4
+  maxEmissionRateAtSlip: 2
   groundOffset: 0.02
 --- !u!1 &8967093696091482235
 GameObject:
