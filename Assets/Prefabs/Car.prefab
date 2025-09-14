@@ -243,17 +243,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.4
+    m_ExtremumSlip: 0.2
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.6
-    m_Stiffness: 2
-  m_SidewaysFriction:
-    m_ExtremumSlip: 0.3
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.7
     m_AsymptoteValue: 0.5
     m_Stiffness: 2
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.28
+    m_ExtremumValue: 1.25
+    m_AsymptoteSlip: 1.1
+    m_AsymptoteValue: 1
+    m_Stiffness: 1.6
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -663,17 +663,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.4
+    m_ExtremumSlip: 0.2
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.6
-    m_Stiffness: 2.5
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 2.4
   m_SidewaysFriction:
     m_ExtremumSlip: 0.3
     m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.7
-    m_AsymptoteValue: 0.5
-    m_Stiffness: 2
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.9
+    m_Stiffness: 2.5
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1311,17 +1311,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.4
+    m_ExtremumSlip: 0.2
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.6
-    m_Stiffness: 2.5
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 2.4
   m_SidewaysFriction:
     m_ExtremumSlip: 0.3
     m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.7
-    m_AsymptoteValue: 0.5
-    m_Stiffness: 2
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.9
+    m_Stiffness: 2.5
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1458,8 +1458,8 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 1600
   m_LinearDamping: 0.05
-  m_AngularDamping: 0.3
-  m_CenterOfMass: {x: 0, y: -0.4, z: 0.5}
+  m_AngularDamping: 0.5
+  m_CenterOfMass: {x: 0, y: -0.3, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -1829,13 +1829,13 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: 0}
   autoCreateDefaultBindingsIfMissing: 1
-  coMPosition: {x: 0, y: -0.4, z: 0.5}
-  ackermannFactor: 1
+  coMPosition: {x: 0, y: -0.3, z: 0}
+  ackermannFactor: 0.8
   maxSpeed: 300
   maxReverseSpeed: 40
   maxSteerAngleAtTopSpeed: 10
-  maxSteerAngle: 25
-  steerSpeedDegPerSec: 180
+  maxSteerAngle: 30
+  steerSpeedDegPerSec: 90
   inputExponent: 1.8
   maxMotorPower: 10000
   maxBrakeTorque: 12500
@@ -1860,25 +1860,25 @@ MonoBehaviour:
   absEnabled: 1
   absSlipLimit: 0.55
   frontForwardStiffness: 2
-  frontForwardExtremumSlip: 0.4
+  frontForwardExtremumSlip: 0.2
   frontForwardExtremumValue: 1
   frontForwardAsymptoteSlip: 0.8
-  frontForwardAsymptoteValue: 0.6
-  rearForwardStiffness: 2.5
-  rearForwardExtremumSlip: 0.4
+  frontForwardAsymptoteValue: 0.5
+  rearForwardStiffness: 2.4
+  rearForwardExtremumSlip: 0.2
   rearForwardExtremumValue: 1
   rearForwardAsymptoteSlip: 0.8
-  rearForwardAsymptoteValue: 0.6
-  frontSidewaysStiffness: 2
-  frontSidewaysExtremumSlip: 0.3
-  frontSidewaysExtremumValue: 1
-  frontSidewaysAsymptoteSlip: 0.7
-  frontSidewaysAsymptoteValue: 0.5
-  rearSidewaysStiffness: 2
+  rearForwardAsymptoteValue: 0.5
+  frontSidewaysStiffness: 1.6
+  frontSidewaysExtremumSlip: 0.28
+  frontSidewaysExtremumValue: 1.25
+  frontSidewaysAsymptoteSlip: 1.1
+  frontSidewaysAsymptoteValue: 1
+  rearSidewaysStiffness: 2.5
   rearSidewaysExtremumSlip: 0.3
-  rearSidewaysExtremumValue: 1
-  rearSidewaysAsymptoteSlip: 0.7
-  rearSidewaysAsymptoteValue: 0.5
+  rearSidewaysExtremumValue: 1.25
+  rearSidewaysAsymptoteSlip: 0.8
+  rearSidewaysAsymptoteValue: 0.9
   frontLightsIntensity: 1000
   frontLightsColor: {r: 1, g: 0.7529412, b: 0, a: 0}
   frontLights:
@@ -2034,8 +2034,8 @@ MonoBehaviour:
   maxSpeed: 300
   maxReverseSpeed: 40
   maxSteerAngleAtTopSpeed: 10
-  maxSteerAngle: 25
-  steerSpeedDegPerSec: 180
+  maxSteerAngle: 30
+  steerSpeedDegPerSec: 90
   inputExponent: 1.8
   maxMotorPower: 10000
   maxBrakeTorque: 12500
@@ -2049,29 +2049,29 @@ MonoBehaviour:
   frontForwardFriction:
   - 2
   - 0.8
-  - 0.4
-  - 0.6
+  - 0.2
+  - 0.5
   - 1
   rearForwardFriction:
-  - 2.5
+  - 2.4
   - 0.8
-  - 0.4
-  - 0.6
+  - 0.2
+  - 0.5
   - 1
   frontSidewaysFriction:
-  - 2
-  - 0.7
-  - 0.3
-  - 0.5
+  - 1.6
+  - 1.1
+  - 0.28
   - 1
+  - 1.25
   rearSidewaysFriction:
-  - 2
-  - 0.7
+  - 2.5
+  - 0.8
   - 0.3
-  - 0.5
-  - 1
-  coMPosition: {x: 0, y: -0.4, z: 0.5}
-  ackermannFactor: 1
+  - 0.9
+  - 1.25
+  coMPosition: {x: 0, y: -0.3, z: 0}
+  ackermannFactor: 0.8
 --- !u!114 &8633431643041831171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2410,17 +2410,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.4
+    m_ExtremumSlip: 0.2
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.6
-    m_Stiffness: 2
-  m_SidewaysFriction:
-    m_ExtremumSlip: 0.3
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.7
     m_AsymptoteValue: 0.5
     m_Stiffness: 2
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.28
+    m_ExtremumValue: 1.25
+    m_AsymptoteSlip: 1.1
+    m_AsymptoteValue: 1
+    m_Stiffness: 1.6
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

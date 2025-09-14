@@ -91,6 +91,9 @@ public class DriveTrainContoller : MonoBehaviour
         foreach (var w in _wheelColliders)
             w.ConfigureVehicleSubsteps(0.5f, 20, 30);
 
+        _carRigidBody.solverIterations = 12;
+        _carRigidBody.solverVelocityIterations = 12;
+
         for (int i = 0; i < _wheelColliders.Length; i++)
         {
             SetupFriction(_wheelColliders[i], i < 2);
