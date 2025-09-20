@@ -1959,6 +1959,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4655496815021022501, guid: a20932a0568b07b4892f211655947c37, type: 3}
   m_PrefabInstance: {fileID: 7514944479051483536}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1559668444 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6235936028265280410, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+  m_PrefabInstance: {fileID: 916651679097046572}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 560e7a41e67ce0f42918a62ad8a7ef85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1604298583
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2313,6 +2324,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: Race OverLay
       objectReference: {fileID: 0}
+    - target: {fileID: 3203048928491931128, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203048928491931128, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203048928491931128, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1559668444}
+    - target: {fileID: 3203048928491931128, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203048928491931128, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnButtonClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203048928491931128, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ButtonScript, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3203048928491931128, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3644341993377305828, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -2578,6 +2617,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: laps
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: carPrefab
       value: 
       objectReference: {fileID: 7107813715564438500, guid: 6282a201fa9c4544dae7b3f4bec01eeb, type: 3}
@@ -2631,35 +2674,35 @@ PrefabInstance:
       objectReference: {fileID: 413192348}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_Id
-      value: 628d7e2d-677d-4556-88e5-e27d8abdbbc5
+      value: a40f6220-c927-4baa-be8d-3f1b169945ab
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_Id
-      value: dba0d5cf-c3fc-44e7-b4a4-5b33d6f975bd
+      value: b49af95e-accc-4e8c-9941-8225f4b5c960
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: e7a05382-0534-4aef-ae04-f5d14246f46e
+      value: 33d36dff-6e92-49c3-85b5-d324a5999fe9
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: 28b17f86-e9c3-4236-9c15-9fecde6349ad
+      value: 63701d47-ce8c-45aa-89c0-2bdc89c01199
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: 2e897fb6-02a1-4f44-a5b3-4431af844d89
+      value: 9978f6de-caa7-4e3a-a75f-dc53607e85a3
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: ae2b78ad-3780-42d8-b233-de24afb91bf5
+      value: 0165b0ad-1c2c-4b7b-aa2b-1bb731989300
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: 4ab6a871-2f00-4204-a051-f324c7b7f0ce
+      value: 8f543a64-a850-4b0f-a538-c28787e665af
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: 01d69b23-5a84-4727-9d32-f54c40492dfb
+      value: f6d99f0e-3458-4732-9891-96c9e1e7a19d
       objectReference: {fileID: 0}
     - target: {fileID: 4655496815021022501, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: m_LocalPosition.x

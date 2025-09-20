@@ -12,7 +12,17 @@ public class ButtonScript : MonoBehaviour
 
     public void OnButtonClick()
     {
-        Debug.Log("Button clicked!");
+        switch (actionType)
+        {
+            case ActionType.ChangeScene:
+                Debug.Log($"Changing scene to: {sceneToLoad.Name}");
+                SceneChange(sceneToLoad);
+                break;
+
+            default:
+                Debug.LogWarning("No action assigned to button.");
+                break;
+        }
     }
 
     public void SceneChange(SceneAssetHelper scene)
