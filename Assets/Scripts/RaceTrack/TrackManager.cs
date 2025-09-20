@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using System;
+using System.Collections;
 
 public class TrackManager : MonoBehaviour
 {
@@ -20,6 +22,9 @@ public class TrackManager : MonoBehaviour
 
     [SerializeField, ShowIf(nameof(isCircuit))] private int laps = 3;
 
+    [Header("Respawn Delay")]
+    [SerializeField, Range(0f, 5f)] private float respawnDelay = 3f;
+
     private GameObject _carInstance;
 
     private int _currentLap = 0;
@@ -31,17 +36,29 @@ public class TrackManager : MonoBehaviour
     private float _lastLapTime = 0f;
 
     private float _trackStartTime = 0f;
+
     private float _trackEndTime = 0f;
+
     private bool _isRaceFinished = false;
 
     private float _lastCheckPointTime = 0f;
 
     private bool _pendingRespawn = false;
+
     private int _respawnCheckPoint = 0;
+
+    private float _respawnTimer = 0f;
 
     public float LastLapTime => _lastLapTime;
     public float CurrentLapTime => Time.time - _lapStartTime;
     public float TotalTrackTime => _isRaceFinished ? _trackEndTime - _trackStartTime : Time.time - _trackStartTime;
+    public int CurrentLap => _currentLap;
+    public int TotalLaps => laps;
+    public int CurrentCheckPointIndex => _currentCheckPointIndex;
+    public int TotalCheckPoints => checkPoints.Count;
+
+    public bool IsRaceFinished => _isRaceFinished;
+    public float RespawnTimer => _respawnTimer;
 
     private void OnValidate()
     {
@@ -60,14 +77,14 @@ public class TrackManager : MonoBehaviour
 
         // Subscribe to events
         respawnLastCheckPoint.action.performed += ctx => Respawn();
-        restartRace.action.performed += ctx => Restart();
+        restartRace.action.performed += ctx => StartCoroutine(RestartCoroutine());
     }
 
     private void OnDisable()
     {
         // Unsubscribe to avoid memory leaks
         respawnLastCheckPoint.action.performed -= ctx => Respawn();
-        restartRace.action.performed -= ctx => Restart();
+        restartRace.action.performed -= ctx => StartCoroutine(RestartCoroutine());
 
         respawnLastCheckPoint.action.Disable();
         restartRace.action.Disable();
@@ -106,30 +123,71 @@ public class TrackManager : MonoBehaviour
 
     private void Start()
     {
+        StartRace();
+    }
+
+    public void StartRace()
+    {
+        StartCoroutine(RestartCoroutine());
+    }
+
+    private IEnumerator RestartCoroutine()
+    {
         Restart();
+        Time.timeScale = 0f;
+
+        float startTime = Time.unscaledTime;
+        while (Time.unscaledTime - startTime < 3f)
+        {
+            _respawnTimer = 3f - (Time.unscaledTime - startTime);
+            Debug.Log($"Restarting in {_respawnTimer:0.0} seconds...");
+            yield return new WaitForSecondsRealtime(0.5f);
+        }
+
+        _respawnTimer = 0f;
+        Time.timeScale = 1f;
     }
 
     private void FixedUpdate()
     {
         if (_pendingRespawn)
         {
-            _pendingRespawn = false;
-
-            var carRb = _carInstance.GetComponent<Rigidbody>();
-            var oldInterpolation = carRb.interpolation;
-
-            carRb.interpolation = RigidbodyInterpolation.None;
-
-            bool oldKinematic = carRb.isKinematic;
-            carRb.isKinematic = false;
-
-            RespawnCar(_respawnCheckPoint);
-
-            Physics.SyncTransforms();
-
-            carRb.isKinematic = oldKinematic;
-            carRb.interpolation = oldInterpolation;
+            StartCoroutine(RespawnDelayCoroutine(respawnDelay));
         }
+    }
+
+    private IEnumerator RespawnDelayCoroutine(float delay)
+    {
+        _pendingRespawn = false;
+
+        var carRb = _carInstance.GetComponent<Rigidbody>();
+        var oldInterpolation = carRb.interpolation;
+
+        carRb.interpolation = RigidbodyInterpolation.None;
+
+        bool oldKinematic = carRb.isKinematic;
+        carRb.isKinematic = false;
+
+        RespawnCar(_respawnCheckPoint);
+
+        Physics.SyncTransforms();
+        carRb.isKinematic = oldKinematic;
+        carRb.interpolation = oldInterpolation;
+        Camera.main.GetComponent<FollowCamera>().SyncCamera();
+
+        Time.timeScale = 0f;
+
+        float startTime = Time.unscaledTime;
+
+        while (Time.unscaledTime - startTime < delay)
+        {
+            _respawnTimer = delay - (Time.unscaledTime - startTime);
+            yield return new WaitForSecondsRealtime(0.5f);
+        }
+
+        _respawnTimer = 0f;
+
+        Time.timeScale = 1f;
     }
 
     private void ResetCheckPoints()
@@ -151,10 +209,12 @@ public class TrackManager : MonoBehaviour
         _carInstance.tag = "Player";
         Camera.main.GetComponent<FollowCamera>().target = _carInstance.transform;
 
+        Camera.main.GetComponent<FollowCamera>().SyncCamera();
+
         _trackStartTime = Time.time;
         _currentLap = 0;
         _currentCheckPointIndex = 0;
-        _lapStartTime = 0f;
+        _lapStartTime = Time.time;
         _lastLapTime = 0f;
         _lastCheckPointTime = 0f;
         _isRaceFinished = false;
@@ -166,7 +226,7 @@ public class TrackManager : MonoBehaviour
     {
         if (_isRaceFinished)
         {
-            Restart();
+            StartCoroutine(RestartCoroutine());
             return;
         }
         if (_currentCheckPointIndex == 0)
@@ -178,7 +238,7 @@ public class TrackManager : MonoBehaviour
             }
             else
             {
-                Restart();
+                StartCoroutine(RestartCoroutine());
             }
         }
         else

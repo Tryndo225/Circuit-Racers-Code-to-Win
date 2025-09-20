@@ -40,4 +40,24 @@ public class FollowCamera : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, Time.fixedDeltaTime * yawSmoothness);
         }
     }
+
+    public void SyncCamera()
+    {
+        if (target == null) return;
+
+        Vector3 desiredPosition = target.TransformPoint(offset);
+        transform.position = desiredPosition;
+
+        Vector3 flatForward = target.forward;
+        flatForward.y = 0;
+
+        if (flatForward.sqrMagnitude > 0.001f)
+        {
+            Quaternion yawRotation = Quaternion.LookRotation(flatForward);
+            Vector3 euler = yawRotation.eulerAngles;
+            euler.x = fixedPitchAngle;
+            Quaternion finalRotation = Quaternion.Euler(euler);
+            transform.rotation = finalRotation;
+        }
+    }
 }

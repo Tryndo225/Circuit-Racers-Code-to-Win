@@ -1221,8 +1221,8 @@ Camera:
   m_GameObject: {fileID: 1334371138}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -2079,8 +2079,8 @@ MonoBehaviour:
   - sceneName: 
     scenePath: 
     sceneAsset: {fileID: 0}
-  - sceneName: Test Track
-    scenePath: Assets/Scenes/Test Track.unity
+  - sceneName: Test Track - Day
+    scenePath: Assets/Scenes/Test Track - Day.unity
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
   - sceneName: Quit Game
     scenePath: Assets/Scenes/Quit Game.unity

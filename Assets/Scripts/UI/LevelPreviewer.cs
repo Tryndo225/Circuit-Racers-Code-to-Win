@@ -51,12 +51,9 @@ public class LevelPreviewer : MonoBehaviour
 
         //Debug.Log("Level generation task completed");
 
-        // Build Texture2D on main thread and show in UI
         var tex = BuildPreviewTexture(map);
         target.texture = tex;
-        target.rectTransform.sizeDelta = new Vector2(tex.width, tex.height); // match pixel size
-
-        //Debug.Log($"Level generated: {map.width}x{map.height}, start={map.startPoint}, finish={map.finishPoint}");
+        target.rectTransform.sizeDelta = new Vector2(tex.width, tex.height);
     }
 
     public Texture2D BuildPreviewTexture(LevelMap map)
