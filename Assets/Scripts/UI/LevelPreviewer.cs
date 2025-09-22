@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 public class LevelPreviewer : MonoBehaviour
 {
@@ -14,126 +15,121 @@ public class LevelPreviewer : MonoBehaviour
 
     [SerializeField] private Color32 grass = Color.green;
     [SerializeField] private Color32 road = Color.gray;
-    [SerializeField] private Color32 start = Color.lightBlue;
+    [SerializeField] private Color32 start = Color.lightGreen;
     [SerializeField] private Color32 finish = Color.red;
-    [SerializeField] private bool topLeftOrigin = true; // draw with (0,0) at top-left
-
-    private LevelGenerator generator;
+    [SerializeField] private Color32 checkPoint = Color.lightBlue;
 
     private void Start()
     {
-        generator = new LevelGenerator(20, 10, 1000);
-        _ = ShowGeneratedPreviewAsync();
+        //generator = new LevelGenerator(20, 10, 1000);
+        //_ = ShowGeneratedPreviewAsync();
     }
 
-    public void GenerateNewPreview()
+    public async Task ShowPreviewAsync(LevelMap map)
     {
-        _ = ShowGeneratedPreviewAsync();
-    }
-
-    public async Task ShowGeneratedPreviewAsync()
-    {
-        var map = await Task.Run(() =>
-        {
-            LevelMap map = null;
-            try
-            {
-                //Debug.Log("Starting level generation task");
-                map = generator.GenerateLevel(50, 50, true, SeedFactory.Next());
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Level generation failed: {ex}");
-                return null;
-            }
-            return map;
-        });
+        //var map = await Task.Run(() =>
+        //{
+        //    LevelMap map = null;
+        //    try
+        //    {
+        //        //Debug.Log("Starting level generation task");
+        //        map = generator.GenerateLevel(50, 50, true, SeedFactory.Next());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.LogError($"Level generation failed: {ex}");
+        //        return null;
+        //    }
+        //    return map;
+        //});
 
         //Debug.Log("Level generation task completed");
 
-        var tex = BuildPreviewTexture(map);
+        var tex = await Task.Run(() =>
+        {
+            return BuildPreviewTexture(map);
+        });
+
         target.texture = tex;
         target.rectTransform.sizeDelta = new Vector2(tex.width, tex.height);
     }
 
-    public Texture2D BuildPreviewTexture(LevelMap map)
+    private Texture2D BuildPreviewTexture(LevelMap map)
     {
-        int texW = map.width * pixelsPerCell;
-        int texH = map.height * pixelsPerCell;
+        int texWidth = map.Width * pixelsPerCell;
+        int texHeight = map.Height * pixelsPerCell;
 
-        var tex = new Texture2D(texW, texH, TextureFormat.RGBA32, false);
+        var tex = new Texture2D(texWidth, texHeight, TextureFormat.RGBA32, false);
         tex.filterMode = FilterMode.Point;
         tex.wrapMode = TextureWrapMode.Clamp;
 
-        var buffer = new Color32[texW * texH];
+        var buffer = new Color32[texWidth * texHeight];
 
-        //Debug.Log("Filling texture buffer");
-
-        // Fill grass first
+        // Fill grass
         for (int i = 0; i < buffer.Length; i++)
         {
             buffer[i] = grass;
         }
 
-        //Debug.Log("Painting road cells");
         // Paint road cells (value==1)
-        for (int y = 0; y < map.height; y++)
+        for (int y = 0; y < map.Height; y++)
         {
-            for (int x = 0; x < map.width; x++)
+            for (int x = 0; x < map.Width; x++)
             {
-                if (map.tiles[x, y] == 1)
+                if (map.Tiles[x, y] == 1 || map.Tiles[x, y] == -2)
                 {
-                    FillCell(buffer, texW, texH, x, y, pixelsPerCell, road, topLeftOrigin);
+                    FillCell(buffer, texWidth, texHeight, x, y, pixelsPerCell, road);
+                }
+
+                if (map.Tiles[x, y] == -2)
+                {
+                    DrawMarker(buffer, texWidth, texHeight, new Coordinates(x, y), pixelsPerCell, checkPoint);
                 }
             }
         }
 
-        //Debug.Log("Overlaying start/finish markers");
-
         // Overlay start/finish markers
-        DrawMarker(buffer, texW, texH, map.startPoint, pixelsPerCell, start, topLeftOrigin);
-        DrawMarker(buffer, texW, texH, map.finishPoint, pixelsPerCell, finish, topLeftOrigin);
+        DrawMarker(buffer, texWidth, texHeight, map.StartPoint, pixelsPerCell, start);
+        DrawMarker(buffer, texWidth, texHeight, map.FinishPoint, pixelsPerCell, finish);
 
         tex.SetPixels32(buffer);
         tex.Apply(false, false);
         return tex;
     }
 
-    private static void FillCell(Color32[] buf, int texW, int texH,
-                                 int cellX, int cellY, int ppc, Color32 color, bool topLeft)
+    private static void FillCell(Color32[] buffer, int texWidth, int texHeight, int cellX, int cellY, int pixelsPerCell, Color32 color)
     {
-        int pxX = cellX * ppc;
-        int pxY = cellY * ppc;
-        if (topLeft) pxY = texH - ppc - pxY;
+        int pxX = cellX * pixelsPerCell;
+        int pxY = cellY * pixelsPerCell;
+        pxY = texHeight - pixelsPerCell - pxY;
 
-        for (int dy = 0; dy < ppc; dy++)
+        for (int dy = 0; dy < pixelsPerCell; dy++)
         {
-            int row = (pxY + dy) * texW;
+            int row = (pxY + dy) * texWidth;
             int idx = row + pxX;
-            for (int dx = 0; dx < ppc; dx++)
+            for (int dx = 0; dx < pixelsPerCell; dx++)
             {
-                buf[idx + dx] = color;
+                buffer[idx + dx] = color;
             }
         }
     }
 
-    private static void DrawMarker(Color32[] buf, int texW, int texH,
-                                   Coordinates c, int ppc, Color32 color, bool topLeft)
+    private static void DrawMarker(Color32[] buffer, int texWidth, int texHeight, Coordinates cell, int pixelsPerCell, Color32 color)
     {
-        if (c.x < 0 || c.y < 0) return;
-        // Slightly thicker marker (a 2*2 block of cells if ppc>=2, else single cell)
-        int size = Math.Max(1, ppc / 2);
-        int pxX = c.x * ppc + (ppc - size) / 2;
-        int pxY = c.y * ppc + (ppc - size) / 2;
-        if (topLeft) pxY = texH - size - pxY;
+        if (cell.X < 0 || cell.Y < 0) return;
+
+        int size = Math.Max(1, pixelsPerCell / 2);
+        int pxX = cell.X * pixelsPerCell + (pixelsPerCell - size) / 2;
+        int pxY = cell.Y * pixelsPerCell + (pixelsPerCell - size) / 2;
+        pxY = texHeight - size - pxY;
 
         for (int dy = 0; dy < size; dy++)
         {
-            int row = (pxY + dy) * texW;
+            int row = (pxY + dy) * texWidth;
             int idx = row + pxX;
             for (int dx = 0; dx < size; dx++)
             {
-                buf[idx + dx] = color;
+                buffer[idx + dx] = color;
             }
         }
     }

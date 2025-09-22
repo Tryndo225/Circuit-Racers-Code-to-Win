@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 internal static class SeedFactory
 {
@@ -9,36 +10,80 @@ internal static class SeedFactory
     public static int Next() => Interlocked.Add(ref _seed, unchecked((int)0x9E3779B9));
 }
 
-public class LevelMap
+[Serializable]
+public class LevelMap : ISerializable
 {
-    public string name;
-    public int width;
-    public int height;
-    public bool circular;
-    public Coordinates startPoint;
-    public Coordinates finishPoint;
-    public int[,] tiles; // -1 = spacer, 0 = grass, 1 = road
+    public string Name;
+    public int Width;
+    public int Height;
+    public bool Circular;
+    public Coordinates StartPoint;
+    public Coordinates FinishPoint;
+    public int[,] Tiles; // -2 = checkpoint, -1 = spacer, 0 = grass, 1 = road, 2 and up = placeholder during generation
+
+    public LevelMap()
+    {
+        Name = "Unnamed";
+        Width = 0;
+        Height = 0;
+        Circular = false;
+        StartPoint = new Coordinates(0, 0);
+        FinishPoint = new Coordinates(0, 0);
+        Tiles = new int[0, 0];
+    }
+
+    public LevelMap(SerializationInfo info, StreamingContext context)
+    {
+        Name = info.GetString("name");
+        Width = info.GetInt32("width");
+        Height = info.GetInt32("height");
+        Circular = info.GetBoolean("circular");
+        StartPoint = (Coordinates)info.GetValue("startPoint", typeof(Coordinates));
+        FinishPoint = (Coordinates)info.GetValue("finishPoint", typeof(Coordinates));
+        Tiles = (int[,])info.GetValue("tiles", typeof(int[,]));
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("name", Name);
+        info.AddValue("width", Width);
+        info.AddValue("height", Height);
+        info.AddValue("circular", Circular);
+        info.AddValue("startPoint", StartPoint);
+        info.AddValue("finishPoint", FinishPoint);
+        info.AddValue("tiles", Tiles);
+    }
 }
 
-public struct Coordinates : IEquatable<Coordinates>
+[Serializable]
+public struct Coordinates : IEquatable<Coordinates>, ISerializable
 {
-    public int x;
-    public int y;
+    public int X;
+    public int Y;
 
     public Coordinates(int x, int y)
     {
-        this.x = x;
-        this.y = y;
+        this.X = x;
+        this.Y = y;
     }
 
+    public Coordinates(SerializationInfo info, StreamingContext context)
+    {
+        X = info.GetInt32("x");
+        Y = info.GetInt32("y");
+    }
+
+    public static Coordinates operator +(Coordinates a, Coordinates b)
+    { return new Coordinates(a.X + b.X, a.Y + b.Y); }
+
     public bool Equals(Coordinates o)
-    { return x == o.x && y == o.y; }
+    { return X == o.X && Y == o.Y; }
 
     public override bool Equals(object obj)
     { return obj is Coordinates o && Equals(o); }
 
     public override int GetHashCode()
-    { return HashCode.Combine(x, y); }
+    { return HashCode.Combine(X, Y); }
 
     public static bool operator ==(Coordinates a, Coordinates b)
     { return a.Equals(b); }
@@ -47,7 +92,13 @@ public struct Coordinates : IEquatable<Coordinates>
     { return !a.Equals(b); }
 
     public override string ToString()
-    { return $"({x}, {y})"; }
+    { return $"({X}, {Y})"; }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("x", X);
+        info.AddValue("y", Y);
+    }
 }
 
 public class LevelGenerator
@@ -81,23 +132,28 @@ public class LevelGenerator
         //UnityEngine.Debug.Log("Generating Level");
 
         LevelMap levelMap = new LevelMap();
-        levelMap.startPoint = new Coordinates(width / 2, height / 2);
-        levelMap.width = width;
-        levelMap.height = height;
-        levelMap.circular = isCircuit;
-        levelMap.tiles = new int[width, height];
+        levelMap.StartPoint = new Coordinates(width / 2, height / 2);
+        levelMap.Width = width;
+        levelMap.Height = height;
+        levelMap.Circular = isCircuit;
+        levelMap.Tiles = new int[width, height];
 
         for (int x = 0; x < width; ++x)
         {
             for (int y = 0; y < height; ++y)
             {
-                levelMap.tiles[x, y] = 0; // Initialize all tiles as empty
+                levelMap.Tiles[x, y] = 0; // Initialize all tiles as empty
             }
         }
 
-        levelMap.tiles.At(levelMap.startPoint) = 1; // Set start point as track
+        levelMap.Tiles.At(levelMap.StartPoint) = 1; // Set start point as track
+        var lastValidPoint = levelMap.StartPoint;
 
-        var lastValidPoint = levelMap.startPoint;
+        if (isCircuit)
+        {
+            lastValidPoint = CircuitStarter(levelMap, rng);
+        }
+
         Coordinates possiblePoint;
 
         for (int i = 0; i < _steps; ++i)
@@ -122,7 +178,7 @@ public class LevelGenerator
         }
         else
         {
-            levelMap.finishPoint = lastValidPoint;
+            levelMap.FinishPoint = lastValidPoint;
             //UnityEngine.Debug.Log($"Level finished at {levelMap.finishPoint}");
         }
 
@@ -142,16 +198,16 @@ public class LevelGenerator
         }
 
         List<Coordinates> modifiedPositions = new List<Coordinates>();
-        if (FloodingAlgorithm(currentPoint, target, levelMap.tiles, modifiedPositions))
+        if (FloodingAlgorithm(currentPoint, target, levelMap.Tiles, modifiedPositions))
         {
-            BackTrack(target, levelMap.tiles);
-            RemovePlaceholders(levelMap.tiles, modifiedPositions);
+            BackTrack(target, levelMap.Tiles);
+            RemovePlaceholders(levelMap.Tiles, modifiedPositions);
             //UnityEngine.Debug.Log($"Step succeeded to {target}");
             return target;
         }
         else
         {
-            RemovePlaceholders(levelMap.tiles, modifiedPositions);
+            RemovePlaceholders(levelMap.Tiles, modifiedPositions);
             //UnityEngine.Debug.Log("Flooding failed to reach target");
             return new Coordinates(-1, -1);
         }
@@ -168,10 +224,10 @@ public class LevelGenerator
 
         while (count < _maxAttempts)
         {
-            int newX = lastPoint.x + rng.Next(-_stepLength, _stepLength + 1);
-            int newY = lastPoint.y + rng.Next(-_stepLength, _stepLength + 1);
+            int newX = lastPoint.X + rng.Next(-_stepLength, _stepLength + 1);
+            int newY = lastPoint.Y + rng.Next(-_stepLength, _stepLength + 1);
 
-            if (!levelMap.tiles.InBounds(newX, newY))
+            if (!levelMap.Tiles.InBounds(newX, newY))
             {
                 continue;
             }
@@ -190,7 +246,7 @@ public class LevelGenerator
 
     private bool TargetCheck(Coordinates current, Coordinates target, LevelMap levelMap)
     {
-        if (levelMap.tiles.At(target) == 1)
+        if (levelMap.Tiles.At(target) == 1)
         {
             return false;
         }
@@ -199,43 +255,70 @@ public class LevelGenerator
         {
             for (int y = -1; y <= 1; ++y)
             {
-                int checkX = target.x + x;
-                int checkY = target.y + y;
-                if (!levelMap.tiles.InBounds(checkX, checkY))
+                int checkX = target.X + x;
+                int checkY = target.Y + y;
+                if (!levelMap.Tiles.InBounds(checkX, checkY))
                 {
                     continue;
                 }
-                else if (levelMap.tiles[checkX, checkY] == 1)
+                else if (levelMap.Tiles[checkX, checkY] == 1)
                 {
                     return false;
                 }
             }
         }
 
-        if (levelMap.circular)
+        int[,] tilesCopy = levelMap.Tiles.Copy();
+        List<Coordinates> modifiedPositions = new List<Coordinates>();
+        bool check = FloodingAlgorithm(current, target, tilesCopy, modifiedPositions);
+        BackTrack(target, tilesCopy);
+        RemovePlaceholders(tilesCopy, modifiedPositions);
+
+        if (levelMap.Circular)
         {
-            int[,] tilesCopy = levelMap.tiles.Copy();
-            List<Coordinates> modifiedPositions = new List<Coordinates>();
-            FloodingAlgorithm(current, target, tilesCopy, modifiedPositions);
-            BackTrack(target, tilesCopy);
-            RemovePlaceholders(tilesCopy, modifiedPositions);
-            return FloodingAlgorithm(target, levelMap.startPoint, tilesCopy);
+            return FloodingAlgorithm(target, levelMap.FinishPoint, tilesCopy) && check;
         }
-        return true;
+
+        return check;
     }
 
     #endregion Target Selection
+
+    #region Circuit Starting
+
+    private static Coordinates CircuitStarter(LevelMap levelMap, Random rng)
+    {
+        var lastValidPoint = levelMap.StartPoint;
+        if (rng.Next(0, 2) % 2 == 0)
+        {
+            levelMap.FinishPoint = new(lastValidPoint.X - 1, lastValidPoint.Y);
+            lastValidPoint.X += 1;
+        }
+        else
+        {
+            levelMap.FinishPoint = new(lastValidPoint.X, lastValidPoint.Y - 1);
+            lastValidPoint.Y += 1;
+        }
+
+        levelMap.Tiles.At(levelMap.FinishPoint) = 1; // Set finish point as track
+        levelMap.Tiles.At(lastValidPoint) = 1; // Mark start/finish as checkpoint
+
+        RoadSpacer(levelMap.StartPoint, levelMap.Tiles);
+        return lastValidPoint;
+    }
+
+    #endregion Circuit Starting
 
     #region Circuit Finishing
 
     private static void CircuitFinisher(LevelMap levelMap, Coordinates lastPoint)
     {
         List<Coordinates> modifiedPositions = new List<Coordinates>();
-        if (FloodingAlgorithm(lastPoint, levelMap.startPoint, levelMap.tiles, modifiedPositions))
+        if (FloodingAlgorithm(lastPoint, levelMap.FinishPoint, levelMap.Tiles, modifiedPositions))
         {
-            BackTrack(levelMap.startPoint, levelMap.tiles);
-            RemovePlaceholders(levelMap.tiles, modifiedPositions);
-            levelMap.finishPoint = levelMap.startPoint;
+            BackTrack(levelMap.StartPoint, levelMap.Tiles);
+            RemovePlaceholders(levelMap.Tiles, modifiedPositions);
+            levelMap.FinishPoint = levelMap.StartPoint;
             //UnityEngine.Debug.Log($"Circuit finished at {levelMap.finishPoint}");
         }
         else
@@ -281,11 +364,11 @@ public class LevelGenerator
 
             foreach (var offset in offsets)
             {
-                int newX = step.position.x + offset.x;
-                int newY = step.position.y + offset.y;
+                int newX = step.position.X + offset.X;
+                int newY = step.position.Y + offset.Y;
                 if (tiles.InBounds(newX, newY))
                 {
-                    if (newX == target.x && newY == target.y)
+                    if (newX == target.X && newY == target.Y)
                     {
                         //UnityEngine.Debug.Log($"Flooding reached target at {target}");
                         tiles.At(target) = step.turn + 1;
@@ -319,8 +402,8 @@ public class LevelGenerator
         {
             foreach (var offset in offsets)
             {
-                int newX = backtrackPoint.x + offset.x;
-                int newY = backtrackPoint.y + offset.y;
+                int newX = backtrackPoint.X + offset.X;
+                int newY = backtrackPoint.Y + offset.Y;
                 if (tiles.InBounds(newX, newY))
                 {
                     if (tiles[newX, newY] == step)
@@ -359,8 +442,8 @@ public class LevelGenerator
         var count = 0;
         foreach (var offset in offsets)
         {
-            int newX = tile.x + offset.x;
-            int newY = tile.y + offset.y;
+            int newX = tile.X + offset.X;
+            int newY = tile.Y + offset.Y;
             if (tiles.InBounds(newX, newY) && tiles[newX, newY] == 1)
             {
                 count++;
@@ -374,8 +457,8 @@ public class LevelGenerator
         {
             foreach (var offset in offsets)
             {
-                int newX = tile.x + offset.x;
-                int newY = tile.y + offset.y;
+                int newX = tile.X + offset.X;
+                int newY = tile.Y + offset.Y;
                 if (tiles.InBounds(newX, newY) && (tiles[newX, newY] > 1 || tiles[newX, newY] == 0))
                 {
                     tiles[newX, newY] = -1;
@@ -392,7 +475,7 @@ public static class Array2DExtensions
 {
     public static ref int At(this int[,] array, Coordinates coords)
     {
-        return ref array[coords.x, coords.y];
+        return ref array[coords.X, coords.Y];
     }
 
     public static string Print(this int[,] array)

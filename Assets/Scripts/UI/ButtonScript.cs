@@ -1,32 +1,67 @@
 using UnityEngine;
+using System;
 
 public class ButtonScript : MonoBehaviour
 {
-    [SerializeField] private ActionType actionType;
-    [SerializeField] private SceneAssetHelper sceneToLoad;
+    [SerializeReference] private ButtonType properties;
 
-    private enum ActionType
+    public ButtonType Properties
     {
-        ChangeScene
+        get => properties;
+        set => properties = value;
     }
 
     public void OnButtonClick()
     {
-        switch (actionType)
+        if (properties == null)
         {
-            case ActionType.ChangeScene:
-                Debug.Log($"Changing scene to: {sceneToLoad.Name}");
-                SceneChange(sceneToLoad);
-                break;
-
-            default:
-                Debug.LogWarning("No action assigned to button.");
-                break;
+            Debug.LogWarning("Button properties are not set.");
+            return;
         }
+        properties.Action();
     }
+}
 
-    public void SceneChange(SceneAssetHelper scene)
+[Serializable]
+public abstract class ButtonType
+{
+    public abstract void Action();
+}
+
+[Serializable]
+public class ChangeSceneButton : ButtonType
+{
+    public ChangeSceneButton()
+    { }
+
+    [SerializeField] private SceneAssetHelper _sceneToLoad;
+
+    public override void Action()
     {
-        SceneManagement.Instance.ChangeScene(scene);
+        if (_sceneToLoad == null)
+        {
+            Debug.LogError("Scene to load is not assigned.");
+            return;
+        }
+        SceneManagement.Instance.ChangeScene(_sceneToLoad);
+    }
+}
+
+[Serializable]
+public class SelectLevelButton : ButtonType
+{
+    public SelectLevelButton()
+    { }
+
+    [SerializeField] private LevelMap _levelMap;
+
+    public override void Action()
+    {
+        if (_levelMap == null)
+        {
+            Debug.LogError("Level map is not assigned.");
+            return;
+        }
+        GameDataManager.Instance.SelectingLevelMap(_levelMap);
     }
 }
