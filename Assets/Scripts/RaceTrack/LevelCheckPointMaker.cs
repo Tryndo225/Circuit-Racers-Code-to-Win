@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 
-public class LevelCheckPointMaker
+public static class LevelCheckPointMaker
 {
     private static readonly Coordinates[] offsets = new Coordinates[]
     {

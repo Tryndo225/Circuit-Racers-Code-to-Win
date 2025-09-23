@@ -21,37 +21,21 @@ public class LevelPreviewer : MonoBehaviour
 
     private void Start()
     {
-        //generator = new LevelGenerator(20, 10, 1000);
-        //_ = ShowGeneratedPreviewAsync();
+    }
+
+    public void Clear()
+    {
+        target.texture = null;
     }
 
     public async Task ShowPreviewAsync(LevelMap map)
     {
-        //var map = await Task.Run(() =>
-        //{
-        //    LevelMap map = null;
-        //    try
-        //    {
-        //        //Debug.Log("Starting level generation task");
-        //        map = generator.GenerateLevel(50, 50, true, SeedFactory.Next());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.LogError($"Level generation failed: {ex}");
-        //        return null;
-        //    }
-        //    return map;
-        //});
-
-        //Debug.Log("Level generation task completed");
-
         var tex = await Task.Run(() =>
         {
             return BuildPreviewTexture(map);
         });
 
         target.texture = tex;
-        target.rectTransform.sizeDelta = new Vector2(tex.width, tex.height);
     }
 
     private Texture2D BuildPreviewTexture(LevelMap map)

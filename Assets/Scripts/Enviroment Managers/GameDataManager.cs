@@ -1,16 +1,18 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Runtime.Serialization;
-using Generic;
-using Unity.VisualScripting;
+using IEnumerableExtention;
 
 [Serializable]
 public struct LevelData : ISerializable
 {
     public LevelMap LevelMap;
     public float Time;
+
+    public LevelData(LevelMap levelMap) : this(levelMap, float.MaxValue)
+    {
+    }
 
     public LevelData(LevelMap levelMap, float time)
     {
@@ -28,6 +30,16 @@ public struct LevelData : ISerializable
     {
         info.AddValue("LevelMap", LevelMap, typeof(LevelMap));
         info.AddValue("Time", Time);
+    }
+
+    public static bool operator ==(LevelData a, LevelData b)
+    {
+        return a.LevelMap == b.LevelMap && a.Time == b.Time;
+    }
+
+    public static bool operator !=(LevelData a, LevelData b)
+    {
+        return !(a == b);
     }
 }
 
@@ -66,10 +78,23 @@ public class GameData : ISerializable
             Levels.Add(new LevelData(map, time));
         }
     }
+
+    public bool ContainsLevel(LevelMap map)
+    {
+        return Levels.Exists(ld => ld.LevelMap == map);
+    }
 }
 
 public class GameDataManager : Generic.Singleton<GameDataManager>
 {
+    public GameData CurrentGameData { get; private set; } = new GameData();
+    public LevelMap CurrentLevelMap { get; private set; } = null;
+    public int Hash { get; private set; }
+
+    public LevelGenerator Generator { get; private set; } = new LevelGenerator(20, 10, 1000);
+
+    private List<Action> onGameDataChanged = new List<Action>();
+
     private void Start()
     {
         if (PlayerPrefs.HasKey("GameData"))
@@ -83,8 +108,15 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
         SaveGameData();
     }
 
-    public GameData CurrentGameData { get; private set; } = new GameData();
-    public LevelMap CurrentLevelMap { get; private set; } = null;
+    public void AddListener(Action action)
+    {
+        onGameDataChanged.Add(action);
+    }
+
+    public void RemoveListener(Action action)
+    {
+        onGameDataChanged.Remove(action);
+    }
 
     private void SaveGameData()
     {
@@ -107,6 +139,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
         {
             string json = PlayerPrefs.GetString("GameData");
             CurrentGameData = JsonUtility.FromJson<GameData>(json);
+            Hash = CurrentGameData.Levels.GetContentHash();
             Debug.Log("Game data loaded.");
         }
         catch (Exception e)
@@ -118,14 +151,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 
     public void SelectingLevelMap(LevelMap map)
     {
-        bool validMap = false;
-        for (int i = 0; i < CurrentGameData.Levels.Count; i++)
-        {
-            if (CurrentGameData.Levels[i].LevelMap == map)
-            {
-                validMap = true;
-            }
-        }
+        bool validMap = CurrentGameData.ContainsLevel(map);
         if (!validMap)
         {
             Debug.LogError("Selected level map is not in game data.");
@@ -144,5 +170,51 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
         }
         CurrentGameData.UpdateLevelTime(CurrentLevelMap, time);
         SaveGameData();
+    }
+
+    public void AddLevel(LevelMap map)
+    {
+        if (map == null)
+        {
+            Debug.LogError("No level map provided.");
+            return;
+        }
+        if (!CurrentGameData.ContainsLevel(map))
+        {
+            CurrentGameData.Levels.Add(new LevelData(map));
+            var newHash = CurrentGameData.Levels.GetContentHash();
+            PotentialHashChange(newHash);
+        }
+        else
+        {
+            Debug.LogWarning("Level map already exists in game data.");
+        }
+    }
+
+    public void RemoveLevel(LevelMap levelMap)
+    {
+        int index = CurrentGameData.Levels.FindIndex(ld => ld.LevelMap == levelMap);
+        if (index >= 0)
+        {
+            CurrentGameData.Levels.RemoveAt(index);
+            var newHash = CurrentGameData.Levels.GetContentHash();
+            PotentialHashChange(newHash);
+        }
+        else
+        {
+            Debug.LogWarning("Level map not found in game data.");
+        }
+    }
+
+    private void PotentialHashChange(int hash)
+    {
+        if (hash != Hash)
+        {
+            Hash = hash;
+            foreach (var action in onGameDataChanged)
+            {
+                action.Invoke();
+            }
+        }
     }
 }

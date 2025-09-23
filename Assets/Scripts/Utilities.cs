@@ -1,7 +1,5 @@
 using UnityEngine;
 using System;
-using System.Runtime.Serialization;
-using Unity.VisualScripting;
 
 [Serializable]
 public abstract class SerializableRunnable : ISerializationCallbackReceiver
@@ -19,6 +17,33 @@ public static class LayerMaskUtils
 {
     public static bool Contains(this LayerMask mask, int layer)
         => (mask.value & (1 << layer)) != 0;
+}
+
+namespace IEnumerableExtention
+{
+    using System.Collections.Generic;
+
+#nullable enable
+
+    public static class IEnumerableExtensions
+    {
+        public static int GetContentHash<T>(this IEnumerable<T> source, IEqualityComparer<T>? comparer = null)
+        {
+            if (source is null)
+                return 0;
+
+            comparer ??= EqualityComparer<T>.Default;
+
+            var hc = new HashCode();
+
+            foreach (var item in source)
+                hc.Add(item, comparer);
+
+            return hc.ToHashCode();
+        }
+    }
+
+#nullable disable
 }
 
 namespace Generic

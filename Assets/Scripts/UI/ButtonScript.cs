@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Threading.Tasks;
 
 public class ButtonScript : MonoBehaviour
 {
@@ -53,7 +54,12 @@ public class SelectLevelButton : ButtonType
     public SelectLevelButton()
     { }
 
-    [SerializeField] private LevelMap _levelMap;
+    public SelectLevelButton(LevelMap levelMap)
+    {
+        _levelMap = levelMap;
+    }
+
+    [SerializeField, ReadOnly] private LevelMap _levelMap;
 
     public override void Action()
     {
@@ -63,5 +69,53 @@ public class SelectLevelButton : ButtonType
             return;
         }
         GameDataManager.Instance.SelectingLevelMap(_levelMap);
+    }
+}
+
+[Serializable]
+public class RemoveLevelButton : ButtonType
+{
+    public RemoveLevelButton()
+    { }
+
+    [SerializeField, ReadOnly] private LevelMap _levelMap;
+
+    public override void Action()
+    {
+        if (_levelMap == null)
+        {
+            Debug.LogError("Level map is not assigned.");
+            return;
+        }
+        GameDataManager.Instance.RemoveLevel(_levelMap);
+    }
+}
+
+[Serializable]
+public class GenerateLevelButton : ButtonType
+{
+    [SerializeField] private GameObject PopUp;
+
+    public GenerateLevelButton()
+    { }
+
+    public override async void Action()  // ok for top-level UI handlers
+    {
+        try
+        {
+            var map = await Task.Run(() =>
+            {
+                return GameDataManager.Instance.Generator.GenerateLevel(50, 50, true, SeedFactory.Next());
+            });
+
+            if (map != null)
+            {
+                PopUp.GetComponent<LevelPopUp>().ShowMap(map);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Level generation failed: {ex}");
+        }
     }
 }
