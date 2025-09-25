@@ -3,7 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-internal static class SeedFactory
+public static class SeedFactory
 {
     private static int _seed = Environment.TickCount;
 
@@ -11,7 +11,7 @@ internal static class SeedFactory
 }
 
 [Serializable]
-public class LevelMap : ISerializable
+public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceiver
 {
     public string Name;
     public int Width;
@@ -19,7 +19,8 @@ public class LevelMap : ISerializable
     public bool Circular;
     public Coordinates StartPoint;
     public Coordinates FinishPoint;
-    public int[,] Tiles; // -2 = checkpoint, -1 = spacer, 0 = grass, 1 = road, 2 and up = placeholder during generation
+    [NonSerialized] public int[,] Tiles; // -2 = checkpoint, -1 = spacer, 0 = grass, 1 = road, 2 and up = placeholder during generation
+    [UnityEngine.SerializeField] private int[] tilesFlat;
 
     public LevelMap()
     {
@@ -40,7 +41,8 @@ public class LevelMap : ISerializable
         Circular = info.GetBoolean("circular");
         StartPoint = (Coordinates)info.GetValue("startPoint", typeof(Coordinates));
         FinishPoint = (Coordinates)info.GetValue("finishPoint", typeof(Coordinates));
-        Tiles = (int[,])info.GetValue("tiles", typeof(int[,]));
+        tilesFlat = (int[])info.GetValue("tilesFlat", typeof(int[]));
+        UnflattenTiles();
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -51,7 +53,36 @@ public class LevelMap : ISerializable
         info.AddValue("circular", Circular);
         info.AddValue("startPoint", StartPoint);
         info.AddValue("finishPoint", FinishPoint);
-        info.AddValue("tiles", Tiles);
+        FlattenTiles();
+        info.AddValue("tilesFlat", tilesFlat);
+    }
+
+    private void FlattenTiles()
+    {
+        if (Tiles == null) return;
+        tilesFlat = new int[Width * Height];
+        for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                tilesFlat[y * Width + x] = Tiles[x, y];
+    }
+
+    private void UnflattenTiles()
+    {
+        if (Width <= 0 || Height <= 0 || tilesFlat == null) return;
+        Tiles = new int[Width, Height];
+        for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                Tiles[x, y] = tilesFlat[y * Width + x];
+    }
+
+    public void OnBeforeSerialize()
+    {
+        FlattenTiles();
+    }
+
+    public void OnAfterDeserialize()
+    {
+        UnflattenTiles();
     }
 }
 
@@ -75,6 +106,15 @@ public struct Coordinates : IEquatable<Coordinates>, ISerializable
 
     public static Coordinates operator +(Coordinates a, Coordinates b)
     { return new Coordinates(a.X + b.X, a.Y + b.Y); }
+
+    public static Coordinates operator -(Coordinates a, Coordinates b)
+    { return new Coordinates(a.X - b.X, a.Y - b.Y); }
+
+    public static Coordinates operator *(Coordinates a, int b)
+    { return new Coordinates(a.X * b, a.Y * b); }
+
+    public static Coordinates operator *(int a, Coordinates b)
+    { return new Coordinates(a * b.X, a * b.Y); }
 
     public bool Equals(Coordinates o)
     { return X == o.X && Y == o.Y; }
@@ -313,13 +353,16 @@ public class LevelGenerator
 
     private static void CircuitFinisher(LevelMap levelMap, Coordinates lastPoint)
     {
+        UnityEngine.Debug.Log("Finishing Circuit");
+        UnityEngine.Debug.Log($"Current map {levelMap.Tiles.Print()}");
         List<Coordinates> modifiedPositions = new List<Coordinates>();
         if (FloodingAlgorithm(lastPoint, levelMap.FinishPoint, levelMap.Tiles, modifiedPositions))
         {
-            BackTrack(levelMap.StartPoint, levelMap.Tiles);
+            BackTrack(levelMap.FinishPoint, levelMap.Tiles);
             RemovePlaceholders(levelMap.Tiles, modifiedPositions);
             levelMap.FinishPoint = levelMap.StartPoint;
-            //UnityEngine.Debug.Log($"Circuit finished at {levelMap.finishPoint}");
+            UnityEngine.Debug.Log($"Circuit finished at {levelMap.FinishPoint}");
+            UnityEngine.Debug.Log($"Final map {levelMap.Tiles.Print()}");
         }
         else
         {
@@ -473,7 +516,7 @@ public class LevelGenerator
 
 public static class Array2DExtensions
 {
-    public static ref int At(this int[,] array, Coordinates coords)
+    public static ref T At<T>(this T[,] array, Coordinates coords)
     {
         return ref array[coords.X, coords.Y];
     }
@@ -492,27 +535,27 @@ public static class Array2DExtensions
         return s;
     }
 
-    public static bool InBounds(this int[,] array, int x, int y)
+    public static bool InBounds<T>(this T[,] array, int x, int y)
     {
         return x >= 0 && x < array.GetLength(0) &&
                y >= 0 && y < array.GetLength(1);
     }
 
-    public static int[,] Copy(this int[,] array)
+    public static T[,] Copy<T>(this T[,] array)
     {
-        int[,] newArray = new int[array.GetLength(0), array.GetLength(1)];
+        T[,] newArray = new T[array.GetLength(0), array.GetLength(1)];
         Array.Copy(array, newArray, array.Length);
         return newArray;
     }
 
-    public static int Max(this int[,] array)
+    public static T Max<T>(this T[,] array) where T : IComparable<T>
     {
-        int max = int.MinValue;
+        T max = array[0, 0];
         for (int x = 0; x < array.GetLength(0); ++x)
         {
             for (int y = 0; y < array.GetLength(1); ++y)
             {
-                if (array[x, y] > max)
+                if (array[x, y].CompareTo(max) > 0)
                 {
                     max = array[x, y];
                 }

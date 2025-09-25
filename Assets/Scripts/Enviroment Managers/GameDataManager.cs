@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using IEnumerableExtention;
 
 [Serializable]
-public struct LevelData : ISerializable
+public class LevelData : ISerializable
 {
     public LevelMap LevelMap;
     public float Time;
@@ -34,12 +34,26 @@ public struct LevelData : ISerializable
 
     public static bool operator ==(LevelData a, LevelData b)
     {
-        return a.LevelMap == b.LevelMap && a.Time == b.Time;
+        return a.LevelMap == b.LevelMap;
     }
 
     public static bool operator !=(LevelData a, LevelData b)
     {
         return !(a == b);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is LevelData other)
+        {
+            return this == other;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(LevelMap, Time);
     }
 }
 
@@ -122,10 +136,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
     {
         try
         {
+            Debug.Log("Game data saved.");
             string json = JsonUtility.ToJson(CurrentGameData);
             PlayerPrefs.SetString("GameData", json);
             PlayerPrefs.Save();
-            Debug.Log("Game data saved.");
+            Debug.Log($"Saved {CurrentGameData.Levels.Count} levels.");
         }
         catch (Exception e)
         {
@@ -141,6 +156,18 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
             CurrentGameData = JsonUtility.FromJson<GameData>(json);
             Hash = CurrentGameData.Levels.GetContentHash();
             Debug.Log("Game data loaded.");
+            Debug.Log($"Loaded {CurrentGameData.Levels.Count} levels.");
+            for (int i = 0; i < CurrentGameData.Levels.Count; i++)
+            {
+                if (CurrentGameData.Levels[i].LevelMap == null)
+                {
+                    Debug.LogWarning($"Level map at index {i} is null.");
+                }
+                else
+                {
+                    Debug.Log($"Level {i}: {CurrentGameData.Levels[i].LevelMap.Tiles.Print()}, Time: {CurrentGameData.Levels[i].Time}");
+                }
+            }
         }
         catch (Exception e)
         {
@@ -149,12 +176,24 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
         }
     }
 
+    public void GoToSelectedLevel()
+    {
+        if (CurrentLevelMap == null)
+        {
+            Debug.LogError("No level map selected.");
+            return;
+        }
+        SceneManagement.Instance.ChangeScene("Level");
+    }
+
     public void SelectingLevelMap(LevelMap map)
     {
+        Debug.Log("Selecting level map.");
         bool validMap = CurrentGameData.ContainsLevel(map);
+
         if (!validMap)
         {
-            Debug.LogError("Selected level map is not in game data.");
+            Debug.LogWarning("Selected level map is not in game data.");
             return;
         }
 
@@ -181,6 +220,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
         }
         if (!CurrentGameData.ContainsLevel(map))
         {
+            Debug.Log("Adding new level map to game data.");
             CurrentGameData.Levels.Add(new LevelData(map));
             var newHash = CurrentGameData.Levels.GetContentHash();
             PotentialHashChange(newHash);
@@ -193,24 +233,39 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 
     public void RemoveLevel(LevelMap levelMap)
     {
-        int index = CurrentGameData.Levels.FindIndex(ld => ld.LevelMap == levelMap);
-        if (index >= 0)
+        if (levelMap == null)
         {
-            CurrentGameData.Levels.RemoveAt(index);
-            var newHash = CurrentGameData.Levels.GetContentHash();
-            PotentialHashChange(newHash);
+            Debug.LogError("No level map provided.");
+            return;
         }
-        else
+        for (int i = 0; i < CurrentGameData.Levels.Count; i++)
         {
-            Debug.LogWarning("Level map not found in game data.");
+            if (CurrentGameData.Levels[i].LevelMap == levelMap)
+            {
+                Debug.Log("Removing level map from game data.");
+                CurrentGameData.Levels.RemoveAt(i);
+                var newHash = CurrentGameData.Levels.GetContentHash();
+                PotentialHashChange(newHash);
+                return;
+            }
         }
+        Debug.LogWarning("Level map not found in game data.");
+    }
+
+    public void ClearLevels()
+    {
+        CurrentGameData.Levels.Clear();
+        var newHash = CurrentGameData.Levels.GetContentHash();
+        PotentialHashChange(newHash);
     }
 
     private void PotentialHashChange(int hash)
     {
+        Debug.Log($"Current Hash: {Hash}, New Hash: {hash}");
         if (hash != Hash)
         {
             Hash = hash;
+            Debug.Log("Game data changed, notifying listeners.");
             foreach (var action in onGameDataChanged)
             {
                 action.Invoke();

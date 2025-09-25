@@ -103,10 +103,20 @@ public class GenerateLevelButton : ButtonType
     {
         try
         {
+            Debug.Log("Starting level generation...");
             var map = await Task.Run(() =>
             {
                 return GameDataManager.Instance.Generator.GenerateLevel(50, 50, true, SeedFactory.Next());
             });
+
+            Debug.Log("Level generated, generating checkpoints...");
+
+            await Task.Run(() =>
+            {
+                LevelCheckPointMaker.GenerateCheckPoints(map);
+            });
+
+            Debug.Log("Checkpoints generated, showing map...");
 
             if (map != null)
             {
@@ -117,5 +127,29 @@ public class GenerateLevelButton : ButtonType
         {
             Debug.LogError($"Level generation failed: {ex}");
         }
+    }
+}
+
+[Serializable]
+public class ClearLevelsButton : ButtonType
+{
+    public ClearLevelsButton()
+    { }
+
+    public override void Action()
+    {
+        GameDataManager.Instance.ClearLevels();
+    }
+}
+
+[Serializable]
+public class GoToSelectedLevel : ButtonType
+{
+    public GoToSelectedLevel()
+    { }
+
+    public override void Action()
+    {
+        GameDataManager.Instance.GoToSelectedLevel();
     }
 }

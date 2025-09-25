@@ -15,17 +15,19 @@ public class LevelEntry : MonoBehaviour
 
     public void LevelSelected()
     {
+        Debug.Log($"Selecting level from game data.");
         GameDataManager.Instance.SelectingLevelMap(levelData.LevelMap);
     }
 
     public void RemoveLevel()
     {
+        // Debug.Log($"Removing level from game data. Level map: \n {levelData.LevelMap.Tiles}");
         GameDataManager.Instance.RemoveLevel(levelData.LevelMap);
-        Destroy(gameObject);
     }
 
     public void SetUp(LevelData levelData)
     {
+        this.levelData = levelData;
         GetComponent<LevelPreviewer>()?.ShowPreviewAsync(levelData.LevelMap);
         if (levelData.Time < float.MaxValue)
         {

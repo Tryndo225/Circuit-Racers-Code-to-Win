@@ -1,10 +1,9 @@
-using UnityEngine;
 using System;
-using System.Threading;
-using System.Collections.Generic;
 
 public static class LevelCheckPointMaker
 {
+    private static readonly Coordinates Invalid = new Coordinates(-1, -1);
+
     private static readonly Coordinates[] offsets = new Coordinates[]
     {
         new Coordinates(1, 0),
@@ -17,51 +16,63 @@ public static class LevelCheckPointMaker
     {
         Coordinates position = levelMap.StartPoint;
         Coordinates lastVisited = levelMap.StartPoint;
-        Coordinates lastDirection = new Coordinates(0, 0);
-        Coordinates direction = new Coordinates(0, 0);
 
+        Coordinates direction = Invalid;
+        Coordinates newDirection = Invalid;
         int straightCount = 0;
-        bool turnedSinceLastCheckPoint = false;
+        Coordinates straightStart = Invalid;
+        bool checkpointPlacedForThisStraight = true;
 
-        while (lastVisited != new Coordinates(-1, -1))
+        while (true)
         {
-            lastVisited = position;
-            lastDirection = direction;
-            direction = Step(levelMap, ref position, lastVisited);
+            newDirection = Step(levelMap, ref position, ref lastVisited);
 
-            if (direction == lastDirection)
+            if (newDirection == Invalid)
+                break;
+
+            if (newDirection == direction)
             {
                 straightCount++;
-                continue;
             }
             else
             {
-                straightCount = 0;
-                turnedSinceLastCheckPoint = true;
-                lastDirection = direction;
+                if (direction != Invalid)
+                {
+                    straightStart = position;
+                    straightCount = 1;
+                    checkpointPlacedForThisStraight = false;
+                }
+                direction = newDirection;
             }
 
-            if (straightCount >= minStraightCountForChackPoint && turnedSinceLastCheckPoint)
+            if (!checkpointPlacedForThisStraight && straightCount >= minStraightCountForChackPoint)
             {
-                levelMap.Tiles.At(lastVisited) = -2;
-                turnedSinceLastCheckPoint = false;
+                if (straightStart != levelMap.StartPoint && straightStart != levelMap.FinishPoint)
+                {
+                    levelMap.Tiles.At(straightStart + ((straightCount / 2) - 1) * direction) = -2;
+                }
+                checkpointPlacedForThisStraight = true;
             }
         }
     }
 
-    private static Coordinates Step(LevelMap levelMap, ref Coordinates position, Coordinates lastVisited)
+    private static Coordinates Step(LevelMap levelMap, ref Coordinates position, ref Coordinates lastVisited)
     {
         foreach (var offset in offsets)
         {
             var next = position + offset;
 
-            if (levelMap.Tiles[next.X, next.Y] == 1 && lastVisited != next && next != levelMap.FinishPoint)
+            if (!levelMap.Tiles.InBounds(next.X, next.Y))
+                continue;
+
+            if (levelMap.Tiles[next.X, next.Y] == 1 && next != lastVisited && next != levelMap.FinishPoint)
             {
+                lastVisited = position;
                 position = next;
                 return offset;
             }
         }
 
-        return new Coordinates(-1, -1);
+        return Invalid;
     }
 }

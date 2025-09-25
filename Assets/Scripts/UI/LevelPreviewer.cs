@@ -11,9 +11,8 @@ public class LevelPreviewer : MonoBehaviour
     [SerializeField] private RawImage target;
 
     [Header("Look")]
-    [SerializeField] private int pixelsPerCell = 8;
-
     [SerializeField] private Color32 grass = Color.green;
+
     [SerializeField] private Color32 road = Color.gray;
     [SerializeField] private Color32 start = Color.lightGreen;
     [SerializeField] private Color32 finish = Color.red;
@@ -30,55 +29,59 @@ public class LevelPreviewer : MonoBehaviour
 
     public async Task ShowPreviewAsync(LevelMap map)
     {
-        var tex = await Task.Run(() =>
+        if (target == null) return;
+
+        int ppc = Mathf.Max(1, Mathf.FloorToInt(target.rectTransform.rect.width / map.Width));
+
+        int maxTex = SystemInfo.maxTextureSize;
+        ppc = Mathf.Min(ppc, Mathf.Max(1, maxTex / Math.Max(map.Width, map.Height)));
+
+        var result = await Task.Run(() =>
         {
-            return BuildPreviewTexture(map);
+            return BuildPreviewBuffer(map, ppc);
         });
+
+        var tex = new Texture2D(result.texWidth, result.texHeight, TextureFormat.RGBA32, false)
+        {
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        tex.SetPixels32(result.buffer);
+        tex.Apply(false, false);
 
         target.texture = tex;
     }
 
-    private Texture2D BuildPreviewTexture(LevelMap map)
+    private (Color32[] buffer, int texWidth, int texHeight) BuildPreviewBuffer(LevelMap map, int pixelsPerCell)
     {
         int texWidth = map.Width * pixelsPerCell;
         int texHeight = map.Height * pixelsPerCell;
-
-        var tex = new Texture2D(texWidth, texHeight, TextureFormat.RGBA32, false);
-        tex.filterMode = FilterMode.Point;
-        tex.wrapMode = TextureWrapMode.Clamp;
 
         var buffer = new Color32[texWidth * texHeight];
 
         // Fill grass
         for (int i = 0; i < buffer.Length; i++)
-        {
-            buffer[i] = grass;
-        }
+            buffer[i] = grass; // OK: 'grass' is a struct value captured when called
 
-        // Paint road cells (value==1)
+        // Road & checkpoints
         for (int y = 0; y < map.Height; y++)
         {
             for (int x = 0; x < map.Width; x++)
             {
-                if (map.Tiles[x, y] == 1 || map.Tiles[x, y] == -2)
-                {
+                int v = map.Tiles[x, y];
+                if (v == 1 || v == -2)
                     FillCell(buffer, texWidth, texHeight, x, y, pixelsPerCell, road);
-                }
 
-                if (map.Tiles[x, y] == -2)
-                {
+                if (v == -2)
                     DrawMarker(buffer, texWidth, texHeight, new Coordinates(x, y), pixelsPerCell, checkPoint);
-                }
             }
         }
 
-        // Overlay start/finish markers
+        // Start/Finish
         DrawMarker(buffer, texWidth, texHeight, map.StartPoint, pixelsPerCell, start);
         DrawMarker(buffer, texWidth, texHeight, map.FinishPoint, pixelsPerCell, finish);
 
-        tex.SetPixels32(buffer);
-        tex.Apply(false, false);
-        return tex;
+        return (buffer, texWidth, texHeight);
     }
 
     private static void FillCell(Color32[] buffer, int texWidth, int texHeight, int cellX, int cellY, int pixelsPerCell, Color32 color)

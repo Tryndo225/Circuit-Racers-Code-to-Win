@@ -1988,9 +1988,12 @@ MonoBehaviour:
   - m_Text: Play
     m_Image: {fileID: 0}
     m_Color: {r: 0.45873782, g: 0.7735849, b: 0, a: 0}
-  - m_Text: Practice
+  - m_Text: Practice - Day
     m_Image: {fileID: 0}
-    m_Color: {r: 0, g: 0.38990107, b: 0.8584906, a: 0}
+    m_Color: {r: 0, g: 0.583291, b: 0.85882354, a: 0}
+  - m_Text: Practice - Night
+    m_Image: {fileID: 0}
+    m_Color: {r: 0, g: 0.075365715, b: 0.58431375, a: 0}
   - m_Text: Quit
     m_Image: {fileID: 0}
     m_Color: {r: 0.5849056, g: 0.000000058105154, b: 0, a: 0}
@@ -2000,12 +2003,15 @@ MonoBehaviour:
   pressedColor: {r: 0, g: 0.3647059, b: 0.5568628, a: 1}
   selectedColor: {r: 0, g: 0.25314453, b: 0.4339623, a: 1}
   scenes:
-  - sceneName: 
-    scenePath: 
-    sceneAsset: {fileID: 0}
+  - sceneName: Level Select
+    scenePath: Assets/Scenes/Level Select.unity
+    sceneAsset: {fileID: 102900000, guid: c7fdf1cedc477da47b13655d28b5f2fa, type: 3}
   - sceneName: Test Track - Day
     scenePath: Assets/Scenes/Test Track - Day.unity
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+  - sceneName: Test Track - Night
+    scenePath: Assets/Scenes/Test Track - Night.unity
+    sceneAsset: {fileID: 102900000, guid: 228bbbe3a85a32749b1a26b0345c1026, type: 3}
   - sceneName: Quit Game
     scenePath: Assets/Scenes/Quit Game.unity
     sceneAsset: {fileID: 102900000, guid: 20e92dfc2fcec3943813caefe016079f, type: 3}
@@ -2063,9 +2069,12 @@ MonoBehaviour:
     - m_Text: Play
       m_Image: {fileID: 0}
       m_Color: {r: 0.45873782, g: 0.7735849, b: 0, a: 0}
-    - m_Text: Practice
+    - m_Text: Practice - Day
       m_Image: {fileID: 0}
-      m_Color: {r: 0, g: 0.38990107, b: 0.8584906, a: 0}
+      m_Color: {r: 0, g: 0.583291, b: 0.85882354, a: 0}
+    - m_Text: Practice - Night
+      m_Image: {fileID: 0}
+      m_Color: {r: 0, g: 0.075365715, b: 0.58431375, a: 0}
     - m_Text: Quit
       m_Image: {fileID: 0}
       m_Color: {r: 0.5849056, g: 0.000000058105154, b: 0, a: 0}

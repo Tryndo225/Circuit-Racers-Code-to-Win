@@ -6,7 +6,7 @@ using System.Collections;
 
 public class TrackManager : MonoBehaviour
 {
-    public List<CheckPointListener> checkPoints;
+    public List<CheckPointListener> CheckPoints;
 
     [Header("Input Settings")]
     [SerializeField] private InputActionProperty respawnLastCheckPoint;
@@ -55,7 +55,7 @@ public class TrackManager : MonoBehaviour
     public int CurrentLap => _currentLap;
     public int TotalLaps => laps;
     public int CurrentCheckPointIndex => _currentCheckPointIndex;
-    public int TotalCheckPoints => checkPoints.Count;
+    public int TotalCheckPoints => CheckPoints.Count;
 
     public bool IsRaceFinished => _isRaceFinished;
     public float RespawnTimer => _respawnTimer;
@@ -110,24 +110,22 @@ public class TrackManager : MonoBehaviour
 
     private void Awake()
     {
-        if (checkPoints == null || checkPoints.Count == 0)
-        {
-            Debug.LogError("TrackManager requires at least one CheckPointListener.");
-            return;
-        }
-        foreach (var checkPoint in checkPoints)
-        {
-            checkPoint.AddListener(CheckPointTaken);
-        }
     }
 
     private void Start()
     {
-        StartRace();
+        if (CheckPoints.Count != 0)
+        {
+            StartRace();
+        }
     }
 
     public void StartRace()
     {
+        foreach (var checkPoint in CheckPoints)
+        {
+            checkPoint.AddListener(CheckPointTaken);
+        }
         StartCoroutine(RestartCoroutine());
     }
 
@@ -192,11 +190,11 @@ public class TrackManager : MonoBehaviour
 
     private void ResetCheckPoints()
     {
-        foreach (var checkPoint in checkPoints)
+        foreach (var checkPoint in CheckPoints)
         {
             checkPoint.SetActive(false);
         }
-        checkPoints[0].SetActive(true);
+        CheckPoints[0].SetActive(true);
     }
 
     private void Restart()
@@ -233,7 +231,7 @@ public class TrackManager : MonoBehaviour
         {
             if (isCircuit && _currentLap > 0)
             {
-                _respawnCheckPoint = checkPoints.Count - 1;
+                _respawnCheckPoint = CheckPoints.Count - 1;
                 _pendingRespawn = true;
             }
             else
@@ -257,10 +255,10 @@ public class TrackManager : MonoBehaviour
             return;
         }
 
-        _carInstance.transform.position = checkPoints[index].cPClaimedPosition;
-        _carInstance.transform.rotation = checkPoints[index].cPClaimedRotation;
-        carRb.linearVelocity = checkPoints[index].cPClaimedRbLinearVelocity;
-        carRb.angularVelocity = checkPoints[index].cPClaimedRbAngularVelocity;
+        _carInstance.transform.position = CheckPoints[index].cPClaimedPosition;
+        _carInstance.transform.rotation = CheckPoints[index].cPClaimedRotation;
+        carRb.linearVelocity = CheckPoints[index].cPClaimedRbLinearVelocity;
+        carRb.angularVelocity = CheckPoints[index].cPClaimedRbAngularVelocity;
 
         _trackStartTime += Time.time - _lastCheckPointTime;
         _lapStartTime += Time.time - _lastCheckPointTime;
@@ -277,7 +275,7 @@ public class TrackManager : MonoBehaviour
                 _trackEndTime = Time.time;
                 _isRaceFinished = true;
                 _lastLapTime = Time.time - _lapStartTime;
-                checkPoints[0].SetActive(false);
+                CheckPoints[0].SetActive(false);
                 Debug.Log("Track finished! Total time: " + TotalTrackTime);
                 return;
             }
@@ -291,20 +289,20 @@ public class TrackManager : MonoBehaviour
             _lapStartTime = Time.time;
             _currentLap++;
         }
-        else if (!isCircuit && _currentCheckPointIndex == checkPoints.Count - 1)
+        else if (!isCircuit && _currentCheckPointIndex == CheckPoints.Count - 1)
         {
             _trackEndTime = Time.time;
             _lastLapTime = Time.time - _lapStartTime;
             _isRaceFinished = true;
-            checkPoints[0].SetActive(false);
+            CheckPoints[0].SetActive(false);
             return;
         }
 
         _lastCheckPointTime = Time.time;
 
-        checkPoints[_currentCheckPointIndex].SetActive(false);
+        CheckPoints[_currentCheckPointIndex].SetActive(false);
 
-        _currentCheckPointIndex = (_currentCheckPointIndex + 1) % checkPoints.Count;
-        checkPoints[_currentCheckPointIndex].SetActive(true);
+        _currentCheckPointIndex = (_currentCheckPointIndex + 1) % CheckPoints.Count;
+        CheckPoints[_currentCheckPointIndex].SetActive(true);
     }
 }
