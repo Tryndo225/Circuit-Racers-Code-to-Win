@@ -45,14 +45,6 @@ public class RaceTrackPlacer : MonoBehaviour
           "111" +
           "XXX", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 90, 0)) }, // Straight Horizontal
 
-        { "X1X" +
-          "XCX" +
-          "X1X", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Straight Vertical Checkpoint
-
-		{ "XXX" +
-          "1C1" +
-          "XXX", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 90, 0)) }, // Straight Horizontal Checkpoint
-
 		{ "X1X" +
           "X11" +
           "XXX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Curve Up-Right
@@ -113,12 +105,10 @@ public class RaceTrackPlacer : MonoBehaviour
 
         if (levelMap == null)
         {
-            Debug.LogError("No LevelMap found in GameDataManager.");
             return;
         }
         else
         {
-            Debug.Log("LevelMap found, starting track placement.");
             foreach (var key in trackPieceLegend.Keys)
             {
                 int keySquared = Mathf.RoundToInt(Mathf.Sqrt(key.Length));
@@ -138,7 +128,6 @@ public class RaceTrackPlacer : MonoBehaviour
 
     private void PlaceTrackPieces()
     {
-        Debug.Log("Placing track pieces...");
         if (levelMap == null || levelMap.Tiles == null)
         {
             Debug.LogError("LevelMap or its Tiles are not set.");
@@ -147,13 +136,12 @@ public class RaceTrackPlacer : MonoBehaviour
 
         var piecesToPlace = CreateTrack();
         Coordinates? position = levelMap.StartPoint;
-        Coordinates? lastPosition = levelMap.StartPoint;
+        Coordinates lastPosition = levelMap.StartPoint;
         bool nextToBigPiece = false;
 
         while (true)
         {
-            lastPosition = position;
-            position = Step(piecesToPlace, position.Value, lastPosition.Value);
+            position = Step(piecesToPlace, position.Value, ref lastPosition);
             if (position == null)
                 break;
 
@@ -182,7 +170,7 @@ public class RaceTrackPlacer : MonoBehaviour
         }
     }
 
-    private Coordinates? Step(TrackPiece[,] piecesToPlace, Coordinates position, Coordinates lastPosition)
+    private Coordinates? Step(TrackPiece[,] piecesToPlace, Coordinates position, ref Coordinates lastPosition)
     {
         foreach (var offset in offsets)
         {
@@ -194,6 +182,7 @@ public class RaceTrackPlacer : MonoBehaviour
             if (next == lastPosition)
                 continue;
 
+            lastPosition = position;
             return next;
         }
 
@@ -202,7 +191,6 @@ public class RaceTrackPlacer : MonoBehaviour
 
     private TrackPiece[,] CreateTrack()
     {
-        Debug.Log("Creating track layout...");
         TrackPiece[,] piecesToPlace = new TrackPiece[levelMap.Tiles.GetLength(0), levelMap.Tiles.GetLength(1)];
         TrackPiece? trackPiece;
         Coordinates coordinates;
@@ -229,10 +217,11 @@ public class RaceTrackPlacer : MonoBehaviour
 
     private TrackPiece? GetTrackPiece(Coordinates coordinates)
     {
-        Debug.Log($"Getting track piece for coordinates: {coordinates}");
+        string pattern = "";
+
         foreach (var size in possibleSizes)
         {
-            string pattern = ExtractPattern(coordinates, size);
+            pattern = ExtractPattern(coordinates, size);
             if (trackPieceLegend.TryGetValue(pattern, out TrackPiece trackPiece))
             {
                 Vector3 positionOffset = new Vector3(coordinates.X * blockOffset, 0, coordinates.Y * blockOffset);
@@ -242,16 +231,22 @@ public class RaceTrackPlacer : MonoBehaviour
                 {
                     trackPiece.Prefab = raceTrackStartFinishPrefab;
                 }
+                else if (levelMap.Tiles.At(coordinates) == -2)
+                {
+                    trackPiece.Prefab = checkpointPrefab;
+                }
 
                 return trackPiece;
             }
         }
+
+        Debug.LogWarning($"No track piece found for pattern at {coordinates}: {pattern}");
+
         return null;
     }
 
     private string ExtractPattern(Coordinates center, int size)
     {
-        Debug.Log($"Extracting pattern at center: {center} with size: {size}");
         int halfSize = size / 2;
         char[,] pattern = new char[size, size];
 
@@ -266,10 +261,14 @@ public class RaceTrackPlacer : MonoBehaviour
                 int py = dy + halfSize;
 
                 char c = 'X';
-                if (levelMap.Tiles.InBounds(x, y))
+                if (dx != 0 && dy != 0)
+                {
+                    c = 'X'; // Diagonal positions are always empty
+                }
+                else if (levelMap.Tiles.InBounds(x, y))
                 {
                     int v = levelMap.Tiles[x, y];
-                    c = (v == 1) ? '1' : (v == -2 ? 'C' : 'X');
+                    c = (v == 1) ? '1' : 'X';
                 }
                 pattern[py, px] = c;
             }

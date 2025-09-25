@@ -1988,10 +1988,10 @@ MonoBehaviour:
   - m_Text: Play
     m_Image: {fileID: 0}
     m_Color: {r: 0.45873782, g: 0.7735849, b: 0, a: 0}
-  - m_Text: Practice - Day
+  - m_Text: DayTest
     m_Image: {fileID: 0}
     m_Color: {r: 0, g: 0.583291, b: 0.85882354, a: 0}
-  - m_Text: Practice - Night
+  - m_Text: NightTest
     m_Image: {fileID: 0}
     m_Color: {r: 0, g: 0.075365715, b: 0.58431375, a: 0}
   - m_Text: Quit
@@ -2069,10 +2069,10 @@ MonoBehaviour:
     - m_Text: Play
       m_Image: {fileID: 0}
       m_Color: {r: 0.45873782, g: 0.7735849, b: 0, a: 0}
-    - m_Text: Practice - Day
+    - m_Text: DayTest
       m_Image: {fileID: 0}
       m_Color: {r: 0, g: 0.583291, b: 0.85882354, a: 0}
-    - m_Text: Practice - Night
+    - m_Text: NightTest
       m_Image: {fileID: 0}
       m_Color: {r: 0, g: 0.075365715, b: 0.58431375, a: 0}
     - m_Text: Quit
