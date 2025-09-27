@@ -1,0 +1,5 @@
+<map id="TyreEffects" name="TyreEffects">
+<area shape="rect" id="Node000001" title="Generates tire effects (smoke particles, skid trail, and audio) when wheel slip exceeds a threshold." alt="" coords="17,123,94,192"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,106,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,90,58,123,53,123,53,90"/>
+</map>

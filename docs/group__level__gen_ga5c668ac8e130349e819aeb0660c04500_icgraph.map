@@ -1,0 +1,5 @@
+<map id="LevelCheckPointMaker.GenerateCheckPoints" name="LevelCheckPointMaker.GenerateCheckPoints">
+<area shape="rect" id="Node000001" title="Walks the road network in levelMap &#160;and converts the midpoint of each sufficiently long straight segm..." alt="" coords="238,5,451,48"/>
+<area shape="rect" id="Node000002" href="$class_generate_level_button.html#a1748a95d62b017914a650960b8edd7b2" title="Execute: generate a level, add checkpoints, and show the preview popup." alt="" coords="5,13,190,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,29,190,29,190,24,222,24"/>
+</map>

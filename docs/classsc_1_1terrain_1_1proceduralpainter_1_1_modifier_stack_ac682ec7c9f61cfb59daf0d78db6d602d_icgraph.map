@@ -1,0 +1,7 @@
+<map id="sc.terrain.proceduralpainter.ModifierStack.Configure" name="sc.terrain.proceduralpainter.ModifierStack.Configure">
+<area shape="rect" id="Node000001" title="Call this once, per terrain." alt="" coords="473,5,655,48"/>
+<area shape="rect" id="Node000002" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html#a4619d849d5ecb7aba634b2ecb76c11dc" title="Repaints an individual terrain." alt="" coords="236,5,425,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="458,29,426,29,426,24,458,24"/>
+<area shape="rect" id="Node000003" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html#a025b3820047956701e9f7f2c9f5b6c93" title="Repaints all the assigned terrains using the current configuration." alt="" coords="5,5,188,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="220,29,188,29,188,24,220,24"/>
+</map>

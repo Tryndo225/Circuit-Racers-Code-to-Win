@@ -1,0 +1,9 @@
+<map id="sc.terrain.proceduralpainter.TerrainPainter" name="sc.terrain.proceduralpainter.TerrainPainter">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,665,177,1135"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="36,5,136,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,90,92,666,87,666,83,90"/>
+<area shape="rect" id="Node000003" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html" title=" " alt="" coords="107,124,278,593"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="104,88,116,123,111,125,99,90"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,594,141,649,136,648,146,593"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="280,312,298,328,303,342,305,359,302,380,294,395,289,392,297,378,300,359,298,343,293,331,276,315"/>
+</map>

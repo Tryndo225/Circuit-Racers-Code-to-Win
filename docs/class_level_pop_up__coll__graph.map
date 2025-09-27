@@ -1,0 +1,5 @@
+<map id="LevelPopUp" name="LevelPopUp">
+<area shape="rect" id="Node000001" title="Simple popup controller that previews a generated LevelMap and lets the user accept (add to game data..." alt="" coords="11,123,101,235"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,106,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,90,58,123,53,123,53,90"/>
+</map>

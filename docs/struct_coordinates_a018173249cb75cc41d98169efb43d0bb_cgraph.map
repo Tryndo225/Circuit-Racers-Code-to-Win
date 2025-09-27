@@ -1,0 +1,8 @@
+<map id="Coordinates.Equals" name="Coordinates.Equals">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,141,32"/>
+<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates (x, y)." alt="" coords="372,5,537,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,16,356,16,356,21,141,21"/>
+<area shape="rect" id="Node000003" href="$struct_coordinates.html#a14c4d704f188413912fc6d1c120517d2" title="Value equality on X and Y." alt="" coords="189,31,324,57"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="141,25,174,30,173,35,141,31"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="324,33,356,29,357,34,325,38"/>
+</map>

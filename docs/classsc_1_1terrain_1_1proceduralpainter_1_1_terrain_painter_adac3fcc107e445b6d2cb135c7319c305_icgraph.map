@@ -1,0 +1,7 @@
+<map id="sc.terrain.proceduralpainter.TerrainPainter.ResizeSplatmaps" name="sc.terrain.proceduralpainter.TerrainPainter.ResizeSplatmaps">
+<area shape="rect" id="Node000001" title="Applies the splatmapResolution value to all terrains." alt="" coords="512,5,720,48"/>
+<area shape="rect" id="Node000002" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html#a025b3820047956701e9f7f2c9f5b6c93" title="Repaints all the assigned terrains using the current configuration." alt="" coords="282,5,464,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="496,29,465,29,465,24,496,24"/>
+<area shape="rect" id="Node000003" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html#a3509ee6df4fc09a0f64ceb2da347a432" title=" " alt="" coords="5,5,234,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="266,29,234,29,234,24,266,24"/>
+</map>

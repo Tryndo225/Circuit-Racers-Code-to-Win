@@ -49,7 +49,15 @@ MonoBehaviour:
     scenePath: Assets/Scenes/Main Menu.unity
     sceneAsset: {fileID: 102900000, guid: 22a9354abb524b34481a9fb8a9a29726, type: 3}
     audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
-  - sceneName: TestScene
-    scenePath: Assets/Scenes/TestScene.unity
+  - sceneName: Test Track - Day
+    scenePath: Assets/Scenes/Test Track - Day.unity
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+  - sceneName: Level Select
+    scenePath: Assets/Scenes/Level Select.unity
+    sceneAsset: {fileID: 102900000, guid: c7fdf1cedc477da47b13655d28b5f2fa, type: 3}
+    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+  - sceneName: Level
+    scenePath: Assets/Scenes/Level.unity
+    sceneAsset: {fileID: 102900000, guid: d5c2cae3d201b1546bfbddc0f1a01656, type: 3}
     audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}

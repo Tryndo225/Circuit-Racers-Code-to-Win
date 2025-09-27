@@ -1,0 +1,11 @@
+<map id="LightsController.ToggleLights" name="LightsController.ToggleLights">
+<area shape="rect" id="Node000001" title="Toggles front/day/rear light sets as a group." alt="" coords="5,64,195,91"/>
+<area shape="rect" id="Node000002" href="$class_lights_controller.html#a40720b35cc765a6cc30133e9c3ccb94a" title="Enables or disables front, day, and rear lights using fade." alt="" coords="243,64,414,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,75,227,75,227,80,195,80"/>
+<area shape="rect" id="Node000003" href="$class_lights_controller.html#a14753bd0b181a607dfa38842539bf8e9" title="Enables or disables day lights using fade and applies configured color." alt="" coords="462,5,657,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,61,489,34,490,39,385,66"/>
+<area shape="rect" id="Node000004" href="$class_lights_controller.html#a16239bde9c4bd3ff836db7b2b35d0870" title="Enables or disables front lights using fade and applies configured color." alt="" coords="476,56,643,99"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="414,75,461,75,461,80,414,80"/>
+<area shape="rect" id="Node000005" href="$class_lights_controller.html#aafe9d0eaa92aa8ca491ec66a195ff1d2" title="Enables or disables rear lights using fade and applies configured color." alt="" coords="478,123,642,165"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="378,89,469,115,468,120,377,94"/>
+</map>

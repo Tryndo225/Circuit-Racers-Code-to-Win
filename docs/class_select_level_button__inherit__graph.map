@@ -1,0 +1,5 @@
+<map id="SelectLevelButton" name="SelectLevelButton">
+<area shape="rect" id="Node000001" title="Strategy: set the currently selected LevelMap in GameDataManager." alt="" coords="5,123,143,235"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract strategy for a button action." alt="" coords="36,5,113,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,90,77,123,72,123,72,90"/>
+</map>

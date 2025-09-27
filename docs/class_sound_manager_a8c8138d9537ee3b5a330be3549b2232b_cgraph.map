@@ -1,0 +1,5 @@
+<map id="SoundManager.ContinueSFXClip" name="SoundManager.ContinueSFXClip">
+<area shape="rect" id="Node000001" title="“Continues” a looping SFX for continueThreshold seconds and then stops it, unless continued again in ..." alt="" coords="5,5,219,32"/>
+<area shape="rect" id="Node000002" href="$class_sound_manager.html#a96abf86ace810cdec1cdca44da9aca80" title="Plays (or reuses) a pooled SFX helper for the given clip at a target transform, with optional volume/..." alt="" coords="267,5,454,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,16,251,16,251,21,219,21"/>
+</map>

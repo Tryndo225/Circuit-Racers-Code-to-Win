@@ -1,0 +1,5 @@
+<map id="TMPro.TMP_PhoneNumberValidator" name="TMPro.TMP_PhoneNumberValidator">
+<area shape="rect" id="Node000001" title="Example of a Custom Character Input Validator to only allow phone number in the (800) 555&#45;1212 format..." alt="" coords="5,123,227,192"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="54,5,178,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,90,119,123,114,123,114,90"/>
+</map>

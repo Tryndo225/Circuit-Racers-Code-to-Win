@@ -1,0 +1,5 @@
+<map id="Coordinates.operator+" name="Coordinates.operator+">
+<area shape="rect" id="Node000001" title="Adds two coordinate vectors component&#45;wise." alt="" coords="5,5,156,32"/>
+<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates (x, y)." alt="" coords="204,5,369,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,16,188,16,188,21,156,21"/>
+</map>

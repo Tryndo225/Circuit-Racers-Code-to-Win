@@ -1,0 +1,9 @@
+<map id="SerializableRunnable" name="SerializableRunnable">
+<area shape="rect" id="Node000001" title="Base class for serializable “commands” that expose a callable entry point via Run." alt="" coords="34,139,176,251"/>
+<area shape="rect" id="Node000003" href="$class_scene_asset_helper.html" title="Serializable, editor&#45;friendly scene reference that stores scene name and path, supports implicit conv..." alt="" coords="9,299,201,709"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="107,266,107,299,102,299,102,266"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="24,5,185,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,106,107,139,102,139,102,106"/>
+<area shape="rect" id="Node000004" href="$class_scene_asset_helper_audio_clip_pair.html" title="A SceneAssetHelper extended with an AudioClip to be used by SceneManagement for automatic background ..." alt="" coords="5,757,204,827"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="107,724,107,758,102,758,102,724"/>
+</map>

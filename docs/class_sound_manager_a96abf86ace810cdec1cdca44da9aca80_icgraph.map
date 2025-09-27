@@ -1,0 +1,13 @@
+<map id="SoundManager.PlaySFXClip" name="SoundManager.PlaySFXClip">
+<area shape="rect" id="Node000001" title="Plays (or reuses) a pooled SFX helper for the given clip at a target transform, with optional volume/..." alt="" coords="267,107,454,133"/>
+<area shape="rect" id="Node000002" href="$class_sound_manager.html#a8c8138d9537ee3b5a330be3549b2232b" title="“Continues” a looping SFX for continueThreshold seconds and then stops it, unless continued again in ..." alt="" coords="5,5,219,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="323,100,274,73,218,46,182,35,183,30,220,42,277,68,326,96"/>
+<area shape="rect" id="Node000003" href="$class_sound_manager.html#ac8c641628ef7d5abe4d35381b7b7e9a7" title="Same as ContinueSFXClip(AudioClip) but with an explicit start volume." alt="" coords="5,56,219,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="276,106,180,86,181,81,277,100"/>
+<area shape="rect" id="Node000004" href="$class_sound_manager.html#a99e5ec8ffcb294ad7843f4b514112226" title="Convenience overload: plays a non&#45;looping SFX at the manager’s position with default volume/pitch." alt="" coords="18,107,206,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="251,123,206,123,206,117,251,117"/>
+<area shape="rect" id="Node000005" href="$class_sound_manager.html#ae2088602ad947dc9d8f37013d42b1422" title="Convenience overload: plays a non&#45;looping SFX at the manager’s position with a volume scalar." alt="" coords="18,157,206,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="277,140,181,159,180,154,276,134"/>
+<area shape="rect" id="Node000006" href="$class_sound_manager.html#a2e67a2adcf457b8258ffa3498e982b1d" title="Convenience overload: plays a non&#45;looping SFX at the given transform with default volume/pitch." alt="" coords="18,208,206,235"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="326,144,277,172,220,198,183,210,182,205,218,194,274,167,323,140"/>
+</map>

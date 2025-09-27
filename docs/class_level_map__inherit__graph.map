@@ -1,0 +1,7 @@
+<map id="LevelMap" name="LevelMap">
+<area shape="rect" id="Node000001" title="Serializable level definition for a grid&#45;based track: dimensions, circuit flag, endpoints,..." alt="" coords="48,139,190,421"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,13,87,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,96,77,138,72,140,59,97"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="110,5,275,91"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="178,106,167,140,162,138,173,104"/>
+</map>

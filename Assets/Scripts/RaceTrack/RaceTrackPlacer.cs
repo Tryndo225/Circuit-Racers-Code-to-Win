@@ -5,13 +5,29 @@ using System.Text;
 using UnityEngine.UIElements;
 
 #region Helper Structures / Classes
+
+/// <summary>
+/// Describes a single placeable track piece: which prefab to spawn and the world-space pose
+/// (position and rotation) to apply at placement time.
+/// </summary>
 [Serializable]
 public struct TrackPiece
 {
+    /// <summary>Prefab to instantiate for this track cell (may be <c>null</c> if no spawn).</summary>
     public GameObject Prefab;
+
+    /// <summary>World-space position to place the prefab at.</summary>
     public Vector3 Position;
+
+    /// <summary>World-space rotation to apply to the prefab.</summary>
     public Quaternion Rotation;
 
+    /// <summary>
+    /// Creates a new <see cref="TrackPiece"/> with explicit prefab and pose.
+    /// </summary>
+    /// <param name="prefab">Prefab reference (can be <c>null</c> for "no piece").</param>
+    /// <param name="position">World-space placement position.</param>
+    /// <param name="rotation">World-space placement rotation.</param>
     public TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation)
     {
         Prefab = prefab;
@@ -20,13 +36,31 @@ public struct TrackPiece
     }
 }
 
+/// <summary>
+/// Serializable dictionary mapping a string pattern key to a <see cref="TrackPiece"/> descriptor.
+/// Keys are compact pattern encodings (e.g., 3x3 or 5x5 matrices concatenated into a string).
+/// </summary>
 [Serializable]
 public class StringTrackPieceDictionary : SerializableDictionary<string, TrackPiece>
 { }
 #endregion Helper Structures / Classes
 
+/// <summary>
+/// Procedural track placer: scans a <see cref="LevelMap"/> grid, matches local patterns
+/// around each path cell to a legend, and instantiates the appropriate track piece prefabs
+/// (including start/finish and checkpoints). Also wires checkpoints to <see cref="TrackManager"/>.
+/// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// @invariant <see cref="trackPieceLegend"/> keys must be perfect squares (3x3, 5x5, …).
+/// @invariant <see cref="LevelMap"/> is present in <see cref="GameDataManager.CurrentLevelMap"/> when placing starts.
+/// @thread Unity main thread (scene start and instantiation only).
+/// </remarks>
 public class RaceTrackPlacer : MonoBehaviour
 {
+    /// <summary>
+    /// Neighbor offsets for 4-way traversal and adjacency tests (right, left, up, down).
+    /// </summary>
     private static readonly Coordinates[] offsets = new Coordinates[]
     {
         new Coordinates(1, 0),
@@ -34,8 +68,17 @@ public class RaceTrackPlacer : MonoBehaviour
         new Coordinates(0, 1),
         new Coordinates(0, -1)
     };
+
     #region Legend
+
     [Header("Track Piece Prefabs")]
+    /// <summary>
+    /// Legend mapping of string patterns to <see cref="TrackPiece"/> descriptors.
+    /// The string keys are flattened NxN character grids (e.g., '1' for track, 'X' for empty),
+    /// optionally containing special markers (e.g., 'C' during matching).
+    /// The associated <see cref="TrackPiece"/> carries default rotation for the shape; final world
+    /// position is filled at placement time.
+    /// </summary>
     [SerializeField]
     private StringTrackPieceDictionary trackPieceLegend = new StringTrackPieceDictionary()
     {
@@ -43,11 +86,11 @@ public class RaceTrackPlacer : MonoBehaviour
           "X1X" +
           "X1X", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Straight Vertical
 
-		{ "XXX" +
+        { "XXX" +
           "111" +
           "XXX", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 90, 0)) }, // Straight Horizontal
 
-		{ "X1X" +
+        { "X1X" +
           "X11" +
           "XXX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Curve Up-Right
 
@@ -55,11 +98,11 @@ public class RaceTrackPlacer : MonoBehaviour
           "11X" +
           "XXX", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 90, 0)) }, // Curve Up-Left
 
-		{ "XXX" +
+        { "XXX" +
           "11X" +
           "X1X", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 180, 0)) }, // Curve Down-Left
 
-		{ "XXX" +
+        { "XXX" +
           "X11" +
           "X1X", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 270, 0)) }, // Curve Down-Right
 
@@ -75,34 +118,48 @@ public class RaceTrackPlacer : MonoBehaviour
           "XXXXX" +
           "XXXXX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Up-Left
 
-		{ "XXXXX" +
+        { "XXXXX" +
           "XXXXX" +
           "XX111" +
           "XX1XX" +
           "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Down-Right
 
-		{ "XXXXX" +
+        { "XXXXX" +
           "XXXXX" +
           "111XX" +
           "XX1XX" +
           "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Down-Left
-	};
+    };
     #endregion Legend
 
+    /// <summary>Prefab for start/finish cells (placed on <see cref="LevelMap.StartPoint"/> and <see cref="LevelMap.FinishPoint"/>).</summary>
     [SerializeField] private GameObject raceTrackStartFinishPrefab;
+
+    /// <summary>Optional list of “big” pieces; adjacency to these can suppress placement to avoid overlap.</summary>
     [SerializeField] private List<GameObject> bigPieces;
+
+    /// <summary>Prefab for intermediate checkpoint cells (non-start/finish with special value).</summary>
     [SerializeField] private GameObject checkpointPrefab;
 
     [Header("Track Settings")]
+    /// <summary>World-space spacing per grid step (meters) when placing pieces.</summary>
     [SerializeField] private int blockOffset = 15;
 
     [Header("Track Layout")]
+    /// <summary>Runtime copy of the level layout pulled from <see cref="GameDataManager"/> at start.</summary>
     [SerializeField, ReadOnly] private LevelMap levelMap;
 
+    /// <summary>All supported pattern sizes (e.g., 5, 3) derived from legend keys.</summary>
     private List<int> possibleSizes = new List<int>();
+
+    /// <summary>Reusable string builder for pattern extraction to reduce allocations.</summary>
     private StringBuilder patternBuilder = new StringBuilder();
 
     #region Setup
+
+    /// <summary>
+    /// Loads the current <see cref="LevelMap"/>, validates legend key sizes, and kicks off placement.
+    /// </summary>
     private void Start()
     {
         levelMap = GameDataManager.Instance.CurrentLevelMap;
@@ -132,6 +189,11 @@ public class RaceTrackPlacer : MonoBehaviour
     #endregion Setup
 
     #region Track Placement
+
+    /// <summary>
+    /// Creates a placement map from the level tiles, then walks the path from StartPoint,
+    /// instantiating prefabs and registering checkpoints with <see cref="TrackManager"/>.
+    /// </summary>
     private void PlaceTrackPieces()
     {
         if (levelMap == null || levelMap.Tiles == null)
@@ -153,7 +215,7 @@ public class RaceTrackPlacer : MonoBehaviour
                 break;
 
             nextToBigPiece = NextToTypes(position.Value, piecesToPlace, bigPieces);
-            
+
             if (piecesToPlace[position.Value.X, position.Value.Y].Prefab != null && !nextToBigPiece)
             {
                 var newGameObject = Instantiate(piecesToPlace[position.Value.X, position.Value.Y].Prefab,
@@ -182,6 +244,10 @@ public class RaceTrackPlacer : MonoBehaviour
 
     #region Track Traversal
 
+    /// <summary>
+    /// Chooses the next unvisited neighbor cell that has a placeable piece, using 4-way adjacency.
+    /// Returns <c>null</c> if no continuation exists.
+    /// </summary>
     private Coordinates? Step(TrackPiece[,] piecesToPlace, Coordinates position, HashSet<Coordinates> visited)
     {
         foreach (var offset in offsets)
@@ -196,6 +262,11 @@ public class RaceTrackPlacer : MonoBehaviour
     #endregion Track Traversal
 
     #region Track Creation
+
+    /// <summary>
+    /// Produces a 2D map of <see cref="TrackPiece"/> descriptors for all track cells (tile values 1 and -2).
+    /// Start/finish and checkpoints are assigned their dedicated prefabs in matching.
+    /// </summary>
     private TrackPiece[,] CreateTrack()
     {
         TrackPiece[,] piecesToPlace = new TrackPiece[levelMap.Tiles.GetLength(0), levelMap.Tiles.GetLength(1)];
@@ -223,6 +294,12 @@ public class RaceTrackPlacer : MonoBehaviour
     }
 
     #region Pattern Matching
+
+    /// <summary>
+    /// Extracts local patterns of supported sizes around <paramref name="coordinates"/>, tries to find
+    /// a legend match, then returns a filled <see cref="TrackPiece"/> with world position and final prefab
+    /// (start/finish and checkpoints override the legend prefab).
+    /// </summary>
     private TrackPiece? GetTrackPiece(Coordinates coordinates)
     {
         string pattern = "";
@@ -253,6 +330,13 @@ public class RaceTrackPlacer : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Builds a flattened NxN pattern string centered at <paramref name="center"/>:
+    /// - '1' marks track cells
+    /// - 'X' marks empty/out-of-bounds
+    /// - 'C' may mark checkpoints on larger kernels so they can be matched distinctly
+    /// Isolated singletons are treated as empty to avoid stray tiles.
+    /// </summary>
     private string ExtractPattern(Coordinates center, int size)
     {
         int halfSize = size / 2;
@@ -317,6 +401,11 @@ public class RaceTrackPlacer : MonoBehaviour
     #endregion Track Creation
 
     #region Helper Methods
+
+    /// <summary>
+    /// Returns true if the given cell has no 4-way neighbor that is not 'X' in the provided pattern.
+    /// Used to cull isolated track singles.
+    /// </summary>
     private bool IsAlone(Coordinates position, char[,] pattern)
     {
         foreach (var offset in offsets)
@@ -330,6 +419,11 @@ public class RaceTrackPlacer : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Checks whether any 4-way neighbor of <paramref name="position"/> in <paramref name="pieces"/>
+    /// belongs to <paramref name="types"/> or matches a specific long-curve key in the legend.
+    /// If true, placement at <paramref name="position"/> may be suppressed to avoid clashes.
+    /// </summary>
     private bool NextToTypes(Coordinates position, TrackPiece[,] pieces, List<GameObject> types)
     {
         bool nextToType = false;

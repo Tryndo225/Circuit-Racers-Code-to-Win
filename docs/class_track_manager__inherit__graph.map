@@ -1,0 +1,5 @@
+<map id="TrackManager" name="TrackManager">
+<area shape="rect" id="Node000001" title="Manages race flow for a track with sequential checkpoints: spawns the player car, tracks laps and tim..." alt="" coords="5,123,172,427"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="38,5,139,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,90,92,123,86,123,86,90"/>
+</map>

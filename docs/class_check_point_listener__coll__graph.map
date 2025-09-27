@@ -1,0 +1,5 @@
+<map id="CheckPointListener" name="CheckPointListener">
+<area shape="rect" id="Node000001" title="Trigger&#45;based checkpoint sensor that captures the player&#39;s pose and velocities on entry and notifies ..." alt="" coords="5,123,200,299"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="52,5,153,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,90,106,123,100,123,100,90"/>
+</map>

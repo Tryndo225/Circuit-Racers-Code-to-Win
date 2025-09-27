@@ -1,0 +1,136 @@
+var annotated_dup =
+[
+    [ "BOKI", "namespace_b_o_k_i.html", [
+      [ "LowPolyNature", "namespace_b_o_k_i_1_1_low_poly_nature.html", [
+        [ "Scripts", "namespace_b_o_k_i_1_1_low_poly_nature_1_1_scripts.html", [
+          [ "FadeInOut", "class_b_o_k_i_1_1_low_poly_nature_1_1_scripts_1_1_fade_in_out.html", "class_b_o_k_i_1_1_low_poly_nature_1_1_scripts_1_1_fade_in_out" ],
+          [ "WaterfallAudio", "class_b_o_k_i_1_1_low_poly_nature_1_1_scripts_1_1_waterfall_audio.html", "class_b_o_k_i_1_1_low_poly_nature_1_1_scripts_1_1_waterfall_audio" ]
+        ] ]
+      ] ]
+    ] ],
+    [ "Generic", "namespace_generic.html", [
+      [ "Singleton< T >", "class_generic_1_1_singleton-1-g.html", "class_generic_1_1_singleton-1-g" ]
+    ] ],
+    [ "IEnumerableExtention", "namespace_i_enumerable_extention.html", [
+      [ "IEnumerableExtensions", "class_i_enumerable_extention_1_1_i_enumerable_extensions.html", "class_i_enumerable_extention_1_1_i_enumerable_extensions" ]
+    ] ],
+    [ "sc", "namespacesc.html", [
+      [ "terrain", "namespacesc_1_1terrain.html", [
+        [ "proceduralpainter", "namespacesc_1_1terrain_1_1proceduralpainter.html", [
+          [ "Attributes", "classsc_1_1terrain_1_1proceduralpainter_1_1_attributes.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_attributes" ],
+          [ "Curvature", "classsc_1_1terrain_1_1proceduralpainter_1_1_curvature.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_curvature" ],
+          [ "Direction", "classsc_1_1terrain_1_1proceduralpainter_1_1_direction.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_direction" ],
+          [ "HeatmapPreview", "classsc_1_1terrain_1_1proceduralpainter_1_1_heatmap_preview.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_heatmap_preview" ],
+          [ "Height", "classsc_1_1terrain_1_1proceduralpainter_1_1_height.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_height" ],
+          [ "LayerSettings", "classsc_1_1terrain_1_1proceduralpainter_1_1_layer_settings.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_layer_settings" ],
+          [ "Modifier", "classsc_1_1terrain_1_1proceduralpainter_1_1_modifier.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_modifier" ],
+          [ "ModifierEditor", "classsc_1_1terrain_1_1proceduralpainter_1_1_modifier_editor.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_modifier_editor" ],
+          [ "ModifierStack", "classsc_1_1terrain_1_1proceduralpainter_1_1_modifier_stack.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_modifier_stack" ],
+          [ "Noise", "classsc_1_1terrain_1_1proceduralpainter_1_1_noise.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_noise" ],
+          [ "PropertyDrawers", "classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers" ],
+          [ "Slope", "classsc_1_1terrain_1_1proceduralpainter_1_1_slope.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_slope" ],
+          [ "TerrainChangeListener", "classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_change_listener.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_change_listener" ],
+          [ "TerrainPainter", "classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter" ],
+          [ "TerrainPainterInspector", "classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter_inspector.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter_inspector" ],
+          [ "TextureMask", "classsc_1_1terrain_1_1proceduralpainter_1_1_texture_mask.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_texture_mask" ],
+          [ "Utilities", "classsc_1_1terrain_1_1proceduralpainter_1_1_utilities.html", "classsc_1_1terrain_1_1proceduralpainter_1_1_utilities" ]
+        ] ]
+      ] ]
+    ] ],
+    [ "TMPro", "namespace_t_m_pro.html", [
+      [ "Examples", "namespace_t_m_pro_1_1_examples.html", [
+        [ "Benchmark01", "class_t_m_pro_1_1_examples_1_1_benchmark01.html", "class_t_m_pro_1_1_examples_1_1_benchmark01" ],
+        [ "Benchmark01_UGUI", "class_t_m_pro_1_1_examples_1_1_benchmark01___u_g_u_i.html", "class_t_m_pro_1_1_examples_1_1_benchmark01___u_g_u_i" ],
+        [ "Benchmark02", "class_t_m_pro_1_1_examples_1_1_benchmark02.html", "class_t_m_pro_1_1_examples_1_1_benchmark02" ],
+        [ "Benchmark03", "class_t_m_pro_1_1_examples_1_1_benchmark03.html", "class_t_m_pro_1_1_examples_1_1_benchmark03" ],
+        [ "Benchmark04", "class_t_m_pro_1_1_examples_1_1_benchmark04.html", "class_t_m_pro_1_1_examples_1_1_benchmark04" ],
+        [ "CameraController", "class_t_m_pro_1_1_examples_1_1_camera_controller.html", "class_t_m_pro_1_1_examples_1_1_camera_controller" ],
+        [ "ObjectSpin", "class_t_m_pro_1_1_examples_1_1_object_spin.html", "class_t_m_pro_1_1_examples_1_1_object_spin" ],
+        [ "ShaderPropAnimator", "class_t_m_pro_1_1_examples_1_1_shader_prop_animator.html", "class_t_m_pro_1_1_examples_1_1_shader_prop_animator" ],
+        [ "SimpleScript", "class_t_m_pro_1_1_examples_1_1_simple_script.html", null ],
+        [ "SkewTextExample", "class_t_m_pro_1_1_examples_1_1_skew_text_example.html", "class_t_m_pro_1_1_examples_1_1_skew_text_example" ],
+        [ "TeleType", "class_t_m_pro_1_1_examples_1_1_tele_type.html", null ],
+        [ "TextConsoleSimulator", "class_t_m_pro_1_1_examples_1_1_text_console_simulator.html", null ],
+        [ "TextMeshProFloatingText", "class_t_m_pro_1_1_examples_1_1_text_mesh_pro_floating_text.html", "class_t_m_pro_1_1_examples_1_1_text_mesh_pro_floating_text" ],
+        [ "TextMeshSpawner", "class_t_m_pro_1_1_examples_1_1_text_mesh_spawner.html", "class_t_m_pro_1_1_examples_1_1_text_mesh_spawner" ],
+        [ "TMP_ExampleScript_01", "class_t_m_pro_1_1_examples_1_1_t_m_p___example_script__01.html", "class_t_m_pro_1_1_examples_1_1_t_m_p___example_script__01" ],
+        [ "TMP_FrameRateCounter", "class_t_m_pro_1_1_examples_1_1_t_m_p___frame_rate_counter.html", "class_t_m_pro_1_1_examples_1_1_t_m_p___frame_rate_counter" ],
+        [ "TMP_TextEventCheck", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_event_check.html", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_event_check" ],
+        [ "TMP_TextInfoDebugTool", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_info_debug_tool.html", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_info_debug_tool" ],
+        [ "TMP_TextSelector_A", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_selector___a.html", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_selector___a" ],
+        [ "TMP_TextSelector_B", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_selector___b.html", "class_t_m_pro_1_1_examples_1_1_t_m_p___text_selector___b" ],
+        [ "TMP_UiFrameRateCounter", "class_t_m_pro_1_1_examples_1_1_t_m_p___ui_frame_rate_counter.html", "class_t_m_pro_1_1_examples_1_1_t_m_p___ui_frame_rate_counter" ],
+        [ "TMPro_InstructionOverlay", "class_t_m_pro_1_1_examples_1_1_t_m_pro___instruction_overlay.html", "class_t_m_pro_1_1_examples_1_1_t_m_pro___instruction_overlay" ],
+        [ "VertexColorCycler", "class_t_m_pro_1_1_examples_1_1_vertex_color_cycler.html", null ],
+        [ "VertexJitter", "class_t_m_pro_1_1_examples_1_1_vertex_jitter.html", "class_t_m_pro_1_1_examples_1_1_vertex_jitter" ],
+        [ "VertexShakeA", "class_t_m_pro_1_1_examples_1_1_vertex_shake_a.html", "class_t_m_pro_1_1_examples_1_1_vertex_shake_a" ],
+        [ "VertexShakeB", "class_t_m_pro_1_1_examples_1_1_vertex_shake_b.html", "class_t_m_pro_1_1_examples_1_1_vertex_shake_b" ],
+        [ "VertexZoom", "class_t_m_pro_1_1_examples_1_1_vertex_zoom.html", "class_t_m_pro_1_1_examples_1_1_vertex_zoom" ],
+        [ "WarpTextExample", "class_t_m_pro_1_1_examples_1_1_warp_text_example.html", "class_t_m_pro_1_1_examples_1_1_warp_text_example" ]
+      ] ],
+      [ "TMP_DigitValidator", "class_t_m_pro_1_1_t_m_p___digit_validator.html", "class_t_m_pro_1_1_t_m_p___digit_validator" ],
+      [ "TMP_PhoneNumberValidator", "class_t_m_pro_1_1_t_m_p___phone_number_validator.html", "class_t_m_pro_1_1_t_m_p___phone_number_validator" ],
+      [ "TMP_TextEventHandler", "class_t_m_pro_1_1_t_m_p___text_event_handler.html", "class_t_m_pro_1_1_t_m_p___text_event_handler" ]
+    ] ],
+    [ "UnityTemplateProjects", "namespace_unity_template_projects.html", [
+      [ "SimpleCameraController", "class_unity_template_projects_1_1_simple_camera_controller.html", "class_unity_template_projects_1_1_simple_camera_controller" ]
+    ] ],
+    [ "Array2DExtensions", "class_array2_d_extensions.html", "class_array2_d_extensions" ],
+    [ "ButtonScript", "class_button_script.html", "class_button_script" ],
+    [ "ButtonType", "class_button_type.html", "class_button_type" ],
+    [ "ButtonTypeDrawer", "class_button_type_drawer.html", "class_button_type_drawer" ],
+    [ "ChangeSceneButton", "class_change_scene_button.html", "class_change_scene_button" ],
+    [ "ChatController", "class_chat_controller.html", "class_chat_controller" ],
+    [ "CheckPointListener", "class_check_point_listener.html", "class_check_point_listener" ],
+    [ "ClearLevelsButton", "class_clear_levels_button.html", "class_clear_levels_button" ],
+    [ "CollisionDetection", "class_collision_detection.html", "class_collision_detection" ],
+    [ "Coordinates", "struct_coordinates.html", "struct_coordinates" ],
+    [ "DriveTrainController", "class_drive_train_controller.html", "class_drive_train_controller" ],
+    [ "DropDownMenuButtonSceneChanger", "class_drop_down_menu_button_scene_changer.html", "class_drop_down_menu_button_scene_changer" ],
+    [ "DropdownSample", "class_dropdown_sample.html", "class_dropdown_sample" ],
+    [ "EngineSound", "class_engine_sound.html", "class_engine_sound" ],
+    [ "EnvMapAnimator", "class_env_map_animator.html", "class_env_map_animator" ],
+    [ "FollowCamera", "class_follow_camera.html", "class_follow_camera" ],
+    [ "GameDataManager", "class_game_data_manager.html", "class_game_data_manager" ],
+    [ "GenerateLevelButton", "class_generate_level_button.html", "class_generate_level_button" ],
+    [ "GoToSelectedLevel", "class_go_to_selected_level.html", "class_go_to_selected_level" ],
+    [ "LayerMaskUtils", "class_layer_mask_utils.html", "class_layer_mask_utils" ],
+    [ "LevelCheckPointMaker", "class_level_check_point_maker.html", "class_level_check_point_maker" ],
+    [ "LevelEntry", "class_level_entry.html", "class_level_entry" ],
+    [ "LevelGenerator", "class_level_generator.html", "class_level_generator" ],
+    [ "LevelMap", "class_level_map.html", "class_level_map" ],
+    [ "LevelPopUp", "class_level_pop_up.html", "class_level_pop_up" ],
+    [ "LevelPreviewer", "class_level_previewer.html", "class_level_previewer" ],
+    [ "LevelScrollContent", "class_level_scroll_content.html", null ],
+    [ "LightsController", "class_lights_controller.html", "class_lights_controller" ],
+    [ "RaceOverLay", "class_race_over_lay.html", null ],
+    [ "RaceTrackPlacer", "class_race_track_placer.html", null ],
+    [ "ReadOnlyAttribute", "class_read_only_attribute.html", null ],
+    [ "ReadOnlyDrawer", "class_read_only_drawer.html", "class_read_only_drawer" ],
+    [ "RemoveLevelButton", "class_remove_level_button.html", "class_remove_level_button" ],
+    [ "SceneAssetHelper", "class_scene_asset_helper.html", "class_scene_asset_helper" ],
+    [ "SceneAssetHelperAudioClipPair", "class_scene_asset_helper_audio_clip_pair.html", "class_scene_asset_helper_audio_clip_pair" ],
+    [ "SceneManagement", "class_scene_management.html", "class_scene_management" ],
+    [ "SeedFactory", "class_seed_factory.html", "class_seed_factory" ],
+    [ "SelectLevelButton", "class_select_level_button.html", "class_select_level_button" ],
+    [ "SerializableDictionary< TKey, TValue >", "class_serializable_dictionary-2-g.html", "class_serializable_dictionary-2-g" ],
+    [ "SerializableRunnable", "class_serializable_runnable.html", "class_serializable_runnable" ],
+    [ "ShowIfAttribute", "class_show_if_attribute.html", "class_show_if_attribute" ],
+    [ "ShowIfDrawer", "class_show_if_drawer.html", "class_show_if_drawer" ],
+    [ "SliderScript", "class_slider_script.html", "class_slider_script" ],
+    [ "SoundManager", "class_sound_manager.html", "class_sound_manager" ],
+    [ "SoundManagerHelper", "class_sound_manager_helper.html", "class_sound_manager_helper" ],
+    [ "StringTrackPieceDictionary", "class_string_track_piece_dictionary.html", "class_string_track_piece_dictionary" ],
+    [ "StringTrackPieceDictionaryDrawer", "class_string_track_piece_dictionary_drawer.html", "class_string_track_piece_dictionary_drawer" ],
+    [ "TrackManager", "class_track_manager.html", "class_track_manager" ],
+    [ "TrackPiece", "struct_track_piece.html", "struct_track_piece" ],
+    [ "TransmissionController", "class_transmission_controller.html", "class_transmission_controller" ],
+    [ "TyreEffects", "class_tyre_effects.html", null ],
+    [ "UIParallax", "class_u_i_parallax.html", null ],
+    [ "UIParallaxLayer", "struct_u_i_parallax_layer.html", "struct_u_i_parallax_layer" ],
+    [ "VehicleController", "class_vehicle_controller.html", null ],
+    [ "Wheel_Collider_3D", "class_wheel___collider__3_d.html", "class_wheel___collider__3_d" ],
+    [ "WheelContactRelay", "class_wheel_contact_relay.html", "class_wheel_contact_relay" ],
+    [ "WheelSpec", "struct_wheel_spec.html", "struct_wheel_spec" ],
+    [ "WheelSpecDrawer", "class_wheel_spec_drawer.html", "class_wheel_spec_drawer" ]
+];

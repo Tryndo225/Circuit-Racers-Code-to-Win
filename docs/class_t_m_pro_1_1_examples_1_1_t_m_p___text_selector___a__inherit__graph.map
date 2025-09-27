@@ -1,0 +1,9 @@
+<map id="TMPro.Examples.TMP_TextSelector_A" name="TMPro.Examples.TMP_TextSelector_A">
+<area shape="rect" id="Node000001" title=" " alt="" coords="124,123,268,229"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,106,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,83,143,121,140,125,100,87"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="130,5,262,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,90,198,123,193,123,193,90"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="286,5,410,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="300,87,256,125,253,121,297,83"/>
+</map>

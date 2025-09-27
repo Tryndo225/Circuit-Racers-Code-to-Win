@@ -1,0 +1,5 @@
+<map id="GoToSelectedLevel" name="GoToSelectedLevel">
+<area shape="rect" id="Node000001" title="Strategy: request a scene change to the gameplay level currently selected in GameDataManager." alt="" coords="5,123,150,213"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract strategy for a button action." alt="" coords="40,5,116,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,89,80,123,75,123,75,89"/>
+</map>

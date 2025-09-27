@@ -1,0 +1,7 @@
+<map id="SceneManagement" name="SceneManagement">
+<area shape="rect" id="Node000001" title="Centralized scene loader and background&#45;music router." alt="" coords="16,261,139,352"/>
+<area shape="rect" id="Node000002" href="$class_generic_1_1_singleton-1-g.html" title="Minimal DontDestroyOnLoad singleton base." alt="" coords="5,123,150,213"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,228,80,262,75,262,75,228"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="27,5,128,75"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="80,89,80,123,75,123,75,89"/>
+</map>

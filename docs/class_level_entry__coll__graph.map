@@ -1,0 +1,10 @@
+<map id="LevelEntry" name="LevelEntry">
+<area shape="rect" id="Node000001" title="UI entry representing a single saved level row." alt="" coords="5,597,119,731"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="7,5,107,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,89,64,598,59,598,55,89"/>
+<area shape="rect" id="Node000004" href="$class_generic_1_1_singleton-1-g.html" title="Minimal DontDestroyOnLoad singleton base." alt="" coords="78,124,223,215"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="93,85,120,123,116,126,88,89"/>
+<area shape="rect" id="Node000003" href="$class_game_data_manager.html" title=" " alt="" coords="78,264,223,525"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="110,526,92,582,87,580,105,524"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="153,230,153,264,148,264,148,230"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="CollisionDetection" name="CollisionDetection">
+<area shape="rect" id="Node000001" title="Plays crash SFX based on collision impulse, with cooldown, volume curve, pitch jitter,..." alt="" coords="5,123,122,213"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="13,5,114,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="66,89,66,123,61,123,61,89"/>
+</map>

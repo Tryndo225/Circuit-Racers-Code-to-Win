@@ -1,0 +1,5 @@
+<map id="EnvMapAnimator" name="EnvMapAnimator">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,123,122,192"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="14,5,114,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="66,90,66,123,61,123,61,90"/>
+</map>

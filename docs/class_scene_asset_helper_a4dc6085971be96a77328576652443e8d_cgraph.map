@@ -1,0 +1,5 @@
+<map id="SceneAssetHelper.operator SceneAssetHelper" name="SceneAssetHelper.operator SceneAssetHelper">
+<area shape="rect" id="Node000001" title="Creates a helper from a loaded Scene by copying name and path." alt="" coords="5,5,187,48"/>
+<area shape="rect" id="Node000002" href="$class_scene_asset_helper.html#a4a748304f4f992996ed2870a0e0ef874" title="Default constructor." alt="" coords="235,5,440,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,24,219,24,219,29,187,29"/>
+</map>

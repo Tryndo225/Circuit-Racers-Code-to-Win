@@ -1,0 +1,4 @@
+var classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_resolution_dropdown_attribute_drawer =
+[
+    [ "OnGUI", "classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_resolution_dropdown_attribute_drawer.html#a33c7eda1d8b9904461a898cf6e9d9b04", null ]
+];

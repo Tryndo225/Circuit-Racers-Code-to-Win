@@ -4,27 +4,79 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 #region Seed Generation
+/// <summary>
+/// Thread-safe seed provider for initializing <see cref="Random"/> instances without collisions.
+/// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// @thread Thread-safe (uses <see cref="Interlocked"/>).
+/// </remarks>
 public static class SeedFactory
 {
+    /// <summary>
+    /// Internal seed state, initialized from <see cref="Environment.TickCount"/>.
+    /// </summary>
     private static int _seed = Environment.TickCount;
 
+    /// <summary>
+    /// Returns the next integer seed, atomically advanced by a large odd constant.
+    /// </summary>
+    /// <returns>New pseudo-random seed value.</returns>
     public static int Next() => Interlocked.Add(ref _seed, unchecked((int)0x9E3779B9));
 }
 #endregion Seed Generation
 
 #region Level Map Class
+/// <summary>
+/// Serializable level definition for a grid-based track: dimensions, circuit flag, endpoints,
+/// and a 2D tile map with Unity-friendly flatten/unflatten for serialization.
+/// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// Tile codes:
+/// -2 = checkpoint, -1 = spacer, 0 = empty/grass, 1 = road, 2+ = BFS placeholders during generation.
+/// @invariant <see cref="Tiles"/> size equals <see cref="Width"/> × <see cref="Height"/> when present.
+/// @thread Unity main thread for Unity serialization callbacks.
+/// </remarks>
 [Serializable]
 public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceiver
 {
+    /// <summary>Display name for the level.</summary>
     public string Name;
+
+    /// <summary>Grid width in tiles.</summary>
     public int Width;
+
+    /// <summary>Grid height in tiles.</summary>
     public int Height;
+
+    /// <summary>True for looped circuits; false for point-to-point tracks.</summary>
     public bool Circular;
+
+    /// <summary>Start cell coordinates.</summary>
     public Coordinates StartPoint;
+
+    /// <summary>Finish cell coordinates (equals <see cref="StartPoint"/> for circuits).</summary>
     public Coordinates FinishPoint;
+
+    /// <summary>
+    /// 2D tile grid:
+    /// <list type="bullet">
+    /// <item>-2 = checkpoint</item>
+    /// <item>-1 = spacer (reserved)</item>
+    /// <item>0 = empty/grass</item>
+    /// <item>1 = road</item>
+    /// <item>2+ = internal placeholders during BFS generation</item>
+    /// </list>
+    /// </summary>
     [NonSerialized] public int[,] Tiles; // -2 = checkpoint, -1 = spacer, 0 = grass, 1 = road, 2 and up = placeholder during generation
+
+    /// <summary>Flattened array used for Unity serialization of <see cref="Tiles"/>.</summary>
     [UnityEngine.SerializeField] private int[] tilesFlat;
 
+    /// <summary>
+    /// Creates a default empty map.
+    /// </summary>
     public LevelMap()
     {
         Name = "Unnamed";
@@ -36,6 +88,9 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
         Tiles = new int[0, 0];
     }
 
+    /// <summary>
+    /// Deserialization constructor for <see cref="ISerializable"/>.
+    /// </summary>
     public LevelMap(SerializationInfo info, StreamingContext context)
     {
         Name = info.GetString("name");
@@ -48,6 +103,9 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
         UnflattenTiles();
     }
 
+    /// <summary>
+    /// Populates the <paramref name="info"/> store with metadata and a flattened tile array.
+    /// </summary>
     public void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         info.AddValue("name", Name);
@@ -60,6 +118,9 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
         info.AddValue("tilesFlat", tilesFlat);
     }
 
+    /// <summary>
+    /// Writes <see cref="Tiles"/> into <see cref="tilesFlat"/> for Unity serialization.
+    /// </summary>
     private void FlattenTiles()
     {
         if (Tiles == null) return;
@@ -69,6 +130,9 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
                 tilesFlat[y * Width + x] = Tiles[x, y];
     }
 
+    /// <summary>
+    /// Recreates <see cref="Tiles"/> from <see cref="tilesFlat"/> after deserialization.
+    /// </summary>
     private void UnflattenTiles()
     {
         if (Width <= 0 || Height <= 0 || tilesFlat == null) return;
@@ -78,11 +142,17 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
                 Tiles[x, y] = tilesFlat[y * Width + x];
     }
 
+    /// <summary>
+    /// Unity callback: ensure <see cref="tilesFlat"/> is up to date before serialization.
+    /// </summary>
     public void OnBeforeSerialize()
     {
         FlattenTiles();
     }
 
+    /// <summary>
+    /// Unity callback: rebuild <see cref="Tiles"/> after deserialization.
+    /// </summary>
     public void OnAfterDeserialize()
     {
         UnflattenTiles();
@@ -91,54 +161,83 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 #endregion Map Class
 
 #region Helper Classes
+/// <summary>
+/// Integer coordinate pair with arithmetic, equality, and serialization support.
+/// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// @invariant Value equality is based on <see cref="X"/> and <see cref="Y"/>.
+/// </remarks>
 [Serializable]
 public struct Coordinates : IEquatable<Coordinates>, ISerializable
 {
+    /// <summary>X coordinate (column index).</summary>
     public int X;
+
+    /// <summary>Y coordinate (row index).</summary>
     public int Y;
 
+    /// <summary>
+    /// Constructs coordinates (x, y).
+    /// </summary>
     public Coordinates(int x, int y)
     {
         this.X = x;
         this.Y = y;
     }
 
+    /// <summary>
+    /// Deserialization constructor for <see cref="ISerializable"/>.
+    /// </summary>
     public Coordinates(SerializationInfo info, StreamingContext context)
     {
         X = info.GetInt32("x");
         Y = info.GetInt32("y");
     }
 
+    /// <summary>Adds two coordinate vectors component-wise.</summary>
     public static Coordinates operator +(Coordinates a, Coordinates b)
     { return new Coordinates(a.X + b.X, a.Y + b.Y); }
 
+    /// <summary>Subtracts two coordinate vectors component-wise.</summary>
     public static Coordinates operator -(Coordinates a, Coordinates b)
     { return new Coordinates(a.X - b.X, a.Y - b.Y); }
 
+    /// <summary>Multiplies a coordinate by a scalar.</summary>
     public static Coordinates operator *(Coordinates a, int b)
     { return new Coordinates(a.X * b, a.Y * b); }
 
+    /// <summary>Multiplies a coordinate by a scalar.</summary>
     public static Coordinates operator *(int a, Coordinates b)
     { return new Coordinates(a * b.X, a * b.Y); }
 
+    /// <summary>Value equality on X and Y.</summary>
     public bool Equals(Coordinates o)
     { return X == o.X && Y == o.Y; }
 
+    /// <inheritdoc />
     public override bool Equals(object obj)
     { return obj is Coordinates o && Equals(o); }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     { return HashCode.Combine(X, Y); }
 
+    /// <summary>Equality operator.</summary>
     public static bool operator ==(Coordinates a, Coordinates b)
     { return a.Equals(b); }
 
+    /// <summary>Inequality operator.</summary>
     public static bool operator !=(Coordinates a, Coordinates b)
     { return !a.Equals(b); }
 
+    /// <summary>Readable string representation.</summary>
     public override string ToString()
     { return $"({X}, {Y})"; }
 
+    /// <summary>
+    /// Serialization callback for <see cref="ISerializable"/>.
+    /// </summary>
     public void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         info.AddValue("x", X);
@@ -147,8 +246,18 @@ public struct Coordinates : IEquatable<Coordinates>, ISerializable
 }
 #endregion Helper Classes
 
+/// <summary>
+/// Procedural level generator (static). Produces circuit or point-to-point tracks using
+/// iterative target selection, BFS “flooding”, backtracking to carve roads, and spacing rules.
+/// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// Tiles semantics: 1 = road, 0 = empty, -1 = spacer, -2 = checkpoint, 2+ = BFS placeholders.
+/// @thread Use on Unity main thread (operates on shared map arrays).
+/// </remarks>
 public static class LevelGenerator
 {
+    /// <summary>4-neighborhood offsets: right, left, up, down.</summary>
     private static readonly Coordinates[] offsets = new Coordinates[]
     {
         new Coordinates(1, 0),
@@ -157,11 +266,33 @@ public static class LevelGenerator
         new Coordinates(0, -1)
     };
 
+    /// <summary>
+    /// Generates a level using an explicit seed to initialize <see cref="Random"/>.
+    /// </summary>
+    /// <param name="width">Grid width (tiles).</param>
+    /// <param name="height">Grid height (tiles).</param>
+    /// <param name="isCircuit">True for a closed loop; false for point-to-point.</param>
+    /// <param name="steps">Number of carving iterations.</param>
+    /// <param name="stepLenght">Maximum manhattan distance to attempt per step (typo preserved).</param>
+    /// <param name="maxAttempts">Max attempts to find a valid target per step.</param>
+    /// <param name="seed">Seed for RNG.</param>
+    /// <returns>A populated <see cref="LevelMap"/>.</returns>
     public static LevelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLenght, int maxAttempts, int seed)
     {
         return GenerateLevel(width, height, isCircuit, steps, stepLenght, maxAttempts, new Random(seed));
     }
 
+    /// <summary>
+    /// Generates a level using a provided <see cref="Random"/> source.
+    /// </summary>
+    /// <param name="width">Grid width (tiles).</param>
+    /// <param name="height">Grid height (tiles).</param>
+    /// <param name="isCircuit">True for a closed loop; false for point-to-point.</param>
+    /// <param name="steps">Number of carving iterations.</param>
+    /// <param name="stepLenght">Maximum manhattan distance to attempt per step (typo preserved).</param>
+    /// <param name="maxAttempts">Max attempts to find a valid target per step.</param>
+    /// <param name="rng">Random generator.</param>
+    /// <returns>A populated <see cref="LevelMap"/>.</returns>
     public static LevelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLenght, int maxAttempts, Random rng)
     {
         //UnityEngine.Debug.Log("Generating Level");
@@ -222,7 +353,15 @@ public static class LevelGenerator
     }
 
     #region Step
-
+    /// <summary>
+    /// Attempts a single carve step: pick target, BFS flood, backtrack to carve, cleanup placeholders.
+    /// </summary>
+    /// <param name="currentPoint">Current road end.</param>
+    /// <param name="levelMap">Target level map.</param>
+    /// <param name="stepLenght">Maximum step length (typo preserved).</param>
+    /// <param name="maxAttemps">Maximum attempts to pick a valid target (typo preserved).</param>
+    /// <param name="rng">Random source.</param>
+    /// <returns>New end point or (-1,-1) on failure.</returns>
     private static Coordinates TryStep(Coordinates currentPoint, LevelMap levelMap, int stepLenght, int maxAttemps, Random rng)
     {
         var target = PickTarget(currentPoint, levelMap, stepLenght, maxAttemps, rng);
@@ -247,11 +386,12 @@ public static class LevelGenerator
             return new Coordinates(-1, -1);
         }
     }
-
     #endregion Step
 
     #region Target Selection
-
+    /// <summary>
+    /// Picks a reachable target coordinate near <paramref name="lastPoint"/> within constraints.
+    /// </summary>
     private static Coordinates PickTarget(Coordinates lastPoint, LevelMap levelMap, int stepLength, int maxAttempts, Random rng)
     {
         int count = 0;
@@ -279,6 +419,10 @@ public static class LevelGenerator
         return new Coordinates(-1, -1);
     }
 
+    /// <summary>
+    /// Validates a target: not overlapping existing road, spaced from neighbors, and path-reachable.
+    /// For circuits, also checks reachability back to start.
+    /// </summary>
     private static bool TargetCheck(Coordinates current, Coordinates target, LevelMap levelMap)
     {
         if (levelMap.Tiles.At(target) == 1)
@@ -316,11 +460,13 @@ public static class LevelGenerator
 
         return check;
     }
-
     #endregion Target Selection
 
     #region Circuit Starting
-
+    /// <summary>
+    /// Prepares a circuit start area by clearing neighbors around <see cref="LevelMap.StartPoint"/>
+    /// and opening one axis to begin the loop.
+    /// </summary>
     private static void CircuitStarter(LevelMap levelMap, Random rng)
     {
         for (int i = -1; i <= 1; ++i)
@@ -353,11 +499,13 @@ public static class LevelGenerator
             throw new Exception("Circuit starting failed");
         }
     }
-
     #endregion Circuit Starting
 
     #region Circuit Finishing
-
+    /// <summary>
+    /// Completes a circuit by BFS from the last point back to <see cref="LevelMap.StartPoint"/>,
+    /// carving the final segment.
+    /// </summary>
     private static void CircuitFinisher(LevelMap levelMap, Coordinates lastPoint)
     {
         UnityEngine.Debug.Log("Finishing Circuit");
@@ -376,16 +524,21 @@ public static class LevelGenerator
             throw new Exception("Circuit finishing failed");
         }
     }
-
     #endregion Circuit Finishing
 
     #region Flooding and Backtracking
-
+    /// <summary>
+    /// Internal BFS step (position + turn count).
+    /// </summary>
     private struct FloodStep
     {
+        /// <summary>Current position.</summary>
         public Coordinates position;
+
+        /// <summary>Turn (distance counter) at this position.</summary>
         public int turn;
 
+        /// <summary>Constructs a flood step.</summary>
         public FloodStep(Coordinates position, int step)
         {
             this.position = position;
@@ -393,6 +546,15 @@ public static class LevelGenerator
         }
     }
 
+    /// <summary>
+    /// BFS flood from <paramref name="start"/> to <paramref name="target"/> over empty cells (0),
+    /// marking visited cells with increasing placeholder values (2+).
+    /// </summary>
+    /// <param name="start">Starting coordinate.</param>
+    /// <param name="target">Target coordinate.</param>
+    /// <param name="tiles">Tile grid (modified in-place).</param>
+    /// <param name="modifiedPositions">Optional collection of positions modified during flood.</param>
+    /// <returns>True if target is reached; otherwise false.</returns>
     private static bool FloodingAlgorithm(Coordinates start, Coordinates target, int[,] tiles, List<Coordinates> modifiedPositions = null)
     {
         FloodStep step = new FloodStep(start, 2);
@@ -439,6 +601,10 @@ public static class LevelGenerator
         return false;
     }
 
+    /// <summary>
+    /// Converts placeholder numbers written by BFS back into road (1) by walking from
+    /// <paramref name="start"/> down to the origin along decreasing turn counts.
+    /// </summary>
     private static void BackTrack(Coordinates start, int[,] tiles)
     {
         var backtrackPoint = start;
@@ -472,6 +638,9 @@ public static class LevelGenerator
         //UnityEngine.Debug.Log($"Backtrack ended");
     }
 
+    /// <summary>
+    /// Removes temporary placeholder values (&gt;1) that were written during flood.
+    /// </summary>
     private static void RemovePlaceholders(int[,] tiles, List<Coordinates> modifiedPositions)
     {
         foreach (var position in modifiedPositions)
@@ -482,11 +651,13 @@ public static class LevelGenerator
             }
         }
     }
-
     #endregion Flooding and Backtracking
 
     #region Road Spacing
-
+    /// <summary>
+    /// Places spacers (-1) around road tiles that have more than one adjacent road neighbor,
+    /// to keep branches visually separated.
+    /// </summary>
     private static void RoadSpacer(Coordinates tile, int[,] tiles)
     {
         var count = 0;
@@ -517,19 +688,30 @@ public static class LevelGenerator
         }
         //UnityEngine.Debug.Log(tiles.Print());
     }
-
     #endregion Road Spacing
 }
 
-
 #region Extensions
+/// <summary>
+/// 2D array helpers used by the level generator (indexing, bounds checks, copying, printing).
+/// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// @thread Pure CPU utilities; safe on main thread.
+/// </remarks>
 public static class Array2DExtensions
 {
+    /// <summary>
+    /// Returns a by-ref alias to <paramref name="array"/> at <paramref name="coords"/> (X,Y).
+    /// </summary>
     public static ref T At<T>(this T[,] array, Coordinates coords)
     {
         return ref array[coords.X, coords.Y];
     }
 
+    /// <summary>
+    /// Formats a 2D int array into a simple CSV-like string (for debugging).
+    /// </summary>
     public static string Print(this int[,] array)
     {
         string s = "";
@@ -544,12 +726,18 @@ public static class Array2DExtensions
         return s;
     }
 
+    /// <summary>
+    /// True if (x,y) is within the array bounds.
+    /// </summary>
     public static bool InBounds<T>(this T[,] array, int x, int y)
     {
         return x >= 0 && x < array.GetLength(0) &&
                y >= 0 && y < array.GetLength(1);
     }
 
+    /// <summary>
+    /// Deep-copies a rectangular 2D array.
+    /// </summary>
     public static T[,] Copy<T>(this T[,] array)
     {
         T[,] newArray = new T[array.GetLength(0), array.GetLength(1)];
@@ -557,6 +745,9 @@ public static class Array2DExtensions
         return newArray;
     }
 
+    /// <summary>
+    /// Returns the maximum element in a 2D array using the default comparer.
+    /// </summary>
     public static T Max<T>(this T[,] array) where T : IComparable<T>
     {
         T max = array[0, 0];

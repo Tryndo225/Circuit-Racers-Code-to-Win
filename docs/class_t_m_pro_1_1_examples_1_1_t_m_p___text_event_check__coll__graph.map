@@ -1,0 +1,12 @@
+<map id="TMPro.Examples.TMP_TextEventCheck" name="TMPro.Examples.TMP_TextEventCheck">
+<area shape="rect" id="Node000001" title=" " alt="" coords="8,372,152,457"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,106,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,89,80,372,74,372,56,90"/>
+<area shape="rect" id="Node000003" href="$class_t_m_pro_1_1_t_m_p___text_event_handler.html" title=" " alt="" coords="98,124,291,300"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="94,84,126,123,122,126,90,88"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="147,301,114,359,110,356,142,299"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="130,5,262,75"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="198,90,198,124,192,124,193,90"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="286,5,410,75"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="310,87,275,126,271,122,306,84"/>
+</map>

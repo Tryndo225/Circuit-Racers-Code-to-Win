@@ -1,0 +1,5 @@
+<map id="TrackManager.CheckPointTaken" name="TrackManager.CheckPointTaken">
+<area shape="rect" id="Node000001" title="Callback when the current checkpoint is taken: advances the checkpoint index, updates lap or finish l..." alt="" coords="221,5,432,32"/>
+<area shape="rect" id="Node000002" href="$class_track_manager.html#aed568299622812c5e9daadc7f2f459ab" title="Initializes the race: subscribes to checkpoint events and starts the restart countdown." alt="" coords="5,5,173,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,21,173,21,173,16,205,16"/>
+</map>

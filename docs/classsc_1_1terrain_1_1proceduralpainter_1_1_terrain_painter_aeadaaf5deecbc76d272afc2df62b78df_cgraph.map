@@ -1,0 +1,7 @@
+<map id="sc.terrain.proceduralpainter.TerrainPainter.CreateSettingsForLayer" name="sc.terrain.proceduralpainter.TerrainPainter.CreateSettingsForLayer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,249,48"/>
+<area shape="rect" id="Node000002" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html#abf9bc4b06b557918a125ecde87f4cded" title="Ensures that all configured layers are in fact assigned to the terrains." alt="" coords="297,5,500,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="249,24,281,24,281,29,249,29"/>
+<area shape="rect" id="Node000003" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_utilities.html#a5bc58af4dd89cfbfeb26d6e3c4b0ec33" title=" " alt="" coords="548,5,730,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="500,24,532,24,532,29,500,29"/>
+</map>

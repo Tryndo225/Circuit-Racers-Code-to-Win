@@ -1,0 +1,5 @@
+<map id="LevelEntry" name="LevelEntry">
+<area shape="rect" id="Node000001" title="UI entry representing a single saved level row." alt="" coords="5,123,119,256"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="12,5,113,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,90,65,123,60,123,60,90"/>
+</map>

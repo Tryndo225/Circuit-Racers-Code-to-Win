@@ -1,0 +1,7 @@
+<map id="sc.terrain.proceduralpainter.TextureMask" name="sc.terrain.proceduralpainter.TextureMask">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,384,177,555"/>
+<area shape="rect" id="Node000002" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_modifier.html" title=" " alt="" coords="5,123,177,336"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,351,94,384,88,384,88,351"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="38,5,144,75"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,89,94,123,88,123,88,89"/>
+</map>

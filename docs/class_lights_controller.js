@@ -1,0 +1,27 @@
+var class_lights_controller =
+[
+    [ "SetBrakeLights", "class_lights_controller.html#a6696343e0479e2fae6c143f25356586f", null ],
+    [ "SetDayLights", "class_lights_controller.html#a14753bd0b181a607dfa38842539bf8e9", null ],
+    [ "SetFrontLights", "class_lights_controller.html#a16239bde9c4bd3ff836db7b2b35d0870", null ],
+    [ "SetLights", "class_lights_controller.html#a40720b35cc765a6cc30133e9c3ccb94a", null ],
+    [ "SetRearLights", "class_lights_controller.html#aafe9d0eaa92aa8ca491ec66a195ff1d2", null ],
+    [ "SetReverseLights", "class_lights_controller.html#a1961648377dd7680c7166f8f58e9f689", null ],
+    [ "ToggleLights", "class_lights_controller.html#a458db17e7a6ec97ebc02d2320a2ed7f5", null ],
+    [ "brakeLights", "class_lights_controller.html#ab822c6c114b7dd5e7acd34642f4d95d6", null ],
+    [ "brakeLightsColor", "class_lights_controller.html#a66267694e96a22fcaab0e9d7d1b308c7", null ],
+    [ "brakeLightsIntensity", "class_lights_controller.html#a30bdbd320d300b5ac8870e415e8c8a82", null ],
+    [ "dayLights", "class_lights_controller.html#a0265da46053d3459a6a52390001709f1", null ],
+    [ "dayLightsColor", "class_lights_controller.html#a52fb6ea75976c7be6e3f61b61707ef15", null ],
+    [ "dayLightsIntensity", "class_lights_controller.html#a04e6146291c45daa59876e4d6a298089", null ],
+    [ "fadeDuration", "class_lights_controller.html#a46567155b4c7bfa870510614f800c963", null ],
+    [ "frontLights", "class_lights_controller.html#afcf212d43ee95658ff5063613e66ceae", null ],
+    [ "frontLightsColor", "class_lights_controller.html#a44951749fe28e40e6bd5be6735b93f41", null ],
+    [ "frontLightsIntensity", "class_lights_controller.html#a7f12375d57833957b45e7ab5d5759734", null ],
+    [ "rearLights", "class_lights_controller.html#a467b0e878661cb5f561c6319646410a0", null ],
+    [ "rearLightsColor", "class_lights_controller.html#aa2ce24ad212ff34ea3860be6fce9a150", null ],
+    [ "rearLightsIntensity", "class_lights_controller.html#a518a85f458fc4517b41fb9fd414543e2", null ],
+    [ "reverseLights", "class_lights_controller.html#a331aa4c7dbb7be500047936fbc2db03f", null ],
+    [ "reverseLightsColor", "class_lights_controller.html#a8ac33ba1d946fd6859506a28719873b0", null ],
+    [ "reverseLightsIntensity", "class_lights_controller.html#a488ce692f1a98ecc2471022e42f9f199", null ],
+    [ "startLightsOn", "class_lights_controller.html#a77e91f7de768c5744d98d32e4a4d22ed", null ]
+];

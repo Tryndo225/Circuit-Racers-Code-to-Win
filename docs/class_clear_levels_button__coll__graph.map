@@ -1,0 +1,5 @@
+<map id="ClearLevelsButton" name="ClearLevelsButton">
+<area shape="rect" id="Node000001" title="Strategy: clear all levels from GameDataManager." alt="" coords="5,123,144,213"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract strategy for a button action." alt="" coords="36,5,113,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,89,78,123,72,123,72,89"/>
+</map>

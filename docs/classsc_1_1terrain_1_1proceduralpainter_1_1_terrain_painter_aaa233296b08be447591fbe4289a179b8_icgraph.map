@@ -1,0 +1,7 @@
+<map id="sc.terrain.proceduralpainter.TerrainPainter.RecalculateBounds" name="sc.terrain.proceduralpainter.TerrainPainter.RecalculateBounds">
+<area shape="rect" id="Node000001" title=" " alt="" coords="537,5,755,48"/>
+<area shape="rect" id="Node000002" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html#ab0dd7065e3eedb8fc5a611f38033d012" title=" " alt="" coords="282,5,489,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="521,29,489,29,489,24,521,24"/>
+<area shape="rect" id="Node000003" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_terrain_painter.html#a3509ee6df4fc09a0f64ceb2da347a432" title=" " alt="" coords="5,5,234,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="266,29,234,29,234,24,266,24"/>
+</map>

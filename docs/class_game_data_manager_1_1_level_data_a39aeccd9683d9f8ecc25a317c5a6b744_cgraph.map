@@ -1,0 +1,5 @@
+<map id="GameDataManager.LevelData.operator==" name="GameDataManager.LevelData.operator==">
+<area shape="rect" id="Node000001" title="Equality compares the LevelMap identity (best time does not affect equality)." alt="" coords="5,13,270,40"/>
+<area shape="rect" id="Node000002" href="$class_game_data_manager_1_1_level_data.html#a3e100065efa7fc76a0d47d489a91b9d4" title="Creates a record with an unknown best time." alt="" coords="318,5,519,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="270,24,302,24,302,29,270,29"/>
+</map>

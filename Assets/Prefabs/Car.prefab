@@ -1831,15 +1831,15 @@ MonoBehaviour:
   autoCreateDefaultBindingsIfMissing: 1
   coMPosition: {x: 0, y: -0.3, z: 0}
   ackermannFactor: 0.8
-  maxSpeed: 300
+  maxSpeed: 200
   maxReverseSpeed: 40
   maxSteerAngleAtTopSpeed: 10
   maxSteerAngle: 30
   steerSpeedDegPerSec: 90
   inputExponent: 1.8
-  maxMotorPower: 10000
-  maxBrakeTorque: 12500
-  handbrakeTorque: 15000
+  maxMotorPower: 15000
+  maxBrakeTorque: 17500
+  handbrakeTorque: 20000
   forwardGears:
   - 3.2
   - 2.1
@@ -2031,15 +2031,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82c9a0912e470934aaf5a1acb6a38e61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 300
+  maxSpeed: 200
   maxReverseSpeed: 40
   maxSteerAngleAtTopSpeed: 10
   maxSteerAngle: 30
   steerSpeedDegPerSec: 90
   inputExponent: 1.8
-  maxMotorPower: 10000
-  maxBrakeTorque: 12500
-  handbrakeTorque: 15000
+  maxMotorPower: 15000
+  maxBrakeTorque: 17500
+  handbrakeTorque: 20000
   antiRollStiffnessFront: 400
   antiRollStiffnessRear: 500
   tractionControlEnabled: 1
