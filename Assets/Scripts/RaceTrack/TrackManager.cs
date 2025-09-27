@@ -7,6 +7,7 @@ using System.Collections;
 public class TrackManager : MonoBehaviour
 {
     public List<CheckPointListener> CheckPoints;
+    public Transform CarSpawn = null;
 
     [Header("Input Settings")]
     [SerializeField] private InputActionProperty respawnLastCheckPoint;
@@ -16,6 +17,8 @@ public class TrackManager : MonoBehaviour
 
     [Header("Car Prefab Reference")]
     [SerializeField] private GameObject carPrefab;
+    [SerializeField] private float carSpawnVerticalOffset = 0.5f;
+    [SerializeField] private float carSpawnHorizontalOffset = -5f;
 
     [Header("Track Settings")]
     [SerializeField] private bool isCircuit = false;
@@ -25,6 +28,7 @@ public class TrackManager : MonoBehaviour
     [Header("Respawn Delay")]
     [SerializeField, Range(0f, 5f)] private float respawnDelay = 3f;
 
+    #region Private Fields
     private GameObject _carInstance;
 
     private int _currentLap = 0;
@@ -48,7 +52,9 @@ public class TrackManager : MonoBehaviour
     private int _respawnCheckPoint = 0;
 
     private float _respawnTimer = 0f;
+    #endregion Private Fields
 
+    #region Public Properties
     public float LastLapTime => _lastLapTime;
     public float CurrentLapTime => Time.time - _lapStartTime;
     public float TotalTrackTime => _isRaceFinished ? _trackEndTime - _trackStartTime : Time.time - _trackStartTime;
@@ -59,7 +65,9 @@ public class TrackManager : MonoBehaviour
 
     public bool IsRaceFinished => _isRaceFinished;
     public float RespawnTimer => _respawnTimer;
+    #endregion Public Properties
 
+    #region Unity Methods
     private void OnValidate()
     {
         if (defaultBindings)
@@ -89,7 +97,28 @@ public class TrackManager : MonoBehaviour
         respawnLastCheckPoint.action.Disable();
         restartRace.action.Disable();
     }
+    private void Awake()
+    {
+    }
 
+    private void Start()
+    {
+        if (CheckPoints.Count != 0)
+        {
+            StartRace();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (_pendingRespawn)
+        {
+            StartCoroutine(RespawnDelayCoroutine(respawnDelay));
+        }
+    }
+    #endregion Unity Methods
+
+    #region Default Input Bindings
     private InputAction CreateDefaultRespawnBind()
     {
         var respawn = new InputAction("Respawn", InputActionType.Button, expectedControlType: "Button");
@@ -107,28 +136,9 @@ public class TrackManager : MonoBehaviour
         restart.AddBinding("<Gamepad>/start");
         return restart;
     }
+    #endregion Default Input Bindings
 
-    private void Awake()
-    {
-    }
-
-    private void Start()
-    {
-        if (CheckPoints.Count != 0)
-        {
-            StartRace();
-        }
-    }
-
-    public void StartRace()
-    {
-        foreach (var checkPoint in CheckPoints)
-        {
-            checkPoint.AddListener(CheckPointTaken);
-        }
-        StartCoroutine(RestartCoroutine());
-    }
-
+    #region Coroutines
     private IEnumerator RestartCoroutine()
     {
         Restart();
@@ -146,13 +156,6 @@ public class TrackManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    private void FixedUpdate()
-    {
-        if (_pendingRespawn)
-        {
-            StartCoroutine(RespawnDelayCoroutine(respawnDelay));
-        }
-    }
 
     private IEnumerator RespawnDelayCoroutine(float delay)
     {
@@ -187,23 +190,29 @@ public class TrackManager : MonoBehaviour
 
         Time.timeScale = 1f;
     }
+    #endregion Coroutines
 
-    private void ResetCheckPoints()
-    {
-        foreach (var checkPoint in CheckPoints)
-        {
-            checkPoint.SetActive(false);
-        }
-        CheckPoints[0].SetActive(true);
-    }
-
+    #region Restart and Respawn Methods
     private void Restart()
     {
         if (_carInstance != null)
         {
             Destroy(_carInstance);
         }
-        _carInstance = Instantiate(carPrefab, transform.position, transform.rotation);
+        Vector3 _carStartPosition;
+        Quaternion _carStartRotation;
+        if (CarSpawn != null)
+        {
+            _carStartPosition = CarSpawn.position;
+            _carStartRotation = CarSpawn.rotation;
+        }
+        else
+        {
+            Debug.LogWarning("Car spawn point not assigned, using TrackManager position.");
+            _carStartPosition = transform.position;
+            _carStartRotation = transform.rotation;
+        }
+        _carInstance = Instantiate(carPrefab, _carStartPosition + (_carStartRotation * Vector3.forward * carSpawnHorizontalOffset) + (Vector3.up * carSpawnVerticalOffset), _carStartRotation);
         _carInstance.tag = "Player";
         Camera.main.GetComponent<FollowCamera>().target = _carInstance.transform;
 
@@ -264,10 +273,38 @@ public class TrackManager : MonoBehaviour
         _lapStartTime += Time.time - _lastCheckPointTime;
         _lastCheckPointTime = Time.time;
     }
+    #endregion Restart and Respawn Methods
+
+    public void StartRace(Vector3? carPosition = null)
+    {
+        if (CheckPoints.Count == 0)
+        {
+            Debug.LogError("No checkpoints assigned to TrackManager.");
+            return;
+        }
+        
+        foreach (var checkPoint in CheckPoints)
+        {
+            checkPoint.RemoveListener(CheckPointTaken);
+            checkPoint.AddListener(CheckPointTaken);
+        }
+
+        var checkpointParent = CheckPoints[0].GetComponentInParent<Transform>();
+        StartCoroutine(RestartCoroutine());
+    }
+
+    private void ResetCheckPoints()
+    {
+        foreach (var checkPoint in CheckPoints)
+        {
+            checkPoint.SetActive(false);
+        }
+        CheckPoints[0].SetActive(true);
+    }
 
     public void CheckPointTaken()
     {
-        Debug.Log($"CheckPoint {_currentCheckPointIndex} taken at {Time.time - _trackStartTime} seconds.");
+        Debug.Log($"CheckPoint {_currentCheckPointIndex} taken at {Time.time - _trackStartTime} seconds. At position {CheckPoints[_currentCheckPointIndex].cPClaimedPosition}");
         if (isCircuit && _currentCheckPointIndex == 0)
         {
             if (_currentLap == laps)
@@ -277,6 +314,7 @@ public class TrackManager : MonoBehaviour
                 _lastLapTime = Time.time - _lapStartTime;
                 CheckPoints[0].SetActive(false);
                 Debug.Log("Track finished! Total time: " + TotalTrackTime);
+                GameDataManager.Instance.CompleteLevel(TotalTrackTime);
                 return;
             }
 

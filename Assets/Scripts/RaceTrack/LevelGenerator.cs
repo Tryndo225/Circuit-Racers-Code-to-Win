@@ -3,13 +3,16 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+#region Seed Generation
 public static class SeedFactory
 {
     private static int _seed = Environment.TickCount;
 
     public static int Next() => Interlocked.Add(ref _seed, unchecked((int)0x9E3779B9));
 }
+#endregion Seed Generation
 
+#region Level Map Class
 [Serializable]
 public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceiver
 {
@@ -85,7 +88,9 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
         UnflattenTiles();
     }
 }
+#endregion Map Class
 
+#region Helper Classes
 [Serializable]
 public struct Coordinates : IEquatable<Coordinates>, ISerializable
 {
@@ -140,8 +145,9 @@ public struct Coordinates : IEquatable<Coordinates>, ISerializable
         info.AddValue("y", Y);
     }
 }
+#endregion Helper Classes
 
-public class LevelGenerator
+public static class LevelGenerator
 {
     private static readonly Coordinates[] offsets = new Coordinates[]
     {
@@ -151,23 +157,12 @@ public class LevelGenerator
         new Coordinates(0, -1)
     };
 
-    private readonly int _steps;
-    private readonly int _stepLength;
-    private readonly int _maxAttempts;
-
-    public LevelGenerator(int steps, int stepLenght, int maxAttempts)
+    public static LevelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLenght, int maxAttempts, int seed)
     {
-        _steps = steps;
-        _stepLength = stepLenght;
-        _maxAttempts = maxAttempts;
+        return GenerateLevel(width, height, isCircuit, steps, stepLenght, maxAttempts, new Random(seed));
     }
 
-    public LevelMap GenerateLevel(int width, int height, bool isCircuit, int seed)
-    {
-        return GenerateLevel(width, height, isCircuit, new Random(seed));
-    }
-
-    public LevelMap GenerateLevel(int width, int height, bool isCircuit, Random rng)
+    public static LevelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLenght, int maxAttempts, Random rng)
     {
         //UnityEngine.Debug.Log("Generating Level");
 
@@ -191,16 +186,16 @@ public class LevelGenerator
 
         if (isCircuit)
         {
-            lastValidPoint = CircuitStarter(levelMap, rng);
+            CircuitStarter(levelMap, rng);
         }
 
         Coordinates possiblePoint;
 
-        for (int i = 0; i < _steps; ++i)
+        for (int i = 0; i < steps; ++i)
         {
             //UnityEngine.Debug.Log($"Step {i + 1}/{_steps}");
 
-            possiblePoint = TryStep(lastValidPoint, levelMap, rng);
+            possiblePoint = TryStep(lastValidPoint, levelMap, stepLenght, maxAttempts, rng);
 
             if (possiblePoint == new Coordinates(-1, -1))
             {
@@ -228,9 +223,9 @@ public class LevelGenerator
 
     #region Step
 
-    private Coordinates TryStep(Coordinates currentPoint, LevelMap levelMap, Random rng)
+    private static Coordinates TryStep(Coordinates currentPoint, LevelMap levelMap, int stepLenght, int maxAttemps, Random rng)
     {
-        var target = PickTarget(currentPoint, levelMap, rng);
+        var target = PickTarget(currentPoint, levelMap, stepLenght, maxAttemps, rng);
         if (target == new Coordinates(-1, -1))
         {
             //UnityEngine.Debug.Log("Failed to find a valid target");
@@ -257,15 +252,15 @@ public class LevelGenerator
 
     #region Target Selection
 
-    private Coordinates PickTarget(Coordinates lastPoint, LevelMap levelMap, Random rng)
+    private static Coordinates PickTarget(Coordinates lastPoint, LevelMap levelMap, int stepLength, int maxAttempts, Random rng)
     {
         int count = 0;
         Coordinates target;
 
-        while (count < _maxAttempts)
+        while (count < maxAttempts)
         {
-            int newX = lastPoint.X + rng.Next(-_stepLength, _stepLength + 1);
-            int newY = lastPoint.Y + rng.Next(-_stepLength, _stepLength + 1);
+            int newX = lastPoint.X + rng.Next(-stepLength, stepLength + 1);
+            int newY = lastPoint.Y + rng.Next(-stepLength, stepLength + 1);
 
             if (!levelMap.Tiles.InBounds(newX, newY))
             {
@@ -284,7 +279,7 @@ public class LevelGenerator
         return new Coordinates(-1, -1);
     }
 
-    private bool TargetCheck(Coordinates current, Coordinates target, LevelMap levelMap)
+    private static bool TargetCheck(Coordinates current, Coordinates target, LevelMap levelMap)
     {
         if (levelMap.Tiles.At(target) == 1)
         {
@@ -316,7 +311,7 @@ public class LevelGenerator
 
         if (levelMap.Circular)
         {
-            return FloodingAlgorithm(target, levelMap.FinishPoint, tilesCopy) && check;
+            return FloodingAlgorithm(target, levelMap.StartPoint, tilesCopy) && check;
         }
 
         return check;
@@ -326,25 +321,37 @@ public class LevelGenerator
 
     #region Circuit Starting
 
-    private static Coordinates CircuitStarter(LevelMap levelMap, Random rng)
+    private static void CircuitStarter(LevelMap levelMap, Random rng)
     {
-        var lastValidPoint = levelMap.StartPoint;
-        if (rng.Next(0, 2) % 2 == 0)
+        for (int i = -1; i <= 1; ++i)
         {
-            levelMap.FinishPoint = new(lastValidPoint.X - 1, lastValidPoint.Y);
-            lastValidPoint.X += 1;
+            for (int j = -1; j <= 1; ++j)
+            {
+                int checkX = levelMap.StartPoint.X + i;
+                int checkY = levelMap.StartPoint.Y + j;
+                if (levelMap.Tiles.InBounds(checkX, checkY))
+                {
+                    levelMap.Tiles[checkX, checkY] = -1; // Fill the area around start point
+                }
+            }
+        }
+
+        if (rng.Next(0, 2) % 2 == 0 && levelMap.Tiles.InBounds(levelMap.StartPoint.X - 1, levelMap.StartPoint.Y) && levelMap.Tiles.InBounds(levelMap.StartPoint.X + 1, levelMap.StartPoint.Y))
+        {
+            // Horizontal start
+            levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = 0;
+            levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = 0;
+        }
+        else if (levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y - 1) && levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y + 1))
+        {
+            // Vertical start
+            levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y + 1] = 0;
+            levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y - 1] = 0;
         }
         else
         {
-            levelMap.FinishPoint = new(lastValidPoint.X, lastValidPoint.Y - 1);
-            lastValidPoint.Y += 1;
+            throw new Exception("Circuit starting failed");
         }
-
-        levelMap.Tiles.At(levelMap.FinishPoint) = 1; // Set finish point as track
-        levelMap.Tiles.At(lastValidPoint) = 1; // Mark start/finish as checkpoint
-
-        RoadSpacer(levelMap.StartPoint, levelMap.Tiles);
-        return lastValidPoint;
     }
 
     #endregion Circuit Starting
@@ -356,9 +363,9 @@ public class LevelGenerator
         UnityEngine.Debug.Log("Finishing Circuit");
         UnityEngine.Debug.Log($"Current map {levelMap.Tiles.Print()}");
         List<Coordinates> modifiedPositions = new List<Coordinates>();
-        if (FloodingAlgorithm(lastPoint, levelMap.FinishPoint, levelMap.Tiles, modifiedPositions))
+        if (FloodingAlgorithm(lastPoint, levelMap.StartPoint, levelMap.Tiles, modifiedPositions))
         {
-            BackTrack(levelMap.FinishPoint, levelMap.Tiles);
+            BackTrack(levelMap.StartPoint, levelMap.Tiles);
             RemovePlaceholders(levelMap.Tiles, modifiedPositions);
             levelMap.FinishPoint = levelMap.StartPoint;
             UnityEngine.Debug.Log($"Circuit finished at {levelMap.FinishPoint}");
@@ -514,6 +521,8 @@ public class LevelGenerator
     #endregion Road Spacing
 }
 
+
+#region Extensions
 public static class Array2DExtensions
 {
     public static ref T At<T>(this T[,] array, Coordinates coords)
@@ -564,3 +573,4 @@ public static class Array2DExtensions
         return max;
     }
 }
+# endregion Extensions

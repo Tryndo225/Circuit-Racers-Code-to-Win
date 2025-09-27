@@ -735,10 +735,6 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChangeSceneState
-  _sceneToLoad:
-    sceneName: Level
-    scenePath: Assets/Scenes/Level.unity
-    sceneAsset: {fileID: 102900000, guid: d5c2cae3d201b1546bfbddc0f1a01656, type: 3}
 --- !u!1 &818862147
 GameObject:
   m_ObjectHideFlags: 0
@@ -1922,8 +1918,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: laps
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: CheckPoints.Array.size
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: carSpawnVerticalOffset
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: carSpawnHorizontalOffset
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: 'CheckPoints.Array.data[0]'
@@ -1967,35 +1975,35 @@ PrefabInstance:
       objectReference: {fileID: 7514944479051483537}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_Id
-      value: b2a9564b-7610-44ff-80dc-7165120e60c7
+      value: e2f7265b-36e3-471d-90b4-1e5c25f3d850
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_Id
-      value: b906c7e5-efbe-4b18-b457-5eb2cf958124
+      value: 36785008-6b88-4448-b85d-6e16beb62759
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: 3b00d392-f75c-45e1-9196-edb64bfb1c3d
+      value: 40d6902e-870d-41cf-9520-50dd51e385af
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: caafb6e9-71bb-4dc6-9cbc-0e05b2e2b03b
+      value: 1f293c29-ed81-4d56-8831-0b8db750bd98
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: d8d3ff98-0118-4495-ac4f-fe87269b2ed9
+      value: b3851bab-7b5a-4d1f-9b2c-c8d981c43556
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: fdfa52be-a71e-4f96-8b38-f4ef3d08c46e
+      value: 46771582-f145-447b-a529-89078915512c
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: 763ae61e-fd2a-4e3f-b535-fc24b693aec6
+      value: 22286661-2eae-457c-82b7-c0eea677970d
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: 06a10467-43f6-472c-9a4c-be7377832c3e
+      value: 5bcb7f37-fe90-43af-a8a5-862b6dcc5cd2
       objectReference: {fileID: 0}
     - target: {fileID: 4655496815021022501, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: m_LocalPosition.x

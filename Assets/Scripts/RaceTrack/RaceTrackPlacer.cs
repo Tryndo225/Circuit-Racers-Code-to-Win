@@ -2,8 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Text;
-using Unity.Mathematics;
+using UnityEngine.UIElements;
 
+#region Helper Structures / Classes
 [Serializable]
 public struct TrackPiece
 {
@@ -22,6 +23,7 @@ public struct TrackPiece
 [Serializable]
 public class StringTrackPieceDictionary : SerializableDictionary<string, TrackPiece>
 { }
+#endregion Helper Structures / Classes
 
 public class RaceTrackPlacer : MonoBehaviour
 {
@@ -32,7 +34,7 @@ public class RaceTrackPlacer : MonoBehaviour
         new Coordinates(0, 1),
         new Coordinates(0, -1)
     };
-
+    #region Legend
     [Header("Track Piece Prefabs")]
     [SerializeField]
     private StringTrackPieceDictionary trackPieceLegend = new StringTrackPieceDictionary()
@@ -85,6 +87,7 @@ public class RaceTrackPlacer : MonoBehaviour
           "XX1XX" +
           "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Down-Left
 	};
+    #endregion Legend
 
     [SerializeField] private GameObject raceTrackStartFinishPrefab;
     [SerializeField] private List<GameObject> bigPieces;
@@ -99,6 +102,7 @@ public class RaceTrackPlacer : MonoBehaviour
     private List<int> possibleSizes = new List<int>();
     private StringBuilder patternBuilder = new StringBuilder();
 
+    #region Setup
     private void Start()
     {
         levelMap = GameDataManager.Instance.CurrentLevelMap;
@@ -125,7 +129,9 @@ public class RaceTrackPlacer : MonoBehaviour
             PlaceTrackPieces();
         }
     }
+    #endregion Setup
 
+    #region Track Placement
     private void PlaceTrackPieces()
     {
         if (levelMap == null || levelMap.Tiles == null)
@@ -136,25 +142,18 @@ public class RaceTrackPlacer : MonoBehaviour
 
         var piecesToPlace = CreateTrack();
         Coordinates? position = levelMap.StartPoint;
-        Coordinates lastPosition = levelMap.StartPoint;
+        HashSet<Coordinates> visited = new HashSet<Coordinates>();
+
         bool nextToBigPiece = false;
+        var trackManager = FindFirstObjectByType<TrackManager>();
 
         while (true)
         {
-            position = Step(piecesToPlace, position.Value, ref lastPosition);
             if (position == null)
                 break;
 
-            nextToBigPiece = false;
-            foreach (var offset in offsets)
-            {
-                var neighbor = position.Value + offset;
-                if (piecesToPlace.InBounds(neighbor.X, neighbor.Y) && bigPieces.Contains(piecesToPlace[neighbor.X, neighbor.Y].Prefab))
-                {
-                    nextToBigPiece = true;
-                    break;
-                }
-            }
+            nextToBigPiece = NextToTypes(position.Value, piecesToPlace, bigPieces);
+            
             if (piecesToPlace[position.Value.X, position.Value.Y].Prefab != null && !nextToBigPiece)
             {
                 var newGameObject = Instantiate(piecesToPlace[position.Value.X, position.Value.Y].Prefab,
@@ -164,31 +163,39 @@ public class RaceTrackPlacer : MonoBehaviour
 
                 if (piecesToPlace[position.Value.X, position.Value.Y].Prefab == raceTrackStartFinishPrefab || piecesToPlace[position.Value.X, position.Value.Y].Prefab == checkpointPrefab)
                 {
-                    FindFirstObjectByType<TrackManager>().CheckPoints.Add(newGameObject.GetComponentInChildren<CheckPointListener>());
+                    trackManager.CheckPoints.Add(newGameObject.GetComponentInChildren<CheckPointListener>());
+
+                    if (position.Value == levelMap.StartPoint)
+                    {
+                        trackManager.CarSpawn = newGameObject.transform;
+                    }
                 }
             }
-        }
-    }
 
-    private Coordinates? Step(TrackPiece[,] piecesToPlace, Coordinates position, ref Coordinates lastPosition)
+            visited.Add(position.Value);
+            position = Step(piecesToPlace, position.Value, visited);
+        }
+
+        trackManager.StartRace();
+    }
+    #endregion Track Placement
+
+    #region Track Traversal
+
+    private Coordinates? Step(TrackPiece[,] piecesToPlace, Coordinates position, HashSet<Coordinates> visited)
     {
         foreach (var offset in offsets)
         {
             var next = position + offset;
-            if (!piecesToPlace.InBounds(next.X, next.Y))
-                continue;
-            if (piecesToPlace[next.X, next.Y].Prefab == null)
-                continue;
-            if (next == lastPosition)
-                continue;
-
-            lastPosition = position;
-            return next;
+            if (piecesToPlace.InBounds(next.X, next.Y) && piecesToPlace[next.X, next.Y].Prefab != null && !visited.Contains(next))
+                return next;
         }
 
         return null;
     }
+    #endregion Track Traversal
 
+    #region Track Creation
     private TrackPiece[,] CreateTrack()
     {
         TrackPiece[,] piecesToPlace = new TrackPiece[levelMap.Tiles.GetLength(0), levelMap.Tiles.GetLength(1)];
@@ -215,6 +222,7 @@ public class RaceTrackPlacer : MonoBehaviour
         return piecesToPlace;
     }
 
+    #region Pattern Matching
     private TrackPiece? GetTrackPiece(Coordinates coordinates)
     {
         string pattern = "";
@@ -224,7 +232,7 @@ public class RaceTrackPlacer : MonoBehaviour
             pattern = ExtractPattern(coordinates, size);
             if (trackPieceLegend.TryGetValue(pattern, out TrackPiece trackPiece))
             {
-                Vector3 positionOffset = new Vector3(coordinates.X * blockOffset, 0, coordinates.Y * blockOffset);
+                Vector3 positionOffset = transform.position + new Vector3(coordinates.X * blockOffset, 0f, coordinates.Y * blockOffset);
                 trackPiece.Position = positionOffset;
 
                 if (coordinates == levelMap.StartPoint || coordinates == levelMap.FinishPoint)
@@ -267,36 +275,48 @@ public class RaceTrackPlacer : MonoBehaviour
                 }
                 else if (levelMap.Tiles.InBounds(x, y))
                 {
-                    int v = levelMap.Tiles[x, y];
-                    c = (v == 1) ? '1' : 'X';
+                    if (levelMap.Tiles[x, y] == -2 || (x == levelMap.StartPoint.X && y == levelMap.StartPoint.Y) || (x == levelMap.FinishPoint.X && y == levelMap.FinishPoint.Y))
+                    {
+                        if (halfSize > 1)
+                            c = 'C'; // Checkpoint treated as special piece in larger patterns
+                        else
+                            c = '1'; // Checkpoint treated as normal piece in smallest patterns
+                    }
+                    else if (levelMap.Tiles[x, y] == 1)
+                    {
+                        c = '1'; // Track piece
+                    }
                 }
                 pattern[py, px] = c;
             }
         }
 
-        for (int x = 0; x < size; x++)
+        for (int y = 0; y < size; y++)
         {
-            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
             {
-                if (pattern[x, y] == '1' && IsAlone(new Coordinates(x, y), pattern))
+                if (pattern[y, x] == '1' && IsAlone(new Coordinates(y, x), pattern))
                 {
-                    pattern[x, y] = 'X'; // Isolated track piece treated as empty
+                    pattern[y, x] = 'X'; // Isolated track piece treated as empty
                 }
             }
         }
 
         patternBuilder.Clear();
-        for (int i = 0; i < size; i++)
+        for (int y = 0; y < size; y++)
         {
-            for (int j = 0; j < size; j++)
+            for (int x = 0; x < size; x++)
             {
-                patternBuilder.Append(pattern[i, j]);
+                patternBuilder.Append(pattern[y, x]);
             }
         }
 
         return patternBuilder.ToString();
     }
+    #endregion Pattern Matching
+    #endregion Track Creation
 
+    #region Helper Methods
     private bool IsAlone(Coordinates position, char[,] pattern)
     {
         foreach (var offset in offsets)
@@ -309,4 +329,20 @@ public class RaceTrackPlacer : MonoBehaviour
         }
         return true;
     }
+
+    private bool NextToTypes(Coordinates position, TrackPiece[,] pieces, List<GameObject> types)
+    {
+        bool nextToType = false;
+        foreach (var offset in offsets)
+        {
+            var neighbor = position + offset;
+            if (pieces.InBounds(neighbor.X, neighbor.Y) && (types.Contains(pieces[neighbor.X, neighbor.Y].Prefab) || pieces[neighbor.X, neighbor.Y].Prefab == trackPieceLegend["XX1XXXX1XXXX111XXXXXXXXXX"].Prefab))
+            {
+                nextToType = true;
+                break;
+            }
+        }
+        return nextToType;
+    }
+    #endregion Helper Methods
 }

@@ -4,6 +4,7 @@ using System;
 using System.Runtime.Serialization;
 using IEnumerableExtention;
 
+#region Helper Classes
 [Serializable]
 public class LevelData : ISerializable
 {
@@ -98,6 +99,7 @@ public class GameData : ISerializable
         return Levels.Exists(ld => ld.LevelMap == map);
     }
 }
+#endregion Helper Classes
 
 public class GameDataManager : Generic.Singleton<GameDataManager>
 {
@@ -105,10 +107,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
     public LevelMap CurrentLevelMap { get; private set; } = null;
     public int Hash { get; private set; }
 
-    public LevelGenerator Generator { get; private set; } = new LevelGenerator(20, 10, 1000);
-
     private List<Action> onGameDataChanged = new List<Action>();
 
+    #region Unity Methods
     private void Start()
     {
         if (PlayerPrefs.HasKey("GameData"))
@@ -121,7 +122,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
     {
         SaveGameData();
     }
+    #endregion Unity Methods
 
+    #region Observer Pattern Methods
     public void AddListener(Action action)
     {
         onGameDataChanged.Add(action);
@@ -131,7 +134,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
     {
         onGameDataChanged.Remove(action);
     }
+    #endregion Observer Pattern Methods
 
+    #region Data Persistence Methods
     private void SaveGameData()
     {
         try
@@ -175,7 +180,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
             CurrentGameData = new GameData();
         }
     }
+    #endregion Data Persistence Methods
 
+    #region Game Data Management Methods
     public void GoToSelectedLevel()
     {
         if (CurrentLevelMap == null)
@@ -258,7 +265,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
         var newHash = CurrentGameData.Levels.GetContentHash();
         PotentialHashChange(newHash);
     }
+    #endregion Game Data Management Methods
 
+    #region Helper Methods
     private void PotentialHashChange(int hash)
     {
         Debug.Log($"Current Hash: {Hash}, New Hash: {hash}");
@@ -272,4 +281,5 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
             }
         }
     }
+    #endregion Helper Methods
 }

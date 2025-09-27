@@ -21,6 +21,7 @@ public class CheckPointListener : MonoBehaviour
     public Vector3 cPClaimedRbLinearVelocity { get; private set; }
     public Vector3 cPClaimedRbAngularVelocity { get; private set; }
 
+    #region Unity Methods
     private void OnValidate()
     {
         GetReferences();
@@ -35,7 +36,9 @@ public class CheckPointListener : MonoBehaviour
     {
         GetReferences();
     }
+    #endregion Unity Methods
 
+    #region Setup Methods
     private void GetReferences()
     {
         checkPointCollider = GetComponent<Collider>();
@@ -55,28 +58,7 @@ public class CheckPointListener : MonoBehaviour
             Debug.LogError("CheckPointListener requires a Renderer component.");
         }
     }
-
-    public void SetActive(bool isActive)
-    {
-        if (checkPointCollider == null || checkPointRenderer == null)
-        {
-            GetReferences();
-        }
-
-        _isActive = isActive;
-        checkPointCollider.enabled = isActive;
-        checkPointRenderer.enabled = isActive;
-    }
-
-    public void AddListener(Action listener)
-    {
-        _listeners.Add(listener);
-    }
-
-    public bool RemoveListener(Action listener)
-    {
-        return _listeners.Remove(listener);
-    }
+    #endregion Setup Methods
 
     private void OnTriggerEnter(Collider other)
     {
@@ -101,4 +83,28 @@ public class CheckPointListener : MonoBehaviour
             }
         }
     }
+
+    public void SetActive(bool isActive)
+    {
+        if (checkPointCollider == null || checkPointRenderer == null)
+        {
+            GetReferences();
+        }
+
+        _isActive = isActive;
+        checkPointCollider.enabled = isActive;
+        checkPointRenderer.enabled = isActive;
+    }
+
+    #region Observer Pattern Methods
+    public void AddListener(Action listener)
+    {
+        _listeners.Add(listener);
+    }
+
+    public bool RemoveListener(Action listener)
+    {
+        return _listeners.Remove(listener);
+    }
+    #endregion Observer Pattern Methods
 }

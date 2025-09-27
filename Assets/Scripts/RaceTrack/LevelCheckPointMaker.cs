@@ -49,7 +49,7 @@ public static class LevelCheckPointMaker
             {
                 if (straightStart != levelMap.StartPoint && straightStart != levelMap.FinishPoint)
                 {
-                    levelMap.Tiles.At(straightStart + ((straightCount / 2) - 1) * direction) = -2;
+                    levelMap.Tiles.At(straightStart + ((straightCount - 1) / 2) * direction) = -2;
                 }
                 checkpointPlacedForThisStraight = true;
             }
