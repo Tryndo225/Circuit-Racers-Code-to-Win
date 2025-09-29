@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using UnityEngine.UIElements;
+using System.Threading.Tasks;
 
 #region Helper Structures / Classes
 
@@ -22,17 +23,21 @@ public struct TrackPiece
     /// <summary>World-space rotation to apply to the prefab.</summary>
     public Quaternion Rotation;
 
+    /// <summary>Tile Size of the given prefab.</summary>
+    public int Size;
+
     /// <summary>
     /// Creates a new <see cref="TrackPiece"/> with explicit prefab and pose.
     /// </summary>
     /// <param name="prefab">Prefab reference (can be <c>null</c> for "no piece").</param>
     /// <param name="position">World-space placement position.</param>
     /// <param name="rotation">World-space placement rotation.</param>
-    public TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation)
+    public TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation, int size = 3)
     {
         Prefab = prefab;
         Position = position;
         Rotation = rotation;
+        Size = size;
     }
 }
 
@@ -43,6 +48,7 @@ public struct TrackPiece
 [Serializable]
 public class StringTrackPieceDictionary : SerializableDictionary<string, TrackPiece>
 { }
+
 #endregion Helper Structures / Classes
 
 /// <summary>
@@ -110,40 +116,43 @@ public class RaceTrackPlacer : MonoBehaviour
           "XX1XX" +
           "XX111" +
           "XXXXX" +
-          "XXXXX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Up-Right
+          "XXXXX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Up-Right
 
         { "XX1XX" +
           "XX1XX" +
           "111XX" +
           "XXXXX" +
-          "XXXXX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Up-Left
+          "XXXXX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Up-Left
 
         { "XXXXX" +
           "XXXXX" +
           "XX111" +
           "XX1XX" +
-          "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Down-Right
+          "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Down-Right
 
         { "XXXXX" +
           "XXXXX" +
           "111XX" +
           "XX1XX" +
-          "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Long Curve Down-Left
+          "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Down-Left
     };
+
     #endregion Legend
+
+    /// <summary>Prefab for cells next to larger pieces for no clipping/ovelap.</summary>
+    [SerializeField] private GameObject blankPlaceHolderPrefab;
+
+    [SerializeField] private GameObject bigBlockHelper;
 
     /// <summary>Prefab for start/finish cells (placed on <see cref="LevelMap.StartPoint"/> and <see cref="LevelMap.FinishPoint"/>).</summary>
     [SerializeField] private GameObject raceTrackStartFinishPrefab;
-
-    /// <summary>Optional list of “big” pieces; adjacency to these can suppress placement to avoid overlap.</summary>
-    [SerializeField] private List<GameObject> bigPieces;
 
     /// <summary>Prefab for intermediate checkpoint cells (non-start/finish with special value).</summary>
     [SerializeField] private GameObject checkpointPrefab;
 
     [Header("Track Settings")]
     /// <summary>World-space spacing per grid step (meters) when placing pieces.</summary>
-    [SerializeField] private int blockOffset = 15;
+    [SerializeField] private float blockOffset = 15;
 
     [Header("Track Layout")]
     /// <summary>Runtime copy of the level layout pulled from <see cref="GameDataManager"/> at start.</summary>
@@ -170,22 +179,16 @@ public class RaceTrackPlacer : MonoBehaviour
         }
         else
         {
-            foreach (var key in trackPieceLegend.Keys)
+            foreach (var value in trackPieceLegend.Values)
             {
-                int keySquared = Mathf.RoundToInt(Mathf.Sqrt(key.Length));
-
-                if (keySquared * keySquared != key.Length)
-                {
-                    Debug.LogError($"Legend key length {key.Length} is not a perfect square: {key}");
-                    continue;
-                }
-                if (!possibleSizes.Contains(keySquared))
-                    possibleSizes.Add(keySquared);
+                possibleSizes.Add(value.Size);
             }
             possibleSizes.Sort((a, b) => b.CompareTo(a)); // Sort descending
+
             PlaceTrackPieces();
         }
     }
+
     #endregion Setup
 
     #region Track Placement
@@ -201,12 +204,13 @@ public class RaceTrackPlacer : MonoBehaviour
             Debug.LogError("LevelMap or its Tiles are not set.");
             return;
         }
-
         var piecesToPlace = CreateTrack();
+
+        StopOverlaying(piecesToPlace);
+
         Coordinates? position = levelMap.StartPoint;
         HashSet<Coordinates> visited = new HashSet<Coordinates>();
 
-        bool nextToBigPiece = false;
         var trackManager = FindFirstObjectByType<TrackManager>();
 
         while (true)
@@ -214,9 +218,7 @@ public class RaceTrackPlacer : MonoBehaviour
             if (position == null)
                 break;
 
-            nextToBigPiece = NextToTypes(position.Value, piecesToPlace, bigPieces);
-
-            if (piecesToPlace[position.Value.X, position.Value.Y].Prefab != null && !nextToBigPiece)
+            if (piecesToPlace[position.Value.X, position.Value.Y].Prefab != null && piecesToPlace[position.Value.X, position.Value.Y].Prefab != blankPlaceHolderPrefab)
             {
                 var newGameObject = Instantiate(piecesToPlace[position.Value.X, position.Value.Y].Prefab,
                             piecesToPlace[position.Value.X, position.Value.Y].Position,
@@ -240,6 +242,24 @@ public class RaceTrackPlacer : MonoBehaviour
 
         trackManager.StartRace();
     }
+
+    private void StopOverlaying(TrackPiece[,] pieces)
+    {
+        int surroundingBlockOverlayed;
+        for (int i = 0; i < pieces.GetLength(0); i++)
+        {
+            for (int j = 0; j < pieces.GetLength(1); j++)
+            {
+                surroundingBlockOverlayed = (pieces[i, j].Size / 2) - 1;
+
+                if (pieces[i, j].Prefab != null && 0 < surroundingBlockOverlayed)
+                {
+                    RemoveAllSurrounding(new Coordinates(i, j), pieces, surroundingBlockOverlayed);
+                }
+            }
+        }
+    }
+
     #endregion Track Placement
 
     #region Track Traversal
@@ -259,6 +279,7 @@ public class RaceTrackPlacer : MonoBehaviour
 
         return null;
     }
+
     #endregion Track Traversal
 
     #region Track Creation
@@ -397,7 +418,9 @@ public class RaceTrackPlacer : MonoBehaviour
 
         return patternBuilder.ToString();
     }
+
     #endregion Pattern Matching
+
     #endregion Track Creation
 
     #region Helper Methods
@@ -430,7 +453,7 @@ public class RaceTrackPlacer : MonoBehaviour
         foreach (var offset in offsets)
         {
             var neighbor = position + offset;
-            if (pieces.InBounds(neighbor.X, neighbor.Y) && (types.Contains(pieces[neighbor.X, neighbor.Y].Prefab) || pieces[neighbor.X, neighbor.Y].Prefab == trackPieceLegend["XX1XXXX1XXXX111XXXXXXXXXX"].Prefab))
+            if (pieces.InBounds(neighbor.X, neighbor.Y) && types.Contains(pieces[neighbor.X, neighbor.Y].Prefab))
             {
                 nextToType = true;
                 break;
@@ -438,5 +461,40 @@ public class RaceTrackPlacer : MonoBehaviour
         }
         return nextToType;
     }
+
+    private void RemoveBlankPieces(TrackPiece[,] pieces)
+    {
+        for (var i = 0; i < pieces.GetLength(0); i++)
+        {
+            for (var j = 0; j < pieces.GetLength(1); j++)
+            {
+                var piece = pieces[i, j];
+                if (piece.Prefab == blankPlaceHolderPrefab)
+                {
+                    piece.Prefab = null;
+                }
+            }
+        }
+    }
+
+    private void RemoveAllSurrounding(Coordinates position, TrackPiece[,] pieces, int halfSize)
+    {
+        for (int dx = -halfSize; dx <= halfSize; dx++)
+        {
+            for (int dy = -halfSize; dy <= halfSize; dy++)
+            {
+                if (dx == 0 && dy == 0)
+                    continue;
+
+                int x = position.X + dx;
+                int y = position.Y + dy;
+                if (pieces.InBounds(x, y) && pieces[x, y].Prefab != null)
+                {
+                    pieces[x, y].Prefab = blankPlaceHolderPrefab;
+                }
+            }
+        }
+    }
+
     #endregion Helper Methods
 }

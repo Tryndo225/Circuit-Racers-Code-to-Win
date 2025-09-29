@@ -4,17 +4,18 @@ using System.Threading.Tasks;
 using UnityEngine.UI;
 
 #region Generic Button Handler
+
 /// <summary>
 /// Generic UI button driver that delegates its click behavior to a pluggable <see cref="ButtonType"/>.
 /// </summary>
 /// <remarks>
 /// @ingroup ui
 /// @brief Keeps scene/UI logic decoupled by holding a serialized strategy object that implements <see cref="ButtonType.Action"/>.
-/// 
+///
 /// Usage:
 /// - Assign a <see cref="ButtonType"/> (e.g., <see cref="ChangeSceneButton"/>, <see cref="GenerateLevelButton"/>) in the Inspector.
 /// - Hook the Unity Button's OnClick() to <see cref="OnButtonClick"/> (or call it from a UnityEvent).
-/// 
+///
 /// Threading:
 /// - Unity main thread for <see cref="OnButtonClick"/>; specific strategies may spawn background work (see <see cref="GenerateLevelButton"/>).
 /// </remarks>
@@ -47,9 +48,11 @@ public class ButtonScript : MonoBehaviour
         properties.Action();
     }
 }
+
 #endregion Generic Button Handler
 
 #region Button Types
+
 /// <summary>
 /// Abstract strategy for a button action. Concrete implementations encapsulate the behavior
 /// (scene change, level selection, generation, etc.) without coupling UI to systems.
@@ -69,6 +72,7 @@ public abstract class ButtonType
 }
 
 #region Concrete Button Types
+
 /// <summary>
 /// Strategy: change to a specific scene via <see cref="SceneManagement"/>.
 /// </summary>
@@ -177,10 +181,10 @@ public class RemoveLevelButton : ButtonType
 /// - Reads UI sliders/toggles to update generation parameters.
 /// - Runs generation and checkpoint placement on background threads via <see cref="Task.Run"/>.
 /// - On success, shows the result in <see cref="LevelPopUp"/> attached to <see cref="popUp"/>.
-/// 
+///
 /// Threading:
 /// - Kicks off CPU work on background threads; UI interactions remain on main.
-/// 
+///
 /// Invariants:
 /// - <see cref="popUp"/> must reference a GameObject with a <see cref="LevelPopUp"/> component.
 /// </remarks>
@@ -188,34 +192,47 @@ public class RemoveLevelButton : ButtonType
 public class GenerateLevelButton : ButtonType
 {
     #region References (UI)
+
     /// <summary>Popup container that owns a <see cref="LevelPopUp"/> for previewing the generated map.</summary>
     [Header("References")]
     [SerializeField] private GameObject popUp;
+
     /// <summary>Slider for width (X) in tiles.</summary>
     [SerializeField] private Slider sizeXSlider;
+
     /// <summary>Slider for height (Y) in tiles.</summary>
     [SerializeField] private Slider sizeYSlider;
+
     /// <summary>Slider for step count (carving iterations).</summary>
     [SerializeField] private Slider stepCountSlider;
+
     /// <summary>Toggle to generate circuits (loop) instead of point-to-point tracks.</summary>
     [SerializeField] private Toggle createCircuitsToggle;
-    #endregion
+
+    #endregion References (UI)
 
     #region Generation Settings (defaults)
+
     /// <summary>Whether to attempt creating closed-loop tracks.</summary>
     [Header("Generation Settings")]
     [SerializeField] public bool createCircuits = true;
+
     /// <summary>Grid width in tiles.</summary>
     [SerializeField] public int sizeX = 50;
+
     /// <summary>Grid height in tiles.</summary>
     [SerializeField] public int sizeY = 50;
+
     /// <summary>Total carving steps.</summary>
     [SerializeField] private int stepCount = 20;
+
     /// <summary>Computed step size (derived from area and count).</summary>
     [SerializeField, ReadOnly] private int stepSize;
+
     /// <summary>Max attempts per step to find a valid target.</summary>
     [SerializeField] private int maxAttemps = 1000;
-    #endregion
+
+    #endregion Generation Settings (defaults)
 
     /// <summary>Parameterless ctor for serialization.</summary>
     public GenerateLevelButton()
@@ -268,7 +285,7 @@ public class GenerateLevelButton : ButtonType
 
             await Task.Run(() =>
             {
-                LevelCheckPointMaker.GenerateCheckPoints(map);
+                LevelCheckPointMaker.GenerateCheckPoints(map, 2);
             });
 
             Debug.Log("Checkpoints generated, showing map...");
@@ -326,5 +343,7 @@ public class GoToSelectedLevel : ButtonType
         GameDataManager.Instance.GoToSelectedLevel();
     }
 }
+
 #endregion Concrete Button Types
+
 #endregion Button Types

@@ -63,7 +63,6 @@ public static class LevelCheckPointMaker
         Coordinates newDirection = Invalid;
         int straightCount = 0;
         Coordinates straightStart = Invalid;
-        bool checkpointPlacedForThisStraight = true;
 
         while (true)
         {
@@ -78,22 +77,20 @@ public static class LevelCheckPointMaker
             }
             else
             {
+                if (straightCount >= minStraightCountForChackPoint)
+                {
+                    if (straightStart != levelMap.StartPoint && straightStart != levelMap.FinishPoint)
+                    {
+                        levelMap.Tiles.At(straightStart + (straightCount / 2 - 1) * direction) = -2;
+                    }
+                }
+
                 if (direction != Invalid)
                 {
                     straightStart = position;
                     straightCount = 1;
-                    checkpointPlacedForThisStraight = false;
                 }
                 direction = newDirection;
-            }
-
-            if (!checkpointPlacedForThisStraight && straightCount >= minStraightCountForChackPoint)
-            {
-                if (straightStart != levelMap.StartPoint && straightStart != levelMap.FinishPoint)
-                {
-                    levelMap.Tiles.At(straightStart + ((straightCount - 1) / 2) * direction) = -2;
-                }
-                checkpointPlacedForThisStraight = true;
             }
         }
     }

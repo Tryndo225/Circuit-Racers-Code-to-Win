@@ -9,21 +9,21 @@ using System;
 /// <remarks>
 /// @ingroup ui
 /// @brief Non-intrusive overlay; read-only view of gameplay timing/progression.
-/// 
+///
 /// Responsibilities:
 /// - Show a full-screen filter and countdown during restarts/respawns (based on <see cref="TrackManager.RespawnTimer"/>).
 /// - Display current lap time and total elapsed track time (after the race has begun).
 /// - Display lap counter and current checkpoint index.
 /// - Show a finish screen with the final time when the race ends.
-/// 
+///
 /// Threading:
 /// - Unity main thread only (driven by <see cref="Update"/>).
-/// 
+///
 /// Dependencies:
 /// - <see cref="TrackManager"/> for race state.
 /// - TextMeshPro (<see cref="TMP_Text"/>) for labels.
 /// - Assigned overlay GameObjects in the scene/inspector.
-/// 
+///
 /// Usage:
 /// - Place on a Canvas GameObject.
 /// - Wire all serialized fields in the Inspector (labels and overlay panels).
@@ -39,7 +39,7 @@ public class RaceOverLay : MonoBehaviour
     /// <summary>Countdown text rendered on top of <see cref="startFilter"/>.</summary>
     [SerializeField] private TMP_Text startTimer;
 
-    #endregion
+    #endregion Inspector : Start Overlay
 
     #region Inspector : Timers
 
@@ -49,7 +49,7 @@ public class RaceOverLay : MonoBehaviour
     /// <summary>Label for the total running time of the track (from race start).</summary>
     [SerializeField] private TMP_Text trackTime;
 
-    #endregion
+    #endregion Inspector : Timers
 
     #region Inspector : Counters
 
@@ -59,7 +59,7 @@ public class RaceOverLay : MonoBehaviour
     /// <summary>Label for the current checkpoint index and total count (e.g., "2/8").</summary>
     [SerializeField] private TMP_Text checkPointCount;
 
-    #endregion
+    #endregion Inspector : Counters
 
     #region Inspector : Finish Screen
 
@@ -69,14 +69,17 @@ public class RaceOverLay : MonoBehaviour
     /// <summary>Label for the final total time shown on the finish screen.</summary>
     [SerializeField] private TMP_Text finalTime;
 
-    #endregion
+    #endregion Inspector : Finish Screen
 
     #region References
 
     /// <summary>Source of race state. Auto-assigned via <see cref="FindFirstObjectByType{T}"/> when missing.</summary>
     [SerializeField, ReadOnly] private TrackManager trackManager;
 
-    #endregion
+    #endregion References
+
+    /// <summary>Tracks whether Overlay was shown to avoid repeated toggling.</summary>
+    private bool toggled = false;
 
     #region Unity Methods
 
@@ -107,6 +110,7 @@ public class RaceOverLay : MonoBehaviour
         trackTime.text = "";
         finalTime.text = "";
         startTimer.text = "";
+        toggled = false;
         startFilter.SetActive(false);
         finishScreen.SetActive(false);
     }
@@ -117,45 +121,55 @@ public class RaceOverLay : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (trackManager == null) return;
-        if (trackManager.RespawnTimer > 0)
+        if (!toggled)
         {
-            startFilter.SetActive(true);
-            startTimer.text = $"{trackManager.RespawnTimer:0}";
-        }
-        else
-        {
-            startTimer.text = "";
-            startFilter.SetActive(false);
-        }
+            if (trackManager == null) return;
+            if (trackManager.RespawnTimer > 0)
+            {
+                startFilter.SetActive(true);
+                startTimer.text = $"{trackManager.RespawnTimer:0}";
+            }
+            else
+            {
+                startTimer.text = "";
+                startFilter.SetActive(false);
+            }
 
-        lapTime.text = FormatTime(trackManager.CurrentLapTime);
+            lapTime.text = FormatTime(trackManager.CurrentLapTime);
 
-        if (trackManager.CurrentLap > 0)
-        {
-            trackTime.text = FormatTime(trackManager.TotalTrackTime);
-        }
-        else
-        {
-            trackTime.text = "";
-        }
+            if (trackManager.CurrentLap > 0)
+            {
+                trackTime.text = FormatTime(trackManager.TotalTrackTime);
+            }
+            else
+            {
+                trackTime.text = "";
+            }
 
-        lapCounter.text = $"{trackManager.CurrentLap}/{trackManager.TotalLaps}";
-        checkPointCount.text = $"{trackManager.CurrentCheckPointIndex}/{trackManager.TotalCheckPoints}";
+            lapCounter.text = $"{trackManager.CurrentLap}/{trackManager.TotalLaps}";
+            checkPointCount.text = $"{trackManager.CurrentCheckPointIndex}/{trackManager.TotalCheckPoints}";
 
-        if (trackManager.IsRaceFinished)
-        {
-            finishScreen.SetActive(true);
-            finalTime.text = $"Final Time: {FormatTime(trackManager.TotalTrackTime)}";
-        }
-        else
-        {
-            finalTime.text = "";
-            finishScreen.SetActive(false);
+            if (trackManager.IsRaceFinished)
+            {
+                finishScreen.SetActive(true);
+                finalTime.text = $"Final Time: {FormatTime(trackManager.TotalTrackTime)}";
+                toggled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape) && !finishScreen.activeSelf)
+            {
+                finishScreen.SetActive(true);
+                finalTime.text = $"Unfinished";
+                toggled = true;
+            }
+            else
+            {
+                finalTime.text = "";
+                finishScreen.SetActive(false);
+            }
         }
     }
 
-    #endregion
+    #endregion Unity Methods
 
     #region Formatting
 
@@ -173,5 +187,5 @@ public class RaceOverLay : MonoBehaviour
             return string.Format("{0:D2}:{1:D2}.{2:D3}", t.Minutes, t.Seconds, t.Milliseconds);
     }
 
-    #endregion
+    #endregion Formatting
 }
