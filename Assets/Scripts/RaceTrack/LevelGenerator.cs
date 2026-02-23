@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 #region Seed Generation
+
 /// <summary>
 /// Thread-safe seed provider for initializing <see cref="Random"/> instances without collisions.
 /// </summary>
@@ -24,9 +25,11 @@ public static class SeedFactory
     /// <returns>New pseudo-random seed value.</returns>
     public static int Next() => Interlocked.Add(ref _seed, unchecked((int)0x9E3779B9));
 }
+
 #endregion Seed Generation
 
 #region Level Map Class
+
 /// <summary>
 /// Serializable level definition for a grid-based track: dimensions, circuit flag, endpoints,
 /// and a 2D tile map with Unity-friendly flatten/unflatten for serialization.
@@ -157,10 +160,39 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
     {
         UnflattenTiles();
     }
+
+    public LevelMap Copy()
+    {
+        LevelMap newMap = new LevelMap();
+        newMap.Name = this.Name;
+        newMap.Width = this.Width;
+        newMap.Height = this.Height;
+        newMap.Circular = this.Circular;
+        newMap.StartPoint = this.StartPoint;
+        newMap.FinishPoint = this.FinishPoint;
+        newMap.Tiles = this.Tiles.Copy();
+        return newMap;
+    }
+
+    public override string ToString()
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        for (int y = 0; y < Height; ++y)
+        {
+            for (int x = 0; x < Width; ++x)
+            {
+                sb.Append(Tiles[x, y]);
+            }
+            sb.AppendLine();
+        }
+        return sb.ToString();
+    }
 }
-#endregion Map Class
+
+#endregion Level Map Class
 
 #region Helper Classes
+
 /// <summary>
 /// Integer coordinate pair with arithmetic, equality, and serialization support.
 /// </summary>
@@ -244,6 +276,7 @@ public struct Coordinates : IEquatable<Coordinates>, ISerializable
         info.AddValue("y", Y);
     }
 }
+
 #endregion Helper Classes
 
 /// <summary>
@@ -273,7 +306,7 @@ public static class LevelGenerator
     /// <param name="height">Grid height (tiles).</param>
     /// <param name="isCircuit">True for a closed loop; false for point-to-point.</param>
     /// <param name="steps">Number of carving iterations.</param>
-    /// <param name="stepLenght">Maximum manhattan distance to attempt per step (typo preserved).</param>
+    /// <param name="stepLenght">Maximum Manhattan distance to attempt per step (typo preserved).</param>
     /// <param name="maxAttempts">Max attempts to find a valid target per step.</param>
     /// <param name="seed">Seed for RNG.</param>
     /// <returns>A populated <see cref="LevelMap"/>.</returns>
@@ -353,6 +386,7 @@ public static class LevelGenerator
     }
 
     #region Step
+
     /// <summary>
     /// Attempts a single carve step: pick target, BFS flood, backtrack to carve, cleanup placeholders.
     /// </summary>
@@ -386,9 +420,11 @@ public static class LevelGenerator
             return new Coordinates(-1, -1);
         }
     }
+
     #endregion Step
 
     #region Target Selection
+
     /// <summary>
     /// Picks a reachable target coordinate near <paramref name="lastPoint"/> within constraints.
     /// </summary>
@@ -460,9 +496,11 @@ public static class LevelGenerator
 
         return check;
     }
+
     #endregion Target Selection
 
     #region Circuit Starting
+
     /// <summary>
     /// Prepares a circuit start area by clearing neighbors around <see cref="LevelMap.StartPoint"/>
     /// and opening one axis to begin the loop.
@@ -499,9 +537,11 @@ public static class LevelGenerator
             throw new Exception("Circuit starting failed");
         }
     }
+
     #endregion Circuit Starting
 
     #region Circuit Finishing
+
     /// <summary>
     /// Completes a circuit by BFS from the last point back to <see cref="LevelMap.StartPoint"/>,
     /// carving the final segment.
@@ -524,9 +564,11 @@ public static class LevelGenerator
             throw new Exception("Circuit finishing failed");
         }
     }
+
     #endregion Circuit Finishing
 
     #region Flooding and Backtracking
+
     /// <summary>
     /// Internal BFS step (position + turn count).
     /// </summary>
@@ -651,9 +693,11 @@ public static class LevelGenerator
             }
         }
     }
+
     #endregion Flooding and Backtracking
 
     #region Road Spacing
+
     /// <summary>
     /// Places spacers (-1) around road tiles that have more than one adjacent road neighbor,
     /// to keep branches visually separated.
@@ -688,10 +732,12 @@ public static class LevelGenerator
         }
         //UnityEngine.Debug.Log(tiles.Print());
     }
+
     #endregion Road Spacing
 }
 
 #region Extensions
+
 /// <summary>
 /// 2D array helpers used by the level generator (indexing, bounds checks, copying, printing).
 /// </summary>
@@ -764,4 +810,5 @@ public static class Array2DExtensions
         return max;
     }
 }
-# endregion Extensions
+
+#endregion Extensions

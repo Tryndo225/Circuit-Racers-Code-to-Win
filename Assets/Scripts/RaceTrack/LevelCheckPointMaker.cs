@@ -8,7 +8,7 @@ using System;
 /// @ingroup level_gen
 /// Traversal starts at <see cref="LevelMap.StartPoint"/> and follows the road until no
 /// forward step is possible. A checkpoint is placed once per straight segment whose
-/// length meets <paramref name="minStraightCountForChackPoint"/>; the checkpoint is
+/// length meets <paramref name="minstraightLengthForCheckPoint"/>; the checkpoint is
 /// positioned roughly at the middle of that straight. Start/finish tiles are never
 /// converted to checkpoints.
 /// @thread Unity main thread (mutates <see cref="LevelMap.Tiles"/>).
@@ -36,7 +36,7 @@ public static class LevelCheckPointMaker
     /// sufficiently long straight segment into a checkpoint tile (-2).
     /// </summary>
     /// <param name="levelMap">Target level definition containing the road grid.</param>
-    /// <param name="minStraightCountForChackPoint">
+    /// <param name="minStraightLengthForCheckPoint">
     /// Minimum number of consecutive road tiles (including the first) required
     /// before a checkpoint is placed on that straight segment. (Typo preserved.)
     /// </param>
@@ -54,43 +54,52 @@ public static class LevelCheckPointMaker
     /// </list>
     /// Complexity: O(N) over visited road tiles (single pass with 4-neighborhood checks).
     /// </remarks>
-    public static void GenerateCheckPoints(LevelMap levelMap, int minStraightCountForChackPoint = 3)
+    public static void GenerateCheckPoints(LevelMap levelMap, int minStraightLengthForCheckPoint = 4)
     {
         Coordinates position = levelMap.StartPoint;
         Coordinates lastVisited = levelMap.StartPoint;
 
         Coordinates direction = Invalid;
-        Coordinates newDirection = Invalid;
-        int straightCount = 0;
         Coordinates straightStart = Invalid;
+        int straightLength = 0;
 
         while (true)
         {
-            newDirection = Step(levelMap, ref position, ref lastVisited);
-
+            Coordinates newDirection = Step(levelMap, ref position, ref lastVisited);
             if (newDirection == Invalid)
                 break;
 
+            if (direction == Invalid)
+            {
+                direction = newDirection;
+                continue;
+            }
+
             if (newDirection == direction)
             {
-                straightCount++;
+                straightLength++;
+                continue;
             }
-            else
-            {
-                if (straightCount >= minStraightCountForChackPoint)
-                {
-                    if (straightStart != levelMap.StartPoint && straightStart != levelMap.FinishPoint)
-                    {
-                        levelMap.Tiles.At(straightStart + (straightCount / 2 - 1) * direction) = -2;
-                    }
-                }
 
-                if (direction != Invalid)
-                {
-                    straightStart = position;
-                    straightCount = 1;
-                }
-                direction = newDirection;
+            PlaceCheckpointIfPossible(levelMap, straightStart, direction, straightLength, minStraightLengthForCheckPoint);
+
+            direction = newDirection;
+            straightStart = position - direction;
+            straightLength = 2;
+        }
+    }
+
+    private static void PlaceCheckpointIfPossible(LevelMap levelMap, Coordinates straightStart, Coordinates direction, int straightLength, int minStraightLengthForCheckPoint)
+    {
+        if (straightLength >= minStraightLengthForCheckPoint && straightStart != Invalid)
+        {
+            int midOffset = (straightLength - 1) / 2;
+
+            Coordinates checkpoint = straightStart + midOffset * direction;
+
+            if (checkpoint != levelMap.StartPoint && checkpoint != levelMap.FinishPoint && levelMap.Tiles.InBounds(checkpoint.X, checkpoint.Y))
+            {
+                levelMap.Tiles.At(checkpoint) = -2;
             }
         }
     }

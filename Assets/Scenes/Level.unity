@@ -349,7 +349,7 @@ MonoBehaviour:
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
       Size: 5
-  blankPlaceHolderPrefab: {fileID: 7202694827811253284, guid: 6e4e5b5a0bac3904ab2979e9244883a1, type: 3}
+  traversalPrefab: {fileID: 7202694827811253284, guid: 6e4e5b5a0bac3904ab2979e9244883a1, type: 3}
   raceTrackStartFinishPrefab: {fileID: 470813522272160979, guid: fa0a76900fe786a43ab20757ed6780fb, type: 3}
   checkpointPrefab: {fileID: 7202694827811253284, guid: 15ac709cde9284c42bfda65b92a897b7, type: 3}
   blockOffset: 27

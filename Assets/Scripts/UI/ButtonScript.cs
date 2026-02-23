@@ -285,7 +285,7 @@ public class GenerateLevelButton : ButtonType
 
             await Task.Run(() =>
             {
-                LevelCheckPointMaker.GenerateCheckPoints(map, 2);
+                LevelCheckPointMaker.GenerateCheckPoints(map);
             });
 
             Debug.Log("Checkpoints generated, showing map...");

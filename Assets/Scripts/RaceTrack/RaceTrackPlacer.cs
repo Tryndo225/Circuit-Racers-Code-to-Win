@@ -140,9 +140,7 @@ public class RaceTrackPlacer : MonoBehaviour
     #endregion Legend
 
     /// <summary>Prefab for cells next to larger pieces for no clipping/ovelap.</summary>
-    [SerializeField] private GameObject blankPlaceHolderPrefab;
-
-    [SerializeField] private GameObject bigBlockHelper;
+    [SerializeField] private GameObject traversalPrefab;
 
     /// <summary>Prefab for start/finish cells (placed on <see cref="LevelMap.StartPoint"/> and <see cref="LevelMap.FinishPoint"/>).</summary>
     [SerializeField] private GameObject raceTrackStartFinishPrefab;
@@ -164,6 +162,9 @@ public class RaceTrackPlacer : MonoBehaviour
     /// <summary>Reusable string builder for pattern extraction to reduce allocations.</summary>
     private StringBuilder patternBuilder = new StringBuilder();
 
+    private TrackPiece traversalTrackPiece;
+    private const int usedTileValue = -5;
+
     #region Setup
 
     /// <summary>
@@ -171,7 +172,8 @@ public class RaceTrackPlacer : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        levelMap = GameDataManager.Instance.CurrentLevelMap;
+        traversalTrackPiece = new TrackPiece(traversalPrefab, Vector3.zero, Quaternion.identity);
+        levelMap = GameDataManager.Instance.CurrentLevelMap.Copy();
 
         if (levelMap == null)
         {
@@ -181,7 +183,8 @@ public class RaceTrackPlacer : MonoBehaviour
         {
             foreach (var value in trackPieceLegend.Values)
             {
-                possibleSizes.Add(value.Size);
+                if (!possibleSizes.Contains(value.Size))
+                    possibleSizes.Add(value.Size);
             }
             possibleSizes.Sort((a, b) => b.CompareTo(a)); // Sort descending
 
@@ -206,8 +209,6 @@ public class RaceTrackPlacer : MonoBehaviour
         }
         var piecesToPlace = CreateTrack();
 
-        StopOverlaying(piecesToPlace);
-
         Coordinates? position = levelMap.StartPoint;
         HashSet<Coordinates> visited = new HashSet<Coordinates>();
 
@@ -218,7 +219,7 @@ public class RaceTrackPlacer : MonoBehaviour
             if (position == null)
                 break;
 
-            if (piecesToPlace[position.Value.X, position.Value.Y].Prefab != null && piecesToPlace[position.Value.X, position.Value.Y].Prefab != blankPlaceHolderPrefab)
+            if (piecesToPlace[position.Value.X, position.Value.Y].Prefab != null && piecesToPlace[position.Value.X, position.Value.Y].Prefab != traversalPrefab)
             {
                 var newGameObject = Instantiate(piecesToPlace[position.Value.X, position.Value.Y].Prefab,
                             piecesToPlace[position.Value.X, position.Value.Y].Position,
@@ -294,19 +295,24 @@ public class RaceTrackPlacer : MonoBehaviour
         TrackPiece? trackPiece;
         Coordinates coordinates;
 
-        for (int x = 0; x < levelMap.Tiles.GetLength(0); x++)
+        foreach (int size in possibleSizes)
         {
-            for (int y = 0; y < levelMap.Tiles.GetLength(1); y++)
+            for (int x = 0; x < levelMap.Tiles.GetLength(0); x++)
             {
-                if (levelMap.Tiles[x, y] != 1 && levelMap.Tiles[x, y] != -2)
-                    continue;
-
-                coordinates = new Coordinates(x, y);
-                trackPiece = GetTrackPiece(coordinates);
-
-                if (trackPiece != null && trackPiece.Value.Prefab != null)
+                for (int y = 0; y < levelMap.Tiles.GetLength(1); y++)
                 {
-                    piecesToPlace[x, y] = trackPiece.Value;
+                    if (piecesToPlace[x, y].Prefab != null || (levelMap.Tiles[x, y] != 1 && levelMap.Tiles[x, y] != -2))
+                        continue;
+
+                    coordinates = new Coordinates(x, y);
+                    trackPiece = GetTrackPiece(coordinates, size, size == possibleSizes[possibleSizes.Count - 1]);
+
+                    if (trackPiece != null && trackPiece.Value.Prefab != null)
+                    {
+                        MarkSpaceAsUsed(coordinates, size);
+                        AddTraversalPlaceHolders(coordinates, size, piecesToPlace);
+                        piecesToPlace[x, y] = trackPiece.Value;
+                    }
                 }
             }
         }
@@ -321,32 +327,29 @@ public class RaceTrackPlacer : MonoBehaviour
     /// a legend match, then returns a filled <see cref="TrackPiece"/> with world position and final prefab
     /// (start/finish and checkpoints override the legend prefab).
     /// </summary>
-    private TrackPiece? GetTrackPiece(Coordinates coordinates)
+    private TrackPiece? GetTrackPiece(Coordinates coordinates, int size, bool allowOverLap)
     {
         string pattern = "";
 
-        foreach (var size in possibleSizes)
+        pattern = ExtractPattern(coordinates, size, allowOverLap);
+        if (trackPieceLegend.TryGetValue(pattern, out TrackPiece trackPiece))
         {
-            pattern = ExtractPattern(coordinates, size);
-            if (trackPieceLegend.TryGetValue(pattern, out TrackPiece trackPiece))
+            Vector3 positionOffset = transform.position + new Vector3(coordinates.X * blockOffset, 0f, coordinates.Y * blockOffset);
+            trackPiece.Position = positionOffset;
+
+            if (coordinates == levelMap.StartPoint || coordinates == levelMap.FinishPoint)
             {
-                Vector3 positionOffset = transform.position + new Vector3(coordinates.X * blockOffset, 0f, coordinates.Y * blockOffset);
-                trackPiece.Position = positionOffset;
-
-                if (coordinates == levelMap.StartPoint || coordinates == levelMap.FinishPoint)
-                {
-                    trackPiece.Prefab = raceTrackStartFinishPrefab;
-                }
-                else if (levelMap.Tiles.At(coordinates) == -2)
-                {
-                    trackPiece.Prefab = checkpointPrefab;
-                }
-
-                return trackPiece;
+                trackPiece.Prefab = raceTrackStartFinishPrefab;
             }
+            else if (levelMap.Tiles.At(coordinates) == -2)
+            {
+                trackPiece.Prefab = checkpointPrefab;
+            }
+
+            return trackPiece;
         }
 
-        Debug.LogWarning($"No track piece found for pattern at {coordinates}: {pattern}");
+        //Debug.Log($"No track piece found for pattern at {coordinates}: {pattern} for size: {size}");
 
         return null;
     }
@@ -354,11 +357,11 @@ public class RaceTrackPlacer : MonoBehaviour
     /// <summary>
     /// Builds a flattened NxN pattern string centered at <paramref name="center"/>:
     /// - '1' marks track cells
-    /// - 'X' marks empty/out-of-bounds
+    /// - 'X' marks empty
     /// - 'C' may mark checkpoints on larger kernels so they can be matched distinctly
     /// Isolated singletons are treated as empty to avoid stray tiles.
     /// </summary>
-    private string ExtractPattern(Coordinates center, int size)
+    private string ExtractPattern(Coordinates center, int size, bool allowOverLap)
     {
         int halfSize = size / 2;
         char[,] pattern = new char[size, size];
@@ -382,12 +385,12 @@ public class RaceTrackPlacer : MonoBehaviour
                 {
                     if (levelMap.Tiles[x, y] == -2 || (x == levelMap.StartPoint.X && y == levelMap.StartPoint.Y) || (x == levelMap.FinishPoint.X && y == levelMap.FinishPoint.Y))
                     {
-                        if (halfSize > 1)
-                            c = 'C'; // Checkpoint treated as special piece in larger patterns
+                        if ((Mathf.Abs(dx) < 2 || Mathf.Abs(dy) < 2) && halfSize > 1)
+                            c = 'C'; // Checkpoint treated as special piece in the center of larger patterns
                         else
                             c = '1'; // Checkpoint treated as normal piece in smallest patterns
                     }
-                    else if (levelMap.Tiles[x, y] == 1)
+                    else if (levelMap.Tiles[x, y] == 1 || allowOverLap && levelMap.Tiles[x, y] == usedTileValue)
                     {
                         c = '1'; // Track piece
                     }
@@ -469,7 +472,7 @@ public class RaceTrackPlacer : MonoBehaviour
             for (var j = 0; j < pieces.GetLength(1); j++)
             {
                 var piece = pieces[i, j];
-                if (piece.Prefab == blankPlaceHolderPrefab)
+                if (piece.Prefab == traversalPrefab)
                 {
                     piece.Prefab = null;
                 }
@@ -490,7 +493,51 @@ public class RaceTrackPlacer : MonoBehaviour
                 int y = position.Y + dy;
                 if (pieces.InBounds(x, y) && pieces[x, y].Prefab != null)
                 {
-                    pieces[x, y].Prefab = blankPlaceHolderPrefab;
+                    pieces[x, y].Prefab = traversalPrefab;
+                }
+            }
+        }
+    }
+
+    private void MarkSpaceAsUsed(Coordinates position, int size)
+    {
+        int usedArea = (size / 2) - 1;
+        Coordinates coords;
+
+        for (int dx = -usedArea; dx <= usedArea; dx++)
+        {
+            for (int dy = -usedArea; dy <= usedArea; dy++)
+            {
+                if (dx != 0 && dy != 0)
+                    continue;
+
+                coords = new Coordinates(position.X + dx, position.Y + dy);
+                if (levelMap.Tiles.InBounds(coords.X, coords.Y) && levelMap.Tiles.At(coords) == 1)
+                {
+                    levelMap.Tiles.At(coords) = usedTileValue;
+                }
+            }
+        }
+    }
+
+    private void AddTraversalPlaceHolders(Coordinates position, int size, TrackPiece[,] pieces)
+    {
+        int usedArea = (size / 2) - 1;
+
+        for (int dx = -usedArea; dx <= usedArea; dx++)
+        {
+            for (int dy = -usedArea; dy <= usedArea; dy++)
+            {
+                if (dx != 0 && dy != 0)
+                    continue;
+
+                int x = position.X + dx;
+                int y = position.Y + dy;
+
+                if (levelMap.Tiles.InBounds(x, y) && levelMap.Tiles[x, y] == usedTileValue)
+                {
+                    if (pieces[x, y].Prefab == null)
+                        pieces[x, y].Prefab = traversalPrefab;
                 }
             }
         }
