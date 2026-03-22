@@ -1,7 +1,7 @@
+using IEnumerableExtention;       // For GetContentHash()
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using IEnumerableExtention;       // For GetContentHash()
 using UnityEngine;
 
 /// <summary>
@@ -26,388 +26,465 @@ using UnityEngine;
 /// </remarks>
 public class GameDataManager : Generic.Singleton<GameDataManager>
 {
-    #region Data Records
+	#region Data Records
 
-    /// <summary>
-    /// Serializable record containing a <see cref="LevelMap"/> reference and its best (lowest) time.
-    /// </summary>
-    [Serializable]
-    public class LevelData : ISerializable
-    {
-        /// <summary>Associated level map.</summary>
-        public LevelMap LevelMap;
+	/// <summary>
+	/// Serializable record containing a <see cref="LevelMap"/> reference and its best (lowest) time.
+	/// </summary>
+	[Serializable]
+	public class LevelData : ISerializable
+	{
+		/// <summary>Associated level map.</summary>
+		public LevelMap LevelMap;
 
-        /// <summary>Best completion time (seconds). Use <see cref="float.MaxValue"/> for unknown.</summary>
-        public float Time;
+		/// <summary>Best completion time (seconds). Use <see cref="float.MaxValue"/> for unknown.</summary>
+		public float Time;
 
-        /// <summary>
-        /// Creates a record with an unknown best time.
-        /// </summary>
-        /// <param name="levelMap">Target level map.</param>
-        public LevelData(LevelMap levelMap) : this(levelMap, float.MaxValue) { }
+		public float[] CheckpointTimeSplits;
 
-        /// <summary>
-        /// Creates a record with a specified best time.
-        /// </summary>
-        /// <param name="levelMap">Target level map.</param>
-        /// <param name="time">Best time in seconds.</param>
-        public LevelData(LevelMap levelMap, float time)
-        {
-            LevelMap = levelMap;
-            Time = time;
-        }
+		/// <summary>
+		/// Creates a record with an unknown best time.
+		/// </summary>
+		/// <param name="levelMap">Target level map.</param>
+		public LevelData(LevelMap levelMap) : this(levelMap, 0) { }
 
-        /// <summary>
-        /// Deserialization constructor.
-        /// </summary>
-        public LevelData(SerializationInfo info, StreamingContext context)
-        {
-            LevelMap = (LevelMap)info.GetValue("LevelMap", typeof(LevelMap));
-            Time = info.GetSingle("Time");
-        }
+		/// <summary>
+		/// Creates a record with a specified best time.
+		/// </summary>
+		/// <param name="levelMap">Target level map.</param>
+		/// <param name="time">Best time in seconds.</param>
+		/// <param name="checkpointTimeSplits">Optional array of checkpoint time splits; if null, initialized to default size.</param>
+		public LevelData(LevelMap levelMap, float time, float[] checkpointTimeSplits = null)
+		{
+			LevelMap = levelMap;
+			Time = time;
 
-        /// <inheritdoc />
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("LevelMap", LevelMap, typeof(LevelMap));
-            info.AddValue("Time", Time);
-        }
+			if (checkpointTimeSplits == null)
+				checkpointTimeSplits = new float[levelMap.CheckpointCountPerLap * levelMap.Laps + 1];
 
-        /// <summary>
-        /// Equality compares the <see cref="LevelMap"/> identity (best time does not affect equality).
-        /// </summary>
-        public static bool operator ==(LevelData a, LevelData b)
-        {
-            if (ReferenceEquals(a, b)) return true;
-            if (a is null || b is null) return false;
-            return a.LevelMap == b.LevelMap;
-        }
+			CheckpointTimeSplits = checkpointTimeSplits;
+		}
 
-        /// <inheritdoc cref="operator =="/>
-        public static bool operator !=(LevelData a, LevelData b) => !(a == b);
+		/// <summary>
+		/// Deserialization constructor.
+		/// </summary>
+		public LevelData(SerializationInfo info, StreamingContext context)
+		{
+			LevelMap = (LevelMap)info.GetValue("LevelMap", typeof(LevelMap));
+			Time = info.GetSingle("Time");
+		}
 
-        /// <inheritdoc />
-        public override bool Equals(object obj) => obj is LevelData other && this == other;
+		/// <inheritdoc />
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("LevelMap", LevelMap, typeof(LevelMap));
+			info.AddValue("Time", Time);
+			info.AddValue("CheckpointTimeSplits", CheckpointTimeSplits, typeof(float[]));
+		}
 
-        /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(LevelMap, Time);
-    }
+		/// <summary>
+		/// Equality compares the <see cref="LevelMap"/> identity (best time does not affect equality).
+		/// </summary>
+		public static bool operator ==(LevelData a, LevelData b)
+		{
+			if (ReferenceEquals(a, b)) return true;
+			if (a is null || b is null) return false;
+			return a.LevelMap == b.LevelMap;
+		}
 
-    /// <summary>
-    /// Serializable container for all saved progression data.
-    /// </summary>
-    [Serializable]
-    public class GameData : ISerializable
-    {
-        /// <summary>List of known levels and their best times.</summary>
-        public List<LevelData> Levels;
+		/// <inheritdoc cref="operator =="/>
+		public static bool operator !=(LevelData a, LevelData b) => !(a == b);
 
-        /// <summary>Creates an empty game data set.</summary>
-        public GameData() => Levels = new List<LevelData>();
+		/// <inheritdoc />
+		public override bool Equals(object obj) => obj is LevelData other && this == other;
 
-        /// <summary>Deserialization constructor.</summary>
-        public GameData(SerializationInfo info, StreamingContext context)
-        {
-            Levels = (List<LevelData>)info.GetValue("Levels", typeof(List<LevelData>));
-        }
+		/// <inheritdoc />
+		public override int GetHashCode() => HashCode.Combine(LevelMap, Time);
+	}
 
-        /// <inheritdoc />
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("Levels", Levels, typeof(List<LevelData>));
-        }
+	/// <summary>
+	/// Serializable container for all saved progression data.
+	/// </summary>
+	[Serializable]
+	public class GameData : ISerializable
+	{
+		/// <summary>List of known levels and their best times.</summary>
+		public List<LevelData> Levels;
+		public float PracticeMapTime = 0;
+		public float[] PracticeMapSplits = new float[11];
 
-        /// <summary>
-        /// Adds or improves a level time; replaces only if <paramref name="time"/> is lower than the stored best.
-        /// </summary>
-        /// <param name="map">Target level map.</param>
-        /// <param name="time">New completion time (seconds).</param>
-        public void UpdateLevelTime(LevelMap map, float time)
-        {
-            int index = Levels.FindIndex(ld => ld.LevelMap == map);
-            if (index >= 0)
-            {
-                if (time < Levels[index].Time)
-                    Levels[index] = new LevelData(map, time);
-            }
-            else
-            {
-                Levels.Add(new LevelData(map, time));
-            }
-        }
+		/// <summary>Creates an empty game data set.</summary>
+		public GameData() => Levels = new List<LevelData>();
 
-        /// <summary>
-        /// Returns true if the level exists in the data set.
-        /// </summary>
-        /// <param name="map">Level map to check.</param>
-        public bool ContainsLevel(LevelMap map) => Levels.Exists(ld => ld.LevelMap == map);
-    }
 
-    #endregion
+		/// <summary>Deserialization constructor.</summary>
+		public GameData(SerializationInfo info, StreamingContext context)
+		{
+			Levels = (List<LevelData>)info.GetValue("Levels", typeof(List<LevelData>));
+		}
 
-    #region Public Properties
+		/// <inheritdoc />
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("Levels", Levels, typeof(List<LevelData>));
+		}
 
-    /// <summary>
-    /// The active data set (list of <see cref="LevelData"/> entries).
-    /// </summary>
-    public GameData CurrentGameData { get; private set; } = new GameData();
+		public float GetCheckpointSplit(LevelMap map, int index)
+		{
+			int levelIndex = Levels.FindIndex(ld => ld.LevelMap == map);
+			if (levelIndex < 0)
+			{
+				Debug.LogError("[GameData] Cannot get checkpoint split; level not found.");
+				return 0;
+			}
+			var splits = Levels[levelIndex].CheckpointTimeSplits;
+			if (index < 0 || index >= splits.Length)
+			{
+				Debug.LogError("[GameData] Checkpoint split index out of bounds.");
+				return 0;
+			}
+			return splits[index];
+		}
 
-    /// <summary>
-    /// The currently selected level to be played (may be null if not selected).
-    /// </summary>
-    public LevelMap CurrentLevelMap { get; private set; } = null;
+		public float GetTestLevelCheckpointSplit(int index)
+		{
+			if (index < 0 || index >= PracticeMapSplits.Length)
+			{
+				Debug.LogError("[GameData] Checkpoint split index out of bounds.");
+				return 0;
+			}
+			return PracticeMapSplits[index];
+		}
 
-    /// <summary>
-    /// Hash of <see cref="CurrentGameData"/>.Levels content for change detection.
-    /// </summary>
-    public int Hash { get; private set; }
+		/// <summary>
+		/// Adds or improves a level time; replaces only if <paramref name="time"/> is lower than the stored best.
+		/// </summary>
+		/// <param name="map">Target level map.</param>
+		/// <param name="time">New completion time (seconds).</param>
+		public void UpdateLevelTime(LevelMap map, float time, float[] splits)
+		{
+			int index = Levels.FindIndex(ld => ld.LevelMap == map);
+			if (index >= 0)
+			{
+				if (time < Levels[index].Time)
+				{
+					Levels[index].Time = time;
+					Levels[index].CheckpointTimeSplits = splits;
+				}
+			}
+			else
+			{
+				Levels.Add(new LevelData(map, time, splits));
+			}
+		}
 
-    #endregion
+		public void UpdateTestLevelTime(float time, float[] splits)
+		{
+			PracticeMapSplits = splits;
+			PracticeMapTime = time;
+		}
 
-    #region Observers
+		public float GetBestLevelTime(LevelMap map)
+		{
+			int index = Levels.FindIndex(ld => ld.LevelMap == map);
+			if (index >= 0)
+			{
+				return Levels[index].Time;
+			}
+			else
+			{
+				return 0;
+			}
+		}
 
-    /// <summary>
-    /// Registered listeners notified whenever the game data content hash changes.
-    /// </summary>
-    private readonly List<Action> onGameDataChanged = new List<Action>();
+		public float GetBestTestLevelTime()
+		{
+			return PracticeMapTime;
+		}
 
-    /// <summary>
-    /// Subscribes a listener to hash-change notifications.
-    /// </summary>
-    /// <param name="action">Callback invoked when game data changes.</param>
-    public void AddListener(Action action)
-    {
-        if (action != null && !onGameDataChanged.Contains(action))
-            onGameDataChanged.Add(action);
-    }
+		/// <summary>
+		/// Returns true if the level exists in the data set.
+		/// </summary>
+		/// <param name="map">Level map to check.</param>
+		public bool ContainsLevel(LevelMap map) => Levels.Exists(ld => ld.LevelMap == map);
+	}
 
-    /// <summary>
-    /// Unsubscribes a previously registered listener.
-    /// </summary>
-    /// <param name="action">Callback to remove.</param>
-    public void RemoveListener(Action action)
-    {
-        if (action != null)
-            onGameDataChanged.Remove(action);
-    }
+	#endregion
 
-    #endregion
+	#region Public Properties
 
-    #region Unity Methods
+	/// <summary>
+	/// The active data set (list of <see cref="LevelData"/> entries).
+	/// </summary>
+	public GameData CurrentGameData { get; private set; } = new GameData();
 
-    /// <summary>
-    /// Unity method: loads saved game data from PlayerPrefs (if present) on startup.
-    /// </summary>
-    private void Start()
-    {
-        if (PlayerPrefs.HasKey("GameData"))
-            LoadGameData();
-    }
+	/// <summary>
+	/// The currently selected level to be played (may be null if not selected).
+	/// </summary>
+	public LevelMap CurrentLevelMap { get; private set; } = null;
 
-    /// <summary>
-    /// Unity method: saves game data to PlayerPrefs on application quit.
-    /// </summary>
-    private void OnApplicationQuit() => SaveGameData();
+	/// <summary>
+	/// Hash of <see cref="CurrentGameData"/>.Levels content for change detection.
+	/// </summary>
+	public int Hash { get; private set; }
 
-    #endregion
+	#endregion
 
-    #region Persistence
+	#region Observers
 
-    /// <summary>
-    /// Serializes <see cref="CurrentGameData"/> to JSON and writes it to PlayerPrefs ("GameData").
-    /// </summary>
-    private void SaveGameData()
-    {
-        try
-        {
-            string json = JsonUtility.ToJson(CurrentGameData);
-            PlayerPrefs.SetString("GameData", json);
-            PlayerPrefs.Save();
-            Debug.Log($"[GameDataManager] Saved {CurrentGameData.Levels.Count} level(s).");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[GameDataManager] Failed to save game data: {e.Message}");
-        }
-    }
+	/// <summary>
+	/// Registered listeners notified whenever the game data content hash changes.
+	/// </summary>
+	private readonly List<Action> onGameDataChanged = new List<Action>();
 
-    /// <summary>
-    /// Loads JSON from PlayerPrefs ("GameData") and deserializes into <see cref="CurrentGameData"/>.
-    /// Recomputes <see cref="Hash"/> and prints debug info.
-    /// </summary>
-    private void LoadGameData()
-    {
-        try
-        {
-            string json = PlayerPrefs.GetString("GameData");
-            CurrentGameData = JsonUtility.FromJson<GameData>(json) ?? new GameData();
+	/// <summary>
+	/// Subscribes a listener to hash-change notifications.
+	/// </summary>
+	/// <param name="action">Callback invoked when game data changes.</param>
+	public void AddListener(Action action)
+	{
+		if (action != null && !onGameDataChanged.Contains(action))
+			onGameDataChanged.Add(action);
+	}
 
-            Hash = CurrentGameData.Levels.GetContentHash();
-            Debug.Log($"[GameDataManager] Loaded {CurrentGameData.Levels.Count} level(s).");
+	/// <summary>
+	/// Unsubscribes a previously registered listener.
+	/// </summary>
+	/// <param name="action">Callback to remove.</param>
+	public void RemoveListener(Action action)
+	{
+		if (action != null)
+			onGameDataChanged.Remove(action);
+	}
 
-            // Optional debug walk-through (guards for missing references)
-            for (int i = 0; i < CurrentGameData.Levels.Count; i++)
-            {
-                var entry = CurrentGameData.Levels[i];
-                if (entry == null || entry.LevelMap == null)
-                {
-                    Debug.LogWarning($"[GameDataManager] Level map at index {i} is null.");
-                }
-                else
-                {
-                    // Replace Tiles.Print() with your own pretty printer if needed
-                    Debug.Log($"[GameDataManager] Level {i}: Best {entry.Time:0.###} s");
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[GameDataManager] Failed to load game data: {e.Message}");
-            CurrentGameData = new GameData();
-            Hash = 0;
-        }
-    }
+	#endregion
 
-    #endregion
+	#region Unity Methods
 
-    #region Selection & Flow
+	/// <summary>
+	/// Unity method: loads saved game data from PlayerPrefs (if present) on startup.
+	/// </summary>
+	private void Start()
+	{
+		if (PlayerPrefs.HasKey("GameData"))
+			LoadGameData();
+	}
 
-    /// <summary>
-    /// Attempts to start gameplay by loading the "Level" scene.
-    /// Requires <see cref="CurrentLevelMap"/> to be set via <see cref="SelectingLevelMap"/>.
-    /// </summary>
-    public void GoToSelectedLevel()
-    {
-        if (CurrentLevelMap == null)
-        {
-            Debug.LogError("[GameDataManager] No level map selected.");
-            return;
-        }
-        SceneManagement.Instance.ChangeScene("Level");
-    }
+	/// <summary>
+	/// Unity method: saves game data to PlayerPrefs on application quit.
+	/// </summary>
+	private void OnApplicationQuit() => SaveGameData();
 
-    /// <summary>
-    /// Selects a level for play, provided it exists in <see cref="CurrentGameData"/>.
-    /// </summary>
-    /// <param name="map">The level map to select.</param>
-    public void SelectingLevelMap(LevelMap map)
-    {
-        if (map == null)
-        {
-            Debug.LogError("[GameDataManager] SelectingLevelMap called with null map.");
-            return;
-        }
+	#endregion
 
-        if (!CurrentGameData.ContainsLevel(map))
-        {
-            Debug.LogWarning("[GameDataManager] Selected level is not present in CurrentGameData.");
-            return;
-        }
+	#region Persistence
 
-        CurrentLevelMap = map;
-    }
+	/// <summary>
+	/// Serializes <see cref="CurrentGameData"/> to JSON and writes it to PlayerPrefs ("GameData").
+	/// </summary>
+	private void SaveGameData()
+	{
+		try
+		{
+			string json = JsonUtility.ToJson(CurrentGameData);
+			PlayerPrefs.SetString("GameData", json);
+			PlayerPrefs.Save();
+			Debug.Log($"[GameDataManager] Saved {CurrentGameData.Levels.Count} level(s).");
+		}
+		catch (Exception e)
+		{
+			Debug.LogError($"[GameDataManager] Failed to save game data: {e.Message}");
+		}
+	}
 
-    #endregion
+	/// <summary>
+	/// Loads JSON from PlayerPrefs ("GameData") and deserializes into <see cref="CurrentGameData"/>.
+	/// Recomputes <see cref="Hash"/> and prints debug info.
+	/// </summary>
+	private void LoadGameData()
+	{
+		try
+		{
+			string json = PlayerPrefs.GetString("GameData");
+			CurrentGameData = JsonUtility.FromJson<GameData>(json) ?? new GameData();
 
-    #region Progression
+			Hash = CurrentGameData.Levels.GetContentHash();
+			Debug.Log($"[GameDataManager] Loaded {CurrentGameData.Levels.Count} level(s).");
 
-    /// <summary>
-    /// Records completion of the currently selected level and updates best time if improved.
-    /// Automatically saves the data set.
-    /// </summary>
-    /// <param name="time">Completion time in seconds.</param>
-    public void CompleteLevel(float time)
-    {
-        if (CurrentLevelMap == null)
-        {
-            Debug.LogError("[GameDataManager] Cannot complete level; no level selected.");
-            return;
-        }
+			// Optional debug walk-through (guards for missing references)
+			for (int i = 0; i < CurrentGameData.Levels.Count; i++)
+			{
+				var entry = CurrentGameData.Levels[i];
+				if (entry == null || entry.LevelMap == null)
+				{
+					Debug.LogWarning($"[GameDataManager] Level map at index {i} is null.");
+				}
+				else
+				{
+					// Replace Tiles.Print() with your own pretty printer if needed
+					Debug.Log($"[GameDataManager] Level {i}: Best {entry.Time:0.###} s");
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			Debug.LogError($"[GameDataManager] Failed to load game data: {e.Message}");
+			CurrentGameData = new GameData();
+			Hash = 0;
+		}
+	}
 
-        CurrentGameData.UpdateLevelTime(CurrentLevelMap, time);
-        SaveGameData(); // Persist immediately after improvement
-    }
+	#endregion
 
-    /// <summary>
-    /// Adds a level to the data set if it does not already exist; triggers change detection.
-    /// </summary>
-    /// <param name="map">Level to add.</param>
-    public void AddLevel(LevelMap map)
-    {
-        if (map == null)
-        {
-            Debug.LogError("[GameDataManager] AddLevel called with null map.");
-            return;
-        }
+	#region Selection & Flow
 
-        if (!CurrentGameData.ContainsLevel(map))
-        {
-            CurrentGameData.Levels.Add(new LevelData(map));
-            PotentialHashChange(CurrentGameData.Levels.GetContentHash());
-        }
-        else
-        {
-            Debug.LogWarning("[GameDataManager] Level already exists; not adding duplicate.");
-        }
-    }
+	/// <summary>
+	/// Attempts to start gameplay by loading the "Level" scene.
+	/// Requires <see cref="CurrentLevelMap"/> to be set via <see cref="SelectingLevelMap"/>.
+	/// </summary>
+	public void GoToSelectedLevel()
+	{
+		if (CurrentLevelMap == null)
+		{
+			Debug.LogError("[GameDataManager] No level map selected.");
+			return;
+		}
+		SceneManagement.Instance.ChangeScene("Level");
+	}
 
-    /// <summary>
-    /// Removes a level from the data set if present; triggers change detection.
-    /// </summary>
-    /// <param name="levelMap">Level to remove.</param>
-    public void RemoveLevel(LevelMap levelMap)
-    {
-        if (levelMap == null)
-        {
-            Debug.LogError("[GameDataManager] RemoveLevel called with null map.");
-            return;
-        }
+	public float GetCurrentMapSplit(int splitIndex)
+	{
+		if (CurrentLevelMap == null)
+		{
+			Debug.Log("[GameDataManager] No level selected, assuming Test Track.");
+			return CurrentGameData.GetTestLevelCheckpointSplit(splitIndex);
+		}
+		return CurrentGameData.GetCheckpointSplit(CurrentLevelMap, splitIndex);
+	}
 
-        for (int i = 0; i < CurrentGameData.Levels.Count; i++)
-        {
-            if (CurrentGameData.Levels[i].LevelMap == levelMap)
-            {
-                CurrentGameData.Levels.RemoveAt(i);
-                PotentialHashChange(CurrentGameData.Levels.GetContentHash());
-                return;
-            }
-        }
+	/// <summary>
+	/// Selects a level for play, provided it exists in <see cref="CurrentGameData"/>.
+	/// </summary>
+	/// <param name="map">The level map to select.</param>
+	public void SelectingLevelMap(LevelMap map)
+	{
+		if (map == null)
+		{
+			Debug.LogError("[GameDataManager] SelectingLevelMap called with null map.");
+			return;
+		}
 
-        Debug.LogWarning("[GameDataManager] Level not found; nothing removed.");
-    }
+		if (!CurrentGameData.ContainsLevel(map))
+		{
+			Debug.LogWarning("[GameDataManager] Selected level is not present in CurrentGameData.");
+			return;
+		}
 
-    /// <summary>
-    /// Clears all levels from the data set; triggers change detection.
-    /// </summary>
-    public void ClearLevels()
-    {
-        CurrentGameData.Levels.Clear();
-        PotentialHashChange(CurrentGameData.Levels.GetContentHash());
-    }
+		CurrentLevelMap = map;
+	}
 
-    #endregion
+	#endregion
 
-    #region Internals
+	#region Progression
 
-    /// <summary>
-    /// Compares a new hash with the current <see cref="Hash"/> and, if different,
-    /// updates <see cref="Hash"/> and notifies all listeners.
-    /// </summary>
-    /// <param name="hash">Newly computed content hash.</param>
-    private void PotentialHashChange(int hash)
-    {
-        if (hash == Hash) return;
+	/// <summary>
+	/// Records completion of the currently selected level and updates best time if improved.
+	/// Automatically saves the data set.
+	/// </summary>
+	/// <param name="time">Completion time in seconds.</param>
+	public void CompleteLevel(float time, float[] checkpointSplits)
+	{
+		if (CurrentLevelMap == null)
+		{
+			Debug.Log("[GameDataManager] No level selected, assuming Test Track.");
+			CurrentGameData.UpdateTestLevelTime(time, checkpointSplits);
+			return;
+		}
 
-        Hash = hash;
+		CurrentGameData.UpdateLevelTime(CurrentLevelMap, time, checkpointSplits);
+		SaveGameData(); // Persist immediately after improvement
+	}
 
-        // Notify observers (iterate snapshot to avoid modification during enumeration)
-        var listeners = onGameDataChanged.ToArray();
-        for (int i = 0; i < listeners.Length; i++)
-        {
-            try { listeners[i]?.Invoke(); }
-            catch (Exception e) { Debug.LogException(e); }
-        }
-    }
+	/// <summary>
+	/// Adds a level to the data set if it does not already exist; triggers change detection.
+	/// </summary>
+	/// <param name="map">Level to add.</param>
+	public void AddLevel(LevelMap map)
+	{
+		if (map == null)
+		{
+			Debug.LogError("[GameDataManager] AddLevel called with null map.");
+			return;
+		}
 
-    #endregion
+		if (!CurrentGameData.ContainsLevel(map))
+		{
+			CurrentGameData.Levels.Add(new LevelData(map));
+			PotentialHashChange(CurrentGameData.Levels.GetContentHash());
+		}
+		else
+		{
+			Debug.LogWarning("[GameDataManager] Level already exists; not adding duplicate.");
+		}
+	}
+
+	/// <summary>
+	/// Removes a level from the data set if present; triggers change detection.
+	/// </summary>
+	/// <param name="levelMap">Level to remove.</param>
+	public void RemoveLevel(LevelMap levelMap)
+	{
+		if (levelMap == null)
+		{
+			Debug.LogError("[GameDataManager] RemoveLevel called with null map.");
+			return;
+		}
+
+		for (int i = 0; i < CurrentGameData.Levels.Count; i++)
+		{
+			if (CurrentGameData.Levels[i].LevelMap == levelMap)
+			{
+				CurrentGameData.Levels.RemoveAt(i);
+				PotentialHashChange(CurrentGameData.Levels.GetContentHash());
+				return;
+			}
+		}
+
+		Debug.LogWarning("[GameDataManager] Level not found; nothing removed.");
+	}
+
+	/// <summary>
+	/// Clears all levels from the data set; triggers change detection.
+	/// </summary>
+	public void ClearLevels()
+	{
+		CurrentGameData.Levels.Clear();
+		PotentialHashChange(CurrentGameData.Levels.GetContentHash());
+	}
+
+	#endregion
+
+	#region Internals
+
+	/// <summary>
+	/// Compares a new hash with the current <see cref="Hash"/> and, if different,
+	/// updates <see cref="Hash"/> and notifies all listeners.
+	/// </summary>
+	/// <param name="hash">Newly computed content hash.</param>
+	private void PotentialHashChange(int hash)
+	{
+		if (hash == Hash) return;
+
+		Hash = hash;
+
+		// Notify observers (iterate snapshot to avoid modification during enumeration)
+		var listeners = onGameDataChanged.ToArray();
+		for (int i = 0; i < listeners.Length; i++)
+		{
+			try { listeners[i]?.Invoke(); }
+			catch (Exception e) { Debug.LogException(e); }
+		}
+	}
+
+	#endregion
 }

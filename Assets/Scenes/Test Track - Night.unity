@@ -428,17 +428,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
   m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!108 &324453936
 Light:
   m_ObjectHideFlags: 0
@@ -447,14 +453,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 324453934}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0.01
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
@@ -736,6 +742,94 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 560e7a41e67ce0f42918a62ad8a7ef85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &764162759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 764162761}
+  - component: {fileID: 764162760}
+  m_Layer: 0
+  m_Name: CheckPointManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &764162760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764162759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dc63d33a983afe4bbcde017a48c8d1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CheckPointManager
+--- !u!4 &764162761
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764162759}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 720.1909, y: 24.98883, z: 378.8865}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &941840216
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 941840218}
+  - component: {fileID: 941840217}
+  m_Layer: 0
+  m_Name: RaceTimeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &941840217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941840216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13d24094455248b4c91d33ed48ec3e82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaceTimeManager
+--- !u!4 &941840218
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941840216}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 720.1909, y: 24.98883, z: 378.8865}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1404015905
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -826,10 +920,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  targetRb: {fileID: 0}
   offset: {x: 0, y: 6, z: -12}
-  followSpeed: 5
-  yawSmoothness: 5
+  positionSmoothTime: 0.25
+  rotationSmoothTime: 0.2
   fixedPitchAngle: 15
+  lookAheadDistance: 4
+  minVelocityForDirection: 0.5
 --- !u!114 &1559772963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -866,7 +963,6 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
     m_Quality: 3
     m_FrameInfluence: 0.100000024
@@ -874,6 +970,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!81 &1559772964
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1035,6 +1132,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1227508315049185584, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1234345817180197087, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: laps
       value: 3
@@ -1123,6 +1228,10 @@ PrefabInstance:
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
       value: e1eff233-c609-47ef-81e4-edfc685b4f6b
       objectReference: {fileID: 0}
+    - target: {fileID: 3181410861926696661, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 4655496815021022501, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: m_LocalPosition.x
       value: 711.86
@@ -1163,9 +1272,37 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5365730415833851809, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5382595762422217891, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5450460833873997512, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5542742289872768450, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6268957589774098393, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7045262663740992993, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7057568684675138322, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: m_Name
       value: Track
+      objectReference: {fileID: 0}
+    - target: {fileID: 8777587787859851685, guid: a20932a0568b07b4892f211655947c37, type: 3}
+      propertyPath: <CheckpointOrder>k__BackingField
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1412,3 +1549,5 @@ SceneRoots:
   - {fileID: 324453937}
   - {fileID: 1685868109}
   - {fileID: 357482324}
+  - {fileID: 764162761}
+  - {fileID: 941840218}

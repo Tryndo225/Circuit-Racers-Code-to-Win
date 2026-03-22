@@ -1,6 +1,7 @@
-using UnityEngine;
 using System;
 using System.Threading.Tasks;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 #region Generic Button Handler
@@ -21,32 +22,32 @@ using UnityEngine.UI;
 /// </remarks>
 public class ButtonScript : MonoBehaviour
 {
-    /// <summary>
-    /// Serialized behavior object that performs the action when the button is clicked.
-    /// </summary>
-    [SerializeReference] private ButtonType properties;
+	/// <summary>
+	/// Serialized behavior object that performs the action when the button is clicked.
+	/// </summary>
+	[SerializeReference] private ButtonType properties;
 
-    /// <summary>
-    /// Read/write accessor for the underlying button behavior.
-    /// </summary>
-    public ButtonType Properties
-    {
-        get => properties;
-        set => properties = value;
-    }
+	/// <summary>
+	/// Read/write accessor for the underlying button behavior.
+	/// </summary>
+	public ButtonType Properties
+	{
+		get => properties;
+		set => properties = value;
+	}
 
-    /// <summary>
-    /// Invoked by the UI Button. Validates configuration and executes <see cref="ButtonType.Action"/>.
-    /// </summary>
-    public void OnButtonClick()
-    {
-        if (properties == null)
-        {
-            Debug.LogWarning("Button properties are not set.");
-            return;
-        }
-        properties.Action();
-    }
+	/// <summary>
+	/// Invoked by the UI Button. Validates configuration and executes <see cref="ButtonType.Action"/>.
+	/// </summary>
+	public void OnButtonClick()
+	{
+		if (properties == null)
+		{
+			Debug.LogWarning("Button properties are not set.");
+			return;
+		}
+		properties.Action();
+	}
 }
 
 #endregion Generic Button Handler
@@ -65,10 +66,10 @@ public class ButtonScript : MonoBehaviour
 [Serializable]
 public abstract class ButtonType
 {
-    /// <summary>
-    /// Execute the action represented by this strategy.
-    /// </summary>
-    public abstract void Action();
+	/// <summary>
+	/// Execute the action represented by this strategy.
+	/// </summary>
+	public abstract void Action();
 }
 
 #region Concrete Button Types
@@ -83,25 +84,25 @@ public abstract class ButtonType
 [Serializable]
 public class ChangeSceneButton : ButtonType
 {
-    /// <summary>Parameterless ctor for serialization.</summary>
-    public ChangeSceneButton()
-    { }
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public ChangeSceneButton()
+	{ }
 
-    /// <summary>
-    /// Target scene (helper) to load when executed.
-    /// </summary>
-    [SerializeField] private SceneAssetHelper _sceneToLoad;
+	/// <summary>
+	/// Target scene (helper) to load when executed.
+	/// </summary>
+	[SerializeField] private SceneAssetHelper _sceneToLoad;
 
-    /// <inheritdoc/>
-    public override void Action()
-    {
-        if (_sceneToLoad == null)
-        {
-            Debug.LogError("Scene to load is not assigned.");
-            return;
-        }
-        SceneManagement.Instance.ChangeScene(_sceneToLoad);
-    }
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		if (_sceneToLoad == null)
+		{
+			Debug.LogError("Scene to load is not assigned.");
+			return;
+		}
+		SceneManagement.Instance.ChangeScene(_sceneToLoad);
+	}
 }
 
 /// <summary>
@@ -114,32 +115,32 @@ public class ChangeSceneButton : ButtonType
 [Serializable]
 public class SelectLevelButton : ButtonType
 {
-    /// <summary>Parameterless ctor for serialization.</summary>
-    public SelectLevelButton()
-    { }
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public SelectLevelButton()
+	{ }
 
-    /// <summary>
-    /// Construct with a concrete level reference.
-    /// </summary>
-    /// <param name="levelMap">Level to select.</param>
-    public SelectLevelButton(LevelMap levelMap)
-    {
-        _levelMap = levelMap;
-    }
+	/// <summary>
+	/// Construct with a concrete level reference.
+	/// </summary>
+	/// <param name="levelMap">Level to select.</param>
+	public SelectLevelButton(LevelMap levelMap)
+	{
+		_levelMap = levelMap;
+	}
 
-    /// <summary>Level to select when executed.</summary>
-    [SerializeField, ReadOnly] private LevelMap _levelMap;
+	/// <summary>Level to select when executed.</summary>
+	[SerializeField, ReadOnly] private LevelMap _levelMap;
 
-    /// <inheritdoc/>
-    public override void Action()
-    {
-        if (_levelMap == null)
-        {
-            Debug.LogError("Level map is not assigned.");
-            return;
-        }
-        GameDataManager.Instance.SelectingLevelMap(_levelMap);
-    }
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		if (_levelMap == null)
+		{
+			Debug.LogError("Level map is not assigned.");
+			return;
+		}
+		GameDataManager.Instance.SelectingLevelMap(_levelMap);
+	}
 }
 
 /// <summary>
@@ -152,23 +153,23 @@ public class SelectLevelButton : ButtonType
 [Serializable]
 public class RemoveLevelButton : ButtonType
 {
-    /// <summary>Parameterless ctor for serialization.</summary>
-    public RemoveLevelButton()
-    { }
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public RemoveLevelButton()
+	{ }
 
-    /// <summary>Level to remove when executed.</summary>
-    [SerializeField, ReadOnly] private LevelMap _levelMap;
+	/// <summary>Level to remove when executed.</summary>
+	[SerializeField, ReadOnly] private LevelMap _levelMap;
 
-    /// <inheritdoc/>
-    public override void Action()
-    {
-        if (_levelMap == null)
-        {
-            Debug.LogError("Level map is not assigned.");
-            return;
-        }
-        GameDataManager.Instance.RemoveLevel(_levelMap);
-    }
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		if (_levelMap == null)
+		{
+			Debug.LogError("Level map is not assigned.");
+			return;
+		}
+		GameDataManager.Instance.RemoveLevel(_levelMap);
+	}
 }
 
 /// <summary>
@@ -191,115 +192,102 @@ public class RemoveLevelButton : ButtonType
 [Serializable]
 public class GenerateLevelButton : ButtonType
 {
-    #region References (UI)
+	#region References (UI)
 
-    /// <summary>Popup container that owns a <see cref="LevelPopUp"/> for previewing the generated map.</summary>
-    [Header("References")]
-    [SerializeField] private GameObject popUp;
+	/// <summary>Popup container that owns a <see cref="LevelPopUp"/> for previewing the generated map.</summary>
+	[Header("References")]
+	[SerializeField] private GameObject popUp;
 
-    /// <summary>Slider for width (X) in tiles.</summary>
-    [SerializeField] private Slider sizeXSlider;
+	/// <summary>Slider for size in tiles.</summary>
+	[SerializeField] private Slider sizeSlider;
 
-    /// <summary>Slider for height (Y) in tiles.</summary>
-    [SerializeField] private Slider sizeYSlider;
+	/// <summary>Toggle to generate circuits (loop) instead of point-to-point tracks.</summary>
+	[SerializeField] private Toggle createCircuitsToggle;
 
-    /// <summary>Slider for step count (carving iterations).</summary>
-    [SerializeField] private Slider stepCountSlider;
+	#endregion References (UI)
 
-    /// <summary>Toggle to generate circuits (loop) instead of point-to-point tracks.</summary>
-    [SerializeField] private Toggle createCircuitsToggle;
+	#region Generation Settings (defaults)
 
-    #endregion References (UI)
+	/// <summary>Whether to attempt creating closed-loop tracks.</summary>
+	[Header("Generation Settings")]
+	[SerializeField] public bool createCircuits = true;
 
-    #region Generation Settings (defaults)
+	/// <summary>Grid size in tiles.</summary>
+	[SerializeField] public int size = 50;
 
-    /// <summary>Whether to attempt creating closed-loop tracks.</summary>
-    [Header("Generation Settings")]
-    [SerializeField] public bool createCircuits = true;
+	/// <summary>Total carving steps.</summary>
+	[SerializeField, ReadOnly] private int stepCount = 20;
 
-    /// <summary>Grid width in tiles.</summary>
-    [SerializeField] public int sizeX = 50;
+	/// <summary>Computed step size (derived from area and count).</summary>
+	[SerializeField, ReadOnly] private int stepSize;
 
-    /// <summary>Grid height in tiles.</summary>
-    [SerializeField] public int sizeY = 50;
+	/// <summary>Max attempts per step to find a valid target.</summary>
+	[SerializeField] private int maxAttemps = 1000;
 
-    /// <summary>Total carving steps.</summary>
-    [SerializeField] private int stepCount = 20;
+	#endregion Generation Settings (defaults)
 
-    /// <summary>Computed step size (derived from area and count).</summary>
-    [SerializeField, ReadOnly] private int stepSize;
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public GenerateLevelButton()
+	{ }
 
-    /// <summary>Max attempts per step to find a valid target.</summary>
-    [SerializeField] private int maxAttemps = 1000;
+	/// <summary>
+	/// Pulls latest values from the bound UI widgets into the generation fields.
+	/// </summary>
+	private void UpdateValues()
+	{
+		if (sizeSlider != null)
+			size = Mathf.RoundToInt(sizeSlider.value);
+		if (createCircuitsToggle != null)
+			createCircuits = createCircuitsToggle.isOn;
+	}
 
-    #endregion Generation Settings (defaults)
+	/// <summary>
+	/// Execute: generate a level, add checkpoints, and show the preview popup.
+	/// </summary>
+	/// <remarks>
+	/// Uses <see cref="Task.Run(Func{Task})"/> to keep the main thread responsive.
+	/// Logs/guards against missing references and exceptions.
+	/// </remarks>
+	public override async void Action()  // ok for top-level UI handlers
+	{
+		try
+		{
+			if (popUp == null)
+			{
+				Debug.LogError("Pop-up is not assigned.");
+				return;
+			}
 
-    /// <summary>Parameterless ctor for serialization.</summary>
-    public GenerateLevelButton()
-    { }
+			UpdateValues();
 
-    /// <summary>
-    /// Pulls latest values from the bound UI widgets into the generation fields.
-    /// </summary>
-    private void UpdateValues()
-    {
-        if (sizeXSlider != null)
-            sizeX = Mathf.RoundToInt(sizeXSlider.value);
-        if (sizeYSlider != null)
-            sizeY = Mathf.RoundToInt(sizeYSlider.value);
-        if (stepCountSlider != null)
-            stepCount = Mathf.RoundToInt(stepCountSlider.value);
-        if (createCircuitsToggle != null)
-            createCircuits = createCircuitsToggle.isOn;
-    }
+			stepCount = size;
+			stepSize = size / 5;
 
-    /// <summary>
-    /// Execute: generate a level, add checkpoints, and show the preview popup.
-    /// </summary>
-    /// <remarks>
-    /// Uses <see cref="Task.Run(Func{Task})"/> to keep the main thread responsive.
-    /// Logs/guards against missing references and exceptions.
-    /// </remarks>
-    public override async void Action()  // ok for top-level UI handlers
-    {
-        try
-        {
-            if (popUp == null)
-            {
-                Debug.LogError("Pop-up is not assigned.");
-                return;
-            }
+			Debug.Log("Starting level generation...");
+			var map = await Task.Run(() =>
+			{
+				return LevelGenerator.GenerateLevel(size, size, createCircuits, stepCount, stepSize, maxAttemps, SeedFactory.Next());
+			});
 
-            UpdateValues();
+			Debug.Log("Level generated, generating checkpoints...");
 
-            // Heuristic: scale step size from area and desired step count.
-            stepSize = Mathf.RoundToInt(Mathf.Sqrt(sizeX * sizeY)) * 4 / stepCount;
+			await Task.Run(() =>
+			{
+				LevelCheckPointMaker.GenerateCheckPoints(map);
+			});
 
-            Debug.Log("Starting level generation...");
-            var map = await Task.Run(() =>
-            {
-                return LevelGenerator.GenerateLevel(sizeX, sizeY, createCircuits, stepCount, stepSize, maxAttemps, SeedFactory.Next());
-            });
+			Debug.Log("Checkpoints generated, showing map...");
 
-            Debug.Log("Level generated, generating checkpoints...");
-
-            await Task.Run(() =>
-            {
-                LevelCheckPointMaker.GenerateCheckPoints(map);
-            });
-
-            Debug.Log("Checkpoints generated, showing map...");
-
-            if (map != null)
-            {
-                popUp.GetComponent<LevelPopUp>().ShowMap(map);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Level generation failed: {ex}");
-        }
-    }
+			if (map != null)
+			{
+				popUp.GetComponent<LevelPopUp>().ShowMap(map);
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError($"Level generation failed: {ex}");
+		}
+	}
 }
 
 /// <summary>
@@ -312,15 +300,15 @@ public class GenerateLevelButton : ButtonType
 [Serializable]
 public class ClearLevelsButton : ButtonType
 {
-    /// <summary>Parameterless ctor for serialization.</summary>
-    public ClearLevelsButton()
-    { }
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public ClearLevelsButton()
+	{ }
 
-    /// <inheritdoc/>
-    public override void Action()
-    {
-        GameDataManager.Instance.ClearLevels();
-    }
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		GameDataManager.Instance.ClearLevels();
+	}
 }
 
 /// <summary>
@@ -333,15 +321,94 @@ public class ClearLevelsButton : ButtonType
 [Serializable]
 public class GoToSelectedLevel : ButtonType
 {
-    /// <summary>Parameterless ctor for serialization.</summary>
-    public GoToSelectedLevel()
-    { }
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public GoToSelectedLevel()
+	{ }
 
-    /// <inheritdoc/>
-    public override void Action()
-    {
-        GameDataManager.Instance.GoToSelectedLevel();
-    }
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		GameDataManager.Instance.GoToSelectedLevel();
+	}
+}
+
+[Serializable]
+public class ClosePopUpButton : ButtonType
+{
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public ClosePopUpButton()
+	{ }
+	/// <summary>Reference to the popup GameObject to close.</summary>
+	[SerializeField] protected GameObject popUp;
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		if (popUp == null)
+		{
+			Debug.LogError("Pop-up is not assigned.");
+			return;
+		}
+		popUp.SetActive(false);
+	}
+}
+
+[Serializable]
+public class OpenPopUpButton : ButtonType
+{
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public OpenPopUpButton()
+	{ }
+	/// <summary>Reference to the popup GameObject to open.</summary>
+	[SerializeField] protected GameObject popUp;
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		if (popUp == null)
+		{
+			Debug.LogError("Pop-up is not assigned.");
+			return;
+		}
+		popUp.SetActive(true);
+	}
+}
+
+[Serializable]
+public class ImportLevelFromClipboardButton : OpenPopUpButton
+{
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public ImportLevelFromClipboardButton()
+	{ }
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		if (ImportExportManager.TryImportLevelFromClipboard(out var levelMap))
+		{
+			GameDataManager.Instance.AddLevel(levelMap);
+		}
+		else
+		{
+			base.Action();
+		}
+	}
+}
+
+[Serializable]
+public class ImportLevelButton : ClosePopUpButton
+{
+	[SerializeField] private TMP_InputField textField;
+	/// <summary>Parameterless ctor for serialization.</summary>
+	public ImportLevelButton()
+	{ }
+	/// <inheritdoc/>
+	public override void Action()
+	{
+		if (!ImportExportManager.TryImportLevelFromString(textField.text))
+			Debug.LogError("Failed to import level: invalid format.");
+		else
+		{
+			base.Action();
+		}
+	}
 }
 
 #endregion Concrete Button Types

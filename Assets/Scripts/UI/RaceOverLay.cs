@@ -1,6 +1,8 @@
-using UnityEngine;
-using TMPro;
 using System;
+using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// HUD controller for race status: start countdown overlay, lap & total time, lap/checkpoint counters,
@@ -31,161 +33,252 @@ using System;
 /// </remarks>
 public class RaceOverLay : MonoBehaviour
 {
-    #region Inspector : Start Overlay
+	#region Inspector : Start Overlay
 
-    /// <summary>Panel/filter that covers the screen during countdown/respawn.</summary>
-    [SerializeField] private GameObject startFilter;
+	/// <summary>Panel/filter that covers the screen during countdown/respawn.</summary>
+	[SerializeField] private GameObject startFilter;
 
-    /// <summary>Countdown text rendered on top of <see cref="startFilter"/>.</summary>
-    [SerializeField] private TMP_Text startTimer;
+	/// <summary>Countdown text rendered on top of <see cref="startFilter"/>.</summary>
+	[SerializeField] private TMP_Text startTimer;
 
-    #endregion Inspector : Start Overlay
+	#endregion Inspector : Start Overlay
 
-    #region Inspector : Timers
+	#region Inspector : Splits
 
-    /// <summary>Label for the current lap's running time.</summary>
-    [SerializeField] private TMP_Text lapTime;
+	[SerializeField] private GameObject cpSplitScreen;
+	[SerializeField] private Image cpPanelOverlay;
+	[SerializeField] private TMP_Text cpTimeText;
+	[SerializeField] private TMP_Text cpDiffText;
+	[SerializeField] private float cpVisibleTime;
+	[SerializeField] private float cpFadeDuration;
 
-    /// <summary>Label for the total running time of the track (from race start).</summary>
-    [SerializeField] private TMP_Text trackTime;
+	private Coroutine fadeCoroutine = null;
 
-    #endregion Inspector : Timers
+	#endregion Inspector : Splits
 
-    #region Inspector : Counters
+	#region Inspector : Timers
 
-    /// <summary>Label for the current lap and total laps (e.g., "1/3").</summary>
-    [SerializeField] private TMP_Text lapCounter;
+	/// <summary>Label for the current lap's running time.</summary>
+	[SerializeField] private TMP_Text lapTime;
 
-    /// <summary>Label for the current checkpoint index and total count (e.g., "2/8").</summary>
-    [SerializeField] private TMP_Text checkPointCount;
+	/// <summary>Label for the total running time of the track (from race start).</summary>
+	[SerializeField] private TMP_Text trackTime;
 
-    #endregion Inspector : Counters
+	#endregion Inspector : Timers
 
-    #region Inspector : Finish Screen
+	#region Inspector : Counters
 
-    /// <summary>Finish/results panel shown when the race is completed.</summary>
-    [SerializeField] private GameObject finishScreen;
+	/// <summary>Label for the current lap and total laps (e.g., "1/3").</summary>
+	[SerializeField] private TMP_Text lapCounter;
 
-    /// <summary>Label for the final total time shown on the finish screen.</summary>
-    [SerializeField] private TMP_Text finalTime;
+	/// <summary>Label for the current checkpoint index and total count (e.g., "2/8").</summary>
+	[SerializeField] private TMP_Text checkPointCount;
 
-    #endregion Inspector : Finish Screen
+	#endregion Inspector : Counters
 
-    #region References
+	#region Inspector : Finish Screen
 
-    /// <summary>Source of race state. Auto-assigned via <see cref="FindFirstObjectByType{T}"/> when missing.</summary>
-    [SerializeField, ReadOnly] private TrackManager trackManager;
+	/// <summary>Finish/results panel shown when the race is completed.</summary>
+	[SerializeField] private GameObject finishScreen;
 
-    #endregion References
+	/// <summary>Label for the final total time shown on the finish screen.</summary>
+	[SerializeField] private TMP_Text finalTime;
 
-    /// <summary>Tracks whether Overlay was shown to avoid repeated toggling.</summary>
-    private bool toggled = false;
+	#endregion Inspector : Finish Screen
 
-    #region Unity Methods
+	#region References
 
-    /// <summary>
-    /// Editor-time validation: backfills <see cref="trackManager"/> if not assigned.
-    /// </summary>
-    private void OnValidate()
-    {
-        if (trackManager == null)
-        {
-            trackManager = FindFirstObjectByType<TrackManager>();
-        }
-    }
+	/// <summary>Source of race state. Auto-assigned via <see cref="FindFirstObjectByType{T}"/> when missing.</summary>
+	[SerializeField, ReadOnly] private TrackManager trackManager;
 
-    /// <summary>
-    /// Initializes references (if needed) and clears/initializes all UI elements to hidden/empty.
-    /// </summary>
-    private void Start()
-    {
-        if (trackManager == null)
-        {
-            trackManager = FindFirstObjectByType<TrackManager>();
-        }
+	#endregion References
 
-        lapCounter.text = "";
-        checkPointCount.text = "";
-        lapTime.text = "";
-        trackTime.text = "";
-        finalTime.text = "";
-        startTimer.text = "";
-        toggled = false;
-        startFilter.SetActive(false);
-        finishScreen.SetActive(false);
-    }
+	/// <summary>Tracks whether Overlay was shown to avoid repeated toggling.</summary>
+	private bool toggled = false;
 
-    /// <summary>
-    /// Per-frame UI sync: updates countdown/overlay, times, counters, and finish panel
-    /// from the current <see cref="TrackManager"/> state.
-    /// </summary>
-    private void Update()
-    {
-        if (!toggled)
-        {
-            if (trackManager == null) return;
-            if (trackManager.RespawnTimer > 0)
-            {
-                startFilter.SetActive(true);
-                startTimer.text = $"{trackManager.RespawnTimer:0}";
-            }
-            else
-            {
-                startTimer.text = "";
-                startFilter.SetActive(false);
-            }
+	#region Unity Methods
 
-            lapTime.text = FormatTime(trackManager.CurrentLapTime);
+	/// <summary>
+	/// Editor-time validation: backfills <see cref="trackManager"/> if not assigned.
+	/// </summary>
+	private void OnValidate()
+	{
+		if (trackManager == null)
+		{
+			trackManager = FindFirstObjectByType<TrackManager>();
+		}
+	}
 
-            if (trackManager.CurrentLap > 0)
-            {
-                trackTime.text = FormatTime(trackManager.TotalTrackTime);
-            }
-            else
-            {
-                trackTime.text = "";
-            }
+	/// <summary>
+	/// Initializes references (if needed) and clears/initializes all UI elements to hidden/empty.
+	/// </summary>
+	private void Start()
+	{
+		if (trackManager == null)
+		{
+			trackManager = FindFirstObjectByType<TrackManager>();
+		}
 
-            lapCounter.text = $"{trackManager.CurrentLap}/{trackManager.TotalLaps}";
-            checkPointCount.text = $"{trackManager.CurrentCheckPointIndex}/{trackManager.TotalCheckPoints}";
+		lapCounter.text = "";
+		checkPointCount.text = "";
+		lapTime.text = "";
+		trackTime.text = "";
+		finalTime.text = "";
+		startTimer.text = "";
+		toggled = false;
+		startFilter.SetActive(false);
+		finishScreen.SetActive(false);
+	}
 
-            if (trackManager.IsRaceFinished)
-            {
-                finishScreen.SetActive(true);
-                finalTime.text = $"Final Time: {FormatTime(trackManager.TotalTrackTime)}";
-                toggled = true;
-            }
-            else if (Input.GetKeyDown(KeyCode.Escape) && !finishScreen.activeSelf)
-            {
-                finishScreen.SetActive(true);
-                finalTime.text = $"Unfinished";
-                toggled = true;
-            }
-            else
-            {
-                finalTime.text = "";
-                finishScreen.SetActive(false);
-            }
-        }
-    }
+	/// <summary>
+	/// Per-frame UI sync: updates countdown/overlay, times, counters, and finish panel
+	/// from the current <see cref="TrackManager"/> state.
+	/// </summary>
+	private void Update()
+	{
+		if (!toggled)
+		{
+			if (trackManager == null) return;
+			if (trackManager.RespawnTimer > 0)
+			{
+				startFilter.SetActive(true);
+				startTimer.text = $"{trackManager.RespawnTimer:0}";
+			}
+			else
+			{
+				startTimer.text = "";
+				startFilter.SetActive(false);
+			}
 
-    #endregion Unity Methods
+			lapTime.text = FormatTime(RaceTimeManager.Instance.GetCurrentLapTime());
 
-    #region Formatting
+			if (trackManager.CurrentLap > 0)
+			{
+				trackTime.text = FormatTime(RaceTimeManager.Instance.GetCurrentRaceTime());
+			}
+			else
+			{
+				trackTime.text = "";
+			}
 
-    /// <summary>
-    /// Formats seconds into "HH:MM:SS.mmm" when hours &gt; 0, otherwise "MM:SS.mmm".
-    /// </summary>
-    /// <param name="time">Seconds to format.</param>
-    /// <returns>Human-readable time string.</returns>
-    private static string FormatTime(float time)
-    {
-        TimeSpan t = TimeSpan.FromSeconds(time);
-        if (t.Hours > 0)
-            return string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", t.Hours, t.Minutes, t.Seconds, t.Milliseconds);
-        else
-            return string.Format("{0:D2}:{1:D2}.{2:D3}", t.Minutes, t.Seconds, t.Milliseconds);
-    }
+			lapCounter.text = $"{trackManager.CurrentLap}/{trackManager.TotalLaps}";
+			checkPointCount.text = $"{trackManager.CurrentCheckPointIndex}/{CheckPointManager.Instance.TotalCheckpoints}";
 
-    #endregion Formatting
+			if (trackManager.IsRaceFinished)
+			{
+				finishScreen.SetActive(true);
+				finalTime.text = $"Final Time: {FormatTime(RaceTimeManager.Instance.RaceEndTime)}";
+				toggled = true;
+			}
+			else if (Input.GetKeyDown(KeyCode.Escape) && !finishScreen.activeSelf)
+			{
+				finishScreen.SetActive(true);
+				finalTime.text = $"Unfinished";
+				toggled = true;
+			}
+			else
+			{
+				finalTime.text = "";
+				finishScreen.SetActive(false);
+			}
+		}
+	}
+
+	#endregion Unity Methods
+
+	#region Public API
+
+	public void DisplaySplit(float splitTime, float splitDiff)
+	{
+		if (fadeCoroutine != null)
+		{
+			StopCoroutine(fadeCoroutine);
+			fadeCoroutine = null;
+		}
+		if (splitDiff > 0)
+		{
+			cpDiffText.color = Color.red;
+		}
+		else if (splitDiff < 0)
+		{
+			cpDiffText.color = Color.green;
+		}
+		else
+		{
+			cpDiffText.color = Color.blue;
+		}
+
+		cpTimeText.text = FormatTime(splitTime);
+		char symbol = splitDiff > 0 ? '+' : '-';
+		cpDiffText.text = $"{symbol}{FormatTime(Mathf.Abs(splitDiff))}";
+
+		cpSplitScreen.SetActive(true);
+
+		fadeCoroutine = StartCoroutine(FadeOutCoroutine(cpVisibleTime, cpFadeDuration, new Graphic[] { cpPanelOverlay, cpTimeText, cpDiffText }, cpSplitScreen));
+	}
+
+	#endregion Public API
+
+	#region Helper
+	#region Coroutine
+	private static IEnumerator FadeOutCoroutine(float timeVisible, float fadeTime, Graphic[] graphics, GameObject gameObject)
+	{
+		Color[] originalColors = new Color[graphics.Length];
+		for (int i = 0; i < graphics.Length; ++i)
+		{
+			originalColors[i] = graphics[i].color;
+		}
+
+		float startTime = Time.time;
+		while (Time.time - startTime < timeVisible)
+		{
+			yield return null;
+		}
+
+		float alphaCoefficient = 1;
+		startTime = Time.time;
+		while (Time.time - startTime < fadeTime)
+		{
+			alphaCoefficient = Mathf.Lerp(1, 0, Mathf.Clamp01((Time.time - startTime) / fadeTime));
+			for (int i = 0; i < graphics.Length; ++i)
+			{
+				Color color = originalColors[i];
+				color.a *= alphaCoefficient;
+				graphics[i].color = color;
+			}
+			yield return null;
+		}
+
+		gameObject.SetActive(false);
+
+		for (int i = 0; i < graphics.Length; ++i)
+		{
+			graphics[i].color = originalColors[i];
+		}
+	}
+
+
+	#endregion Coroutine
+
+	#endregion Helper
+
+	#region Formatting
+
+	/// <summary>
+	/// Formats seconds into "HH:MM:SS.mmm" when hours &gt; 0, otherwise "MM:SS.mmm".
+	/// </summary>
+	/// <param name="time">Seconds to format.</param>
+	/// <returns>Human-readable time string.</returns>
+	private static string FormatTime(float time)
+	{
+		TimeSpan t = TimeSpan.FromSeconds(time);
+		if (t.Hours > 0)
+			return string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", t.Hours, t.Minutes, t.Seconds, t.Milliseconds);
+		else if (t.Minutes > 0)
+			return string.Format("{0:D2}:{1:D2}.{2:D3}", t.Minutes, t.Seconds, t.Milliseconds);
+		else
+			return string.Format("{0:D2}.{1:D3}", t.Seconds, t.Milliseconds);
+	}
+
+	#endregion Formatting
 }

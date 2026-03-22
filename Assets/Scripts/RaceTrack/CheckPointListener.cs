@@ -1,6 +1,6 @@
 using System;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Trigger-based checkpoint sensor that captures the player's pose and velocities on entry
@@ -14,8 +14,8 @@ using System.Collections.Generic;
 /// @usage
 /// - Call <see cref="SetActive(bool)"/> to enable/disable the checkpoint (toggles collider &amp; renderer).
 /// - Register callbacks with <see cref="AddListener(Action)"/> to react when the player enters the trigger.
-/// - After a claim, read the captured respawn data via <see cref="cPClaimedPosition"/>, <see cref="cPClaimedRotation"/>,
-///   <see cref="cPClaimedRbLinearVelocity"/>, and <see cref="cPClaimedRbAngularVelocity"/>.
+/// - After a claim, read the captured respawn data via <see cref="CPClaimedPosition"/>, <see cref="CPClaimedRotation"/>,
+///   <see cref="CPClaimedRbLinearVelocity"/>, and <see cref="CPClaimedRbAngularVelocity"/>.
 /// </remarks>
 [Serializable]
 [DisallowMultipleComponent]
@@ -23,155 +23,158 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Renderer))]
 public class CheckPointListener : MonoBehaviour
 {
-    [Header("Check Point Reference")]
-    /// <summary>
-    /// Trigger collider used to detect the player crossing the checkpoint.
-    /// Auto-cached in <see cref="GetReferences"/>.
-    /// </summary>
-    [SerializeField, ReadOnly] private Collider checkPointCollider;
+	[Header("Checkpoint Settings")]
+	[field: SerializeField] public int CheckpointOrder { get; private set; }
 
-    /// <summary>
-    /// Visual marker for the checkpoint. Toggled alongside the collider in <see cref="SetActive(bool)"/>.
-    /// Auto-cached in <see cref="GetReferences"/>.
-    /// </summary>
-    [SerializeField, ReadOnly] private Renderer checkPointRenderer;
+	[Header("Check Point Reference")]
+	/// <summary>
+	/// Trigger collider used to detect the player crossing the checkpoint.
+	/// Auto-cached in <see cref="GetReferences"/>.
+	/// </summary>
+	[SerializeField, ReadOnly] private Collider checkPointCollider;
 
-    /// <summary>
-    /// True while the checkpoint is accepting triggers and visible (see <see cref="SetActive(bool)"/>).
-    /// </summary>
-    private bool _isActive = false;
+	/// <summary>
+	/// Visual marker for the checkpoint. Toggled alongside the collider in <see cref="SetActive(bool)"/>.
+	/// Auto-cached in <see cref="GetReferences"/>.
+	/// </summary>
+	[SerializeField, ReadOnly] private Renderer checkPointRenderer;
 
-    /// <summary>
-    /// Observer list invoked when the player claims this checkpoint.
-    /// </summary>
-    private List<Action> _listeners = new List<Action>();
+	/// <summary>
+	/// True while the checkpoint is accepting triggers and visible (see <see cref="SetActive(bool)"/>).
+	/// </summary>
+	private bool _isActive = false;
 
-    /// <summary>Captured player position at the moment of trigger entry.</summary>
-    public Vector3 cPClaimedPosition { get; private set; }
-    /// <summary>Captured player rotation at the moment of trigger entry.</summary>
-    public Quaternion cPClaimedRotation { get; private set; }
-    /// <summary>Captured player rigidbody linear velocity at the moment of trigger entry.</summary>
-    public Vector3 cPClaimedRbLinearVelocity { get; private set; }
-    /// <summary>Captured player rigidbody angular velocity at the moment of trigger entry.</summary>
-    public Vector3 cPClaimedRbAngularVelocity { get; private set; }
+	/// <summary>
+	/// Observer list invoked when the player claims this checkpoint.
+	/// </summary>
+	private HashSet<Action> _listeners = new HashSet<Action>();
 
-    #region Unity Methods
+	/// <summary>Captured player position at the moment of trigger entry.</summary>
+	public Vector3 CPClaimedPosition { get; private set; }
+	/// <summary>Captured player rotation at the moment of trigger entry.</summary>
+	public Quaternion CPClaimedRotation { get; private set; }
+	/// <summary>Captured player rigidbody linear velocity at the moment of trigger entry.</summary>
+	public Vector3 CPClaimedRbLinearVelocity { get; private set; }
+	/// <summary>Captured player rigidbody angular velocity at the moment of trigger entry.</summary>
+	public Vector3 CPClaimedRbAngularVelocity { get; private set; }
 
-    /// <summary>
-    /// Editor validation hook: caches required references and warns on misconfiguration.
-    /// </summary>
-    private void OnValidate()
-    {
-        GetReferences();
-    }
+	#region Unity Methods
 
-    /// <summary>
-    /// Unity Awake: caches component references.
-    /// </summary>
-    private void Awake()
-    {
-        GetReferences();
-    }
+	/// <summary>
+	/// Editor validation hook: caches required references and warns on misconfiguration.
+	/// </summary>
+	private void OnValidate()
+	{
+		GetReferences();
+	}
 
-    /// <summary>
-    /// Unity Start: ensures references are cached.
-    /// </summary>
-    private void Start()
-    {
-        GetReferences();
-    }
-    #endregion Unity Methods
+	/// <summary>
+	/// Unity Awake: caches component references.
+	/// </summary>
+	private void Awake()
+	{
+		GetReferences();
+	}
 
-    #region Setup Methods
-    /// <summary>
-    /// Caches the <see cref="Collider"/> and <see cref="Renderer"/> components and validates
-    /// that the collider is set as a trigger.
-    /// </summary>
-    private void GetReferences()
-    {
-        checkPointCollider = GetComponent<Collider>();
-        if (checkPointCollider == null)
-        {
-            Debug.LogError("CheckPointListener requires a Collider component.");
-        }
+	/// <summary>
+	/// Unity Start: ensures references are cached.
+	/// </summary>
+	private void Start()
+	{
+		GetReferences();
+	}
+	#endregion Unity Methods
 
-        if (!checkPointCollider.isTrigger)
-        {
-            Debug.LogWarning("CheckPointListener collider should be set as a trigger.");
-        }
+	#region Setup Methods
+	/// <summary>
+	/// Caches the <see cref="Collider"/> and <see cref="Renderer"/> components and validates
+	/// that the collider is set as a trigger.
+	/// </summary>
+	private void GetReferences()
+	{
+		checkPointCollider = GetComponent<Collider>();
+		if (checkPointCollider == null)
+		{
+			Debug.LogError("CheckPointListener requires a Collider component.");
+		}
 
-        checkPointRenderer = GetComponent<Renderer>();
-        if (checkPointRenderer == null)
-        {
-            Debug.LogError("CheckPointListener requires a Renderer component.");
-        }
-    }
-    #endregion Setup Methods
+		if (!checkPointCollider.isTrigger)
+		{
+			Debug.LogWarning("CheckPointListener collider should be set as a trigger.");
+		}
 
-    /// <summary>
-    /// Physics callback: when active and a collider tagged <c>Player</c> enters,
-    /// captures position, rotation, and velocities, then notifies listeners.
-    /// </summary>
-    /// <param name="other">Incoming collider.</param>
-    private void OnTriggerEnter(Collider other)
-    {
-        if (_isActive && other.CompareTag("Player"))
-        {
-            other.GetComponent<Rigidbody>();
+		checkPointRenderer = GetComponent<Renderer>();
+		if (checkPointRenderer == null)
+		{
+			Debug.LogError("CheckPointListener requires a Renderer component.");
+		}
+	}
+	#endregion Setup Methods
 
-            cPClaimedPosition = other.transform.position;
-            cPClaimedRotation = other.transform.rotation;
+	/// <summary>
+	/// Physics callback: when active and a collider tagged <c>Player</c> enters,
+	/// captures position, rotation, and velocities, then notifies listeners.
+	/// </summary>
+	/// <param name="other">Incoming collider.</param>
+	private void OnTriggerEnter(Collider other)
+	{
+		if (_isActive && other.CompareTag("Player"))
+		{
+			other.GetComponent<Rigidbody>();
 
-            var playerRigidbody = other.GetComponent<Rigidbody>();
+			CPClaimedPosition = other.transform.position;
+			CPClaimedRotation = other.transform.rotation;
 
-            cPClaimedRbLinearVelocity = playerRigidbody.linearVelocity;
-            cPClaimedRbAngularVelocity = playerRigidbody.angularVelocity;
+			var playerRigidbody = other.GetComponent<Rigidbody>();
 
-            if (_listeners != null)
-            {
-                foreach (var listener in _listeners)
-                {
-                    listener?.Invoke();
-                }
-            }
-        }
-    }
+			CPClaimedRbLinearVelocity = playerRigidbody.linearVelocity;
+			CPClaimedRbAngularVelocity = playerRigidbody.angularVelocity;
 
-    /// <summary>
-    /// Enables/disables the checkpoint. When disabled, the collider is turned off and the
-    /// renderer is hidden; the checkpoint will not claim or notify.
-    /// </summary>
-    /// <param name="isActive">True to enable; false to disable.</param>
-    public void SetActive(bool isActive)
-    {
-        if (checkPointCollider == null || checkPointRenderer == null)
-        {
-            GetReferences();
-        }
+			if (_listeners != null)
+			{
+				foreach (var listener in _listeners)
+				{
+					listener?.Invoke();
+				}
+			}
+		}
+	}
 
-        _isActive = isActive;
-        checkPointCollider.enabled = isActive;
-        checkPointRenderer.enabled = isActive;
-    }
+	/// <summary>
+	/// Enables/disables the checkpoint. When disabled, the collider is turned off and the
+	/// renderer is hidden; the checkpoint will not claim or notify.
+	/// </summary>
+	/// <param name="isActive">True to enable; false to disable.</param>
+	public void SetActive(bool isActive)
+	{
+		if (checkPointCollider == null || checkPointRenderer == null)
+		{
+			GetReferences();
+		}
 
-    #region Observer Pattern Methods
-    /// <summary>
-    /// Registers a callback to be invoked when this checkpoint is claimed by the player.
-    /// </summary>
-    /// <param name="listener">Action to invoke on claim.</param>
-    public void AddListener(Action listener)
-    {
-        _listeners.Add(listener);
-    }
+		_isActive = isActive;
+		checkPointCollider.enabled = isActive;
+		checkPointRenderer.enabled = isActive;
+	}
 
-    /// <summary>
-    /// Unregisters a previously added listener.
-    /// </summary>
-    /// <param name="listener">Action to remove.</param>
-    /// <returns>True if the listener was removed; otherwise false.</returns>
-    public bool RemoveListener(Action listener)
-    {
-        return _listeners.Remove(listener);
-    }
-    #endregion Observer Pattern Methods
+	#region Observer Pattern Methods
+	/// <summary>
+	/// Registers a callback to be invoked when this checkpoint is claimed by the player.
+	/// </summary>
+	/// <param name="listener">Action to invoke on claim.</param>
+	public void AddListener(Action listener)
+	{
+		_listeners.Add(listener);
+	}
+
+	/// <summary>
+	/// Unregisters a previously added listener.
+	/// </summary>
+	/// <param name="listener">Action to remove.</param>
+	/// <returns>True if the listener was removed; otherwise false.</returns>
+	public bool RemoveListener(Action listener)
+	{
+		return _listeners.Remove(listener);
+	}
+	#endregion Observer Pattern Methods
 }

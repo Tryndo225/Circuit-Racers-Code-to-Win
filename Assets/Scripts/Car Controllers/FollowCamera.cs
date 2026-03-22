@@ -1,112 +1,195 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Third-person follow camera that tracks a target with a configurable local-space offset,
-/// smooth positional damping, and yaw aligned to the target with a fixed pitch angle.
+/// Third-person follow camera for a racing game that tracks a target using a configurable
+/// offset, smooth positional damping, smooth yaw alignment, a fixed pitch angle,
+/// and movement-direction-based positioning. When reversing, both camera rotation
+/// and position flip to the opposite side of the car.
 /// </summary>
 /// <remarks>
 /// @ingroup car_ctrl
-/// @thread Unity main thread (Update).
+/// @thread Unity main thread (LateUpdate).
 /// </remarks>
 public class FollowCamera : MonoBehaviour
 {
-    #region Inspector
+	#region Inspector
 
-    [Header("Target Settings")]
-    /// <summary>Transform to follow. If null, no update occurs.</summary>
-    public Transform target;
+	[Header("Target")]
+	/// <summary>Transform to follow. If null, camera update is skipped.</summary>
+	public Transform target;
 
-    [Header("Offset & Movement")]
-    /// <summary>Camera offset in the target's local space.</summary>
-    public Vector3 offset = new Vector3(0f, 6f, -12f);
+	[Header("Physics")]
+	/// <summary>
+	/// Optional Rigidbody used to determine actual movement direction.
+	/// If assigned, the camera can flip properly when the vehicle reverses.
+	/// </summary>
+	public Rigidbody targetRb;
 
-    /// <summary>Follow responsiveness (higher = snappier). Used as 1 / followSpeed in SmoothDamp.</summary>
-    public float followSpeed = 5f;
+	[Header("Offset")]
+	/// <summary>
+	/// Camera offset values. X is side offset, Y is height, and Z controls follow distance.
+	/// The sign of Z is ignored for movement-direction-based positioning.
+	/// </summary>
+	public Vector3 offset = new Vector3(0f, 6f, -12f);
 
-    [Header("Rotation Settings")]
-    /// <summary>Yaw interpolation speed (higher = faster yaw alignment).</summary>
-    public float yawSmoothness = 5f;
+	[Header("Position Smoothing")]
+	/// <summary>
+	/// Time used by <see cref="Vector3.SmoothDamp"/> for positional follow smoothing.
+	/// Smaller values make the camera more responsive, larger values make it smoother.
+	/// </summary>
+	public float positionSmoothTime = 0.25f;
 
-    /// <summary>Fixed pitch angle in degrees applied on top of yaw.</summary>
-    public float fixedPitchAngle = 15f;
+	[Header("Rotation Smoothing")]
+	/// <summary>
+	/// Time used by <see cref="Mathf.SmoothDampAngle"/> for yaw smoothing.
+	/// Smaller values make yaw react faster, larger values make it turn more gently.
+	/// </summary>
+	public float rotationSmoothTime = 0.2f;
 
-    #endregion
+	[Header("Pitch")]
+	/// <summary>Fixed pitch angle in degrees applied to the camera rotation.</summary>
+	public float fixedPitchAngle = 15f;
 
-    #region State
+	[Header("Look Ahead")]
+	/// <summary>
+	/// Distance applied along the chosen movement heading to make the camera anticipate motion.
+	/// </summary>
+	public float lookAheadDistance = 4f;
 
-    /// <summary>Velocity accumulator used by SmoothDamp.</summary>
-    private Vector3 velocity;
+	[Header("Movement Direction")]
+	/// <summary>
+	/// Minimum planar speed required before Rigidbody velocity is used as the camera heading.
+	/// Below this threshold, target forward is used instead.
+	/// </summary>
+	public float minVelocityForDirection = 0.5f;
 
-    #endregion
+	#endregion
 
-    #region Unity Methods
+	#region State
 
-    /// <summary>
-    /// Updates position using SmoothDamp toward target.TransformPoint(offset) and
-    /// rotates toward target yaw while enforcing a fixed pitch angle.
-    /// </summary>
-    private void Update()
-    {
-        if (target == null) return;
+	/// <summary>Velocity accumulator used internally by <see cref="Vector3.SmoothDamp"/>.</summary>
+	private Vector3 positionVelocity;
 
-        // Smooth follow toward local-space offset
-        Vector3 desiredPosition = target.TransformPoint(offset);
-        transform.position = Vector3.SmoothDamp(
-            transform.position,
-            desiredPosition,
-            ref velocity,
-            1f / followSpeed
-        );
+	/// <summary>Velocity accumulator used internally by <see cref="Mathf.SmoothDampAngle"/>.</summary>
+	private float yawVelocity;
 
-        // Compute yaw from target forward projected onto XZ plane
-        Vector3 flatForward = target.forward;
-        flatForward.y = 0f;
+	#endregion
 
-        if (flatForward.sqrMagnitude > 0.001f)
-        {
-            Quaternion yawRotation = Quaternion.LookRotation(flatForward);
+	#region Unity Methods
 
-            // Apply fixed pitch on top of yaw
-            Vector3 euler = yawRotation.eulerAngles;
-            euler.x = fixedPitchAngle;
-            Quaternion finalRotation = Quaternion.Euler(euler);
+	/// <summary>
+	/// Updates the camera after all regular frame movement using smooth positional damping toward
+	/// a movement-direction-based follow position plus look-ahead, and smooth yaw damping toward
+	/// the chosen heading while enforcing a fixed pitch angle.
+	/// </summary>
+	private void LateUpdate()
+	{
+		if (target == null)
+		{
+			return;
+		}
 
-            // Smooth yaw toward target orientation
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                finalRotation,
-                Time.fixedDeltaTime * yawSmoothness
-            );
-        }
-    }
+		Vector3 flatDirection = GetCameraDirection();
 
-    #endregion
+		Vector3 desiredPosition = GetDesiredCameraPosition();
+		transform.position = Vector3.SmoothDamp(
+			transform.position,
+			desiredPosition,
+			ref positionVelocity,
+			positionSmoothTime
+		);
 
-    #region Public API
+		float targetYaw = Mathf.Atan2(flatDirection.x, flatDirection.z) * Mathf.Rad2Deg;
+		float currentYaw = transform.eulerAngles.y;
 
-    /// <summary>
-    /// Instantly snaps camera position and rotation to the target with the configured offset and pitch.
-    /// Useful after teleports or scene loads.
-    /// </summary>
-    public void SyncCamera()
-    {
-        if (target == null) return;
+		float smoothYaw = Mathf.SmoothDampAngle(
+			currentYaw,
+			targetYaw,
+			ref yawVelocity,
+			rotationSmoothTime
+		);
 
-        Vector3 desiredPosition = target.TransformPoint(offset);
-        transform.position = desiredPosition;
+		transform.rotation = Quaternion.Euler(fixedPitchAngle, smoothYaw, 0f);
+	}
 
-        Vector3 flatForward = target.forward;
-        flatForward.y = 0f;
+	#endregion
 
-        if (flatForward.sqrMagnitude > 0.001f)
-        {
-            Quaternion yawRotation = Quaternion.LookRotation(flatForward);
-            Vector3 euler = yawRotation.eulerAngles;
-            euler.x = fixedPitchAngle;
-            Quaternion finalRotation = Quaternion.Euler(euler);
-            transform.rotation = finalRotation;
-        }
-    }
+	#region Public API
 
-    #endregion
+	/// <summary>
+	/// Instantly snaps the camera to the target using the configured movement-based offset,
+	/// look-ahead, and fixed pitch angle. Useful after teleports, respawns, or scene loads.
+	/// </summary>
+	public void SyncCamera()
+	{
+		if (target == null)
+		{
+			return;
+		}
+
+		transform.position = GetDesiredCameraPosition();
+
+		Vector3 flatDirection = GetCameraDirection();
+		float targetYaw = Mathf.Atan2(flatDirection.x, flatDirection.z) * Mathf.Rad2Deg;
+		transform.rotation = Quaternion.Euler(fixedPitchAngle, targetYaw, 0f);
+
+		positionVelocity = Vector3.zero;
+		yawVelocity = 0f;
+	}
+
+	public void SetTarget(Transform newTarget)
+	{
+		target = newTarget;
+		newTarget.TryGetComponent<Rigidbody>(out targetRb);
+		SyncCamera();
+	}
+
+	#endregion
+
+	#region Helpers
+
+	/// <summary>
+	/// Returns the flattened heading the camera should use. Prefers Rigidbody planar velocity
+	/// when the target is moving fast enough, otherwise falls back to target forward.
+	/// This allows both camera rotation and camera position to flip when reversing.
+	/// </summary>
+	private Vector3 GetCameraDirection()
+	{
+		if (targetRb != null)
+		{
+			Vector3 flatVelocity = targetRb.linearVelocity;
+			flatVelocity.y = 0f;
+
+			if (flatVelocity.sqrMagnitude > minVelocityForDirection * minVelocityForDirection)
+			{
+				return flatVelocity.normalized;
+			}
+		}
+
+		Vector3 flatForward = target.forward;
+		flatForward.y = 0f;
+
+		if (flatForward.sqrMagnitude < 0.001f)
+		{
+			return Vector3.forward;
+		}
+
+		return flatForward.normalized;
+	}
+
+	private Vector3 GetDesiredCameraPosition()
+	{
+		Vector3 flatDirection = GetCameraDirection();
+		float distance = Mathf.Abs(offset.z);
+		Vector3 right = Vector3.Cross(Vector3.up, flatDirection).normalized;
+		Vector3 lookAhead = flatDirection * lookAheadDistance;
+		return
+			target.position
+			- flatDirection * distance
+			+ Vector3.up * offset.y
+			+ right * offset.x
+			+ lookAhead;
+	}
+
+	#endregion
 }
