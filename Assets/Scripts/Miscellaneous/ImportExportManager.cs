@@ -41,7 +41,7 @@ public static class ImportExportManager
 			map.Name = Encoding.UTF8.GetString(Convert.FromBase64String(parts[0]));
 			map.Height = int.Parse(parts[1]);
 			map.Width = int.Parse(parts[2]);
-			map.Circular = parts[3] == "1";
+			map.Circuit = parts[3] == "1";
 			map.StartPoint = new Coordinates(
 				int.Parse(parts[4]),
 				int.Parse(parts[5])
@@ -79,7 +79,7 @@ public static class ImportExportManager
 		sb.Append('|');
 		sb.Append(levelMap.Width);
 		sb.Append('|');
-		sb.Append(levelMap.Circular ? 1 : 0);
+		sb.Append(levelMap.Circuit ? 1 : 0);
 		sb.Append('|');
 		sb.Append(levelMap.StartPoint.X);
 		sb.Append('|');

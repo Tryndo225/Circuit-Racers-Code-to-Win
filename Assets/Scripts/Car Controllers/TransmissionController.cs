@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Simple automatic transmission: computes engine RPM from wheel RPM and current gear,
@@ -16,189 +16,194 @@ using System.Collections.Generic;
 /// </remarks>
 public class TransmissionController : MonoBehaviour
 {
-    #region Inspector: Transmission & RPM
+	#region Inspector: Transmission & RPM
 
-    [Header("Transmission & RPM")]
-    /// <summary>Forward gear ratios (index 0 is first gear).</summary>
-    [Tooltip("Forward gear ratios (1..N)")]
-    public float[] forwardGears;
+	[Header("Transmission & RPM")]
+	/// <summary>Forward gear ratios (index 0 is first gear).</summary>
+	[Tooltip("Forward gear ratios (1..N)")]
+	public float[] forwardGears;
 
-    /// <summary>Final drive ratio (multiplies the selected gear ratio).</summary>
-    public float finalDrive;
+	/// <summary>Final drive ratio (multiplies the selected gear ratio).</summary>
+	public float finalDrive;
 
-    /// <summary>Engine idle RPM.</summary>
-    [Tooltip("Engine idle RPM")]
-    public float idleRPM;
+	/// <summary>Engine idle RPM.</summary>
+	[Tooltip("Engine idle RPM")]
+	public float idleRPM;
 
-    /// <summary>Engine redline RPM (maximum RPM).</summary>
-    [Tooltip("Engine redline RPM (max RPM)")]
-    public float redlineRPM;
+	/// <summary>Engine redline RPM (maximum RPM).</summary>
+	[Tooltip("Engine redline RPM (max RPM)")]
+	public float redlineRPM;
 
-    /// <summary>Auto shift-up threshold (RPM).</summary>
-    [Tooltip("Auto shift up when RPM exceeds this")]
-    public float shiftUpRPM;
+	/// <summary>Auto shift-up threshold (RPM).</summary>
+	[Tooltip("Auto shift up when RPM exceeds this")]
+	public float shiftUpRPM;
 
-    /// <summary>Auto shift-down threshold (RPM).</summary>
-    [Tooltip("Auto shift down when RPM falls below this")]
-    public float shiftDownRPM;
+	/// <summary>Auto shift-down threshold (RPM).</summary>
+	[Tooltip("Auto shift down when RPM falls below this")]
+	public float shiftDownRPM;
 
-    /// <summary>Seconds during which torque is cut while shifting.</summary>
-    [Tooltip("Seconds torque is cut during a shift")]
-    public float shiftDuration;
+	/// <summary>Seconds during which torque is cut while shifting.</summary>
+	[Tooltip("Seconds torque is cut during a shift")]
+	public float shiftDuration;
 
-    /// <summary>Slip threshold above which shifting is suppressed.</summary>
-    [Tooltip("Slip threshold for shifting")]
-    public float slipThreshold;
+	/// <summary>Slip threshold above which shifting is suppressed.</summary>
+	[Tooltip("Slip threshold for shifting")]
+	public float slipThreshold;
 
-    /// <summary>Callbacks invoked each time a shift starts (up or down).</summary>
-    [Tooltip("Delegetes for shifting event")]
-    public List<System.Action> OnShift;
+	/// <summary>Callbacks invoked each time a shift starts (up or down).</summary>
+	[Tooltip("Delegetes for shifting event")]
+	public List<System.Action> OnShift;
 
-    #endregion
+	#endregion
 
-    #region State & Properties
+	#region State & Properties
 
-    /// <summary>True while a shift is in progress.</summary>
-    private bool _isShifting = false;
+	/// <summary>True while a shift is in progress.</summary>
+	private bool _isShifting = false;
 
-    /// <summary>Zero-based index of the current gear.</summary>
-    public int CurrentGear { get; private set; } = 0;
+	/// <summary>Zero-based index of the current gear.</summary>
+	public int CurrentGear { get; private set; } = 0;
 
-    /// <summary>Current engine RPM after mapping from wheel RPM and clamping.</summary>
-    public float EngineRPM { get; private set; } = 0f;
+	/// <summary>Current engine RPM after mapping from wheel RPM and clamping.</summary>
+	public float EngineRPM { get; private set; } = 0f;
 
-    #endregion
+	#endregion
 
-    #region Public API
+	#region Public API
 
-    /// <summary>
-    /// Updates RPM and decides whether to start an upshift/downshift based on thresholds and slip.
-    /// Returns true if torque should be cut this frame (during shift or when starting one).
-    /// </summary>
-    /// <param name="wheelRPM">Average RPM of driven wheels (grounded).</param>
-    /// <param name="wheelSlip">Average slip measure; higher means more slip.</param>
-    /// <returns>True if torque should be cut.</returns>
-    public bool HandleShifting(float wheelRPM, float wheelSlip)
-    {
-        if (_isShifting)
-        {
-            return true;
-        }
+	/// <summary>
+	/// Updates RPM and decides whether to start an upshift/downshift based on thresholds and slip.
+	/// Returns true if torque should be cut this frame (during shift or when starting one).
+	/// </summary>
+	/// <param name="wheelRPM">Average RPM of driven wheels (grounded).</param>
+	/// <param name="wheelSlip">Average slip measure; higher means more slip.</param>
+	/// <returns>True if torque should be cut.</returns>
+	public bool HandleShifting(float wheelRPM, float wheelSlip)
+	{
+		if (_isShifting)
+		{
+			return true;
+		}
 
-        EngineRPM = CalculateRPM(wheelRPM);
+		EngineRPM = CalculateRPM(wheelRPM);
 
-        if (wheelSlip > slipThreshold)
-        {
-            return false;
-        }
+		if (wheelSlip > slipThreshold)
+		{
+			return false;
+		}
 
-        if (EngineRPM >= shiftUpRPM && CurrentGear < forwardGears.Length - 1)
-        {
-            StartCoroutine(ShiftUp());
-            return true;
-        }
-        else if (EngineRPM <= shiftDownRPM && CurrentGear > 0)
-        {
-            StartCoroutine(ShiftDown());
-            return true;
-        }
+		if (EngineRPM >= shiftUpRPM && CurrentGear < forwardGears.Length - 1)
+		{
+			StartCoroutine(ShiftUp());
+			return true;
+		}
+		else if (EngineRPM <= shiftDownRPM && CurrentGear > 0)
+		{
+			StartCoroutine(ShiftDown());
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    #endregion
+	public float GetNormalizedRPM()
+	{
+		return Mathf.InverseLerp(idleRPM, redlineRPM, EngineRPM);
+	}
 
-    #region Private Helpers
+	#endregion
 
-    /// <summary>Returns the ratio of the current forward gear.</summary>
-    private float CurrentGearRatio()
-    {
-        return forwardGears[CurrentGear];
-    }
+	#region Private Helpers
 
-    /// <summary>
-    /// Computes engine RPM from wheel RPM via current gear and final drive, then clamps to [idleRPM, redlineRPM].
-    /// </summary>
-    private float CalculateRPM(float wheelRPM)
-    {
-        // engine rpm = wheel rpm * (gear * final drive)
-        float gr = Mathf.Abs(CurrentGearRatio()) * Mathf.Abs(finalDrive);
-        float engine = wheelRPM * gr;
+	/// <summary>Returns the ratio of the current forward gear.</summary>
+	private float CurrentGearRatio()
+	{
+		return forwardGears[CurrentGear];
+	}
 
-        // keep above idle, clamp to redline
-        engine = Mathf.Max(idleRPM, engine);
-        engine = Mathf.Min(engine, redlineRPM);
+	/// <summary>
+	/// Computes engine RPM from wheel RPM via current gear and final drive, then clamps to [idleRPM, redlineRPM].
+	/// </summary>
+	private float CalculateRPM(float wheelRPM)
+	{
+		// engine rpm = wheel rpm * (gear * final drive)
+		float gr = Mathf.Abs(CurrentGearRatio()) * Mathf.Abs(finalDrive);
+		float engine = wheelRPM * gr;
 
-        return engine;
-    }
+		// keep above idle, clamp to redline
+		engine = Mathf.Max(idleRPM, engine);
+		engine = Mathf.Min(engine, redlineRPM);
 
-    #endregion
+		return engine;
+	}
 
-    #region Coroutines: Shifting
+	#endregion
 
-    /// <summary>
-    /// Starts an upshift: invokes OnShift callbacks, eases EngineRPM toward idle during shiftDuration,
-    /// then increments CurrentGear and clears shifting flag.
-    /// </summary>
-    private IEnumerator ShiftUp()
-    {
-        if (_isShifting || CurrentGear >= forwardGears.Length - 1)
-            yield break;
+	#region Coroutines: Shifting
 
-        _isShifting = true;
+	/// <summary>
+	/// Starts an upshift: invokes OnShift callbacks, eases EngineRPM toward idle during shiftDuration,
+	/// then increments CurrentGear and clears shifting flag.
+	/// </summary>
+	private IEnumerator ShiftUp()
+	{
+		if (_isShifting || CurrentGear >= forwardGears.Length - 1)
+			yield break;
 
-        if (OnShift != null)
-        {
-            foreach (var action in OnShift)
-            {
-                action?.Invoke();
-            }
-        }
+		_isShifting = true;
 
-        float originalRPM = EngineRPM;
+		if (OnShift != null)
+		{
+			foreach (var action in OnShift)
+			{
+				action?.Invoke();
+			}
+		}
 
-        for (float t = 0; t < shiftDuration; t += Time.deltaTime)
-        {
-            EngineRPM = Mathf.Lerp(originalRPM, idleRPM, t / shiftDuration);
-            yield return null;
-        }
+		float originalRPM = EngineRPM;
 
-        // Shift up
-        CurrentGear++;
-        _isShifting = false;
-    }
+		for (float t = 0; t < shiftDuration; t += Time.deltaTime)
+		{
+			EngineRPM = Mathf.Lerp(originalRPM, idleRPM, t / shiftDuration);
+			yield return null;
+		}
 
-    /// <summary>
-    /// Starts a downshift: invokes OnShift callbacks, eases EngineRPM toward redline during shiftDuration,
-    /// then decrements CurrentGear and clears shifting flag.
-    /// </summary>
-    private IEnumerator ShiftDown()
-    {
-        if (_isShifting || CurrentGear <= 0)
-            yield break;
+		// Shift up
+		CurrentGear++;
+		_isShifting = false;
+	}
 
-        _isShifting = true;
+	/// <summary>
+	/// Starts a downshift: invokes OnShift callbacks, eases EngineRPM toward redline during shiftDuration,
+	/// then decrements CurrentGear and clears shifting flag.
+	/// </summary>
+	private IEnumerator ShiftDown()
+	{
+		if (_isShifting || CurrentGear <= 0)
+			yield break;
 
-        if (OnShift != null)
-        {
-            foreach (var action in OnShift)
-            {
-                action?.Invoke();
-            }
-        }
+		_isShifting = true;
 
-        float originalRPM = EngineRPM;
+		if (OnShift != null)
+		{
+			foreach (var action in OnShift)
+			{
+				action?.Invoke();
+			}
+		}
 
-        for (float t = 0; t < shiftDuration; t += Time.deltaTime)
-        {
-            EngineRPM = Mathf.Lerp(originalRPM, redlineRPM, t / shiftDuration);
-            yield return null;
-        }
+		float originalRPM = EngineRPM;
 
-        // Shift down
-        CurrentGear--;
-        _isShifting = false;
-    }
+		for (float t = 0; t < shiftDuration; t += Time.deltaTime)
+		{
+			EngineRPM = Mathf.Lerp(originalRPM, redlineRPM, t / shiftDuration);
+			yield return null;
+		}
 
-    #endregion
+		// Shift down
+		CurrentGear--;
+		_isShifting = false;
+	}
+
+	#endregion
 }

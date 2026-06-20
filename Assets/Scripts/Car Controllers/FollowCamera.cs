@@ -92,22 +92,12 @@ public class FollowCamera : MonoBehaviour
 		Vector3 flatDirection = GetCameraDirection();
 
 		Vector3 desiredPosition = GetDesiredCameraPosition();
-		transform.position = Vector3.SmoothDamp(
-			transform.position,
-			desiredPosition,
-			ref positionVelocity,
-			positionSmoothTime
-		);
+		transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
 
 		float targetYaw = Mathf.Atan2(flatDirection.x, flatDirection.z) * Mathf.Rad2Deg;
 		float currentYaw = transform.eulerAngles.y;
 
-		float smoothYaw = Mathf.SmoothDampAngle(
-			currentYaw,
-			targetYaw,
-			ref yawVelocity,
-			rotationSmoothTime
-		);
+		float smoothYaw = Mathf.SmoothDampAngle(currentYaw, targetYaw, ref yawVelocity, rotationSmoothTime);
 
 		transform.rotation = Quaternion.Euler(fixedPitchAngle, smoothYaw, 0f);
 	}
@@ -183,12 +173,7 @@ public class FollowCamera : MonoBehaviour
 		float distance = Mathf.Abs(offset.z);
 		Vector3 right = Vector3.Cross(Vector3.up, flatDirection).normalized;
 		Vector3 lookAhead = flatDirection * lookAheadDistance;
-		return
-			target.position
-			- flatDirection * distance
-			+ Vector3.up * offset.y
-			+ right * offset.x
-			+ lookAhead;
+		return target.position - flatDirection * distance + Vector3.up * offset.y + right * offset.x + lookAhead;
 	}
 
 	#endregion

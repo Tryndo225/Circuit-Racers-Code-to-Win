@@ -421,6 +421,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		{
 			CurrentGameData.Levels.Add(new LevelData(map));
 			PotentialHashChange(CurrentGameData.Levels.GetContentHash());
+			SaveGameData();
 		}
 		else
 		{
@@ -460,6 +461,64 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	{
 		CurrentGameData.Levels.Clear();
 		PotentialHashChange(CurrentGameData.Levels.GetContentHash());
+	}
+
+	#endregion
+
+	#region Level Editing
+
+	public LevelMap CreateEditableCopy(LevelMap sourceMap)
+	{
+		if (sourceMap == null)
+		{
+			Debug.LogError("[GameDataManager] CreateEditableCopy called with null map.");
+			return null;
+		}
+
+		int index = CurrentGameData.Levels.FindIndex(ld => ld.LevelMap == sourceMap);
+
+		if (index < 0)
+		{
+			Debug.LogWarning("[GameDataManager] Cannot edit level; map is not present in CurrentGameData.");
+			return null;
+		}
+
+		return CurrentGameData.Levels[index].LevelMap.Copy();
+	}
+
+	public bool ReplaceLevel(LevelMap originalMap, LevelMap editedMap)
+	{
+		if (originalMap == null)
+		{
+			Debug.LogError("[GameDataManager] ReplaceLevel called with null original map.");
+			return false;
+		}
+
+		if (editedMap == null)
+		{
+			Debug.LogError("[GameDataManager] ReplaceLevel called with null edited map.");
+			return false;
+		}
+
+		int index = CurrentGameData.Levels.FindIndex(ld => ld.LevelMap == originalMap);
+
+		if (index < 0)
+		{
+			Debug.LogWarning("[GameDataManager] Cannot replace level; original map was not found.");
+			return false;
+		}
+
+		CurrentGameData.Levels[index] = new LevelData(editedMap);
+
+		if (CurrentLevelMap == originalMap)
+		{
+			CurrentLevelMap = editedMap;
+		}
+
+		PotentialHashChange(CurrentGameData.Levels.GetContentHash());
+		SaveGameData();
+
+		return true;
 	}
 
 	#endregion

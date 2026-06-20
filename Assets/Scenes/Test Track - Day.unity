@@ -1611,6 +1611,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 253771779235658738, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 253771779235658738, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1088272993499871106, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1088272993499871106, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1088272993499871106, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1088272993499871106, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1088272993499871106, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2418046248732683640, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
       propertyPath: m_Name
       value: Race OverLay
@@ -1887,6 +1915,38 @@ PrefabInstance:
       propertyPath: managedReferences[1912308518665846867]._sceneToLoad.sceneAsset
       value: 
       objectReference: {fileID: 102900000, guid: c7fdf1cedc477da47b13655d28b5f2fa, type: 3}
+    - target: {fileID: 6398011153562856579, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6398011153562856579, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6398011153562856579, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8965985759374910814, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8965985759374910814, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8965985759374910814, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8965985759374910814, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8965985759374910814, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2085,11 +2145,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: carSpawnVerticalOffset
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: carSpawnHorizontalOffset
-      value: 0
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: 'CheckPoints.Array.data[0]'
@@ -2133,35 +2193,35 @@ PrefabInstance:
       objectReference: {fileID: 7514944479051483537}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_Id
-      value: 1530286d-5cbd-4448-aed9-5fac298e4364
+      value: 36492d6f-10b8-4d8b-a83d-81d41ee27a57
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_Id
-      value: 46400101-7d16-400d-88d3-d4a131e36c43
+      value: 1a67d2fb-613d-4e59-87b1-7d0d72559d5a
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: 37f1cf9e-99ce-40ce-b130-09886a7be62e
+      value: b681a174-9a91-4c8a-8ce4-6d81d8033de4
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: b6d51ba7-ba6f-4843-90cf-287210e55348
+      value: d58b8800-9e8f-4711-bfb1-4b7754823a52
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: 5b7cb68a-b179-4f17-b3f8-0a6b5ab0907d
+      value: a81b1527-89f6-4f4f-8402-9c8727549494
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: de51cd7d-a1f3-45db-8e32-e9050d6a2516
+      value: e9612689-49fa-429a-b078-ec3bfa149dd0
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: 9f252591-4f08-4834-a029-1c1bc44a8076
+      value: d2ee3a6b-7329-47ac-bb20-2ae991b1bfc6
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: 9486857c-4b18-48a5-bb39-cb023a986fec
+      value: 3eb243b4-3207-4106-9ce6-55e8bc1550c8
       objectReference: {fileID: 0}
     - target: {fileID: 3181410861926696661, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: <CheckpointOrder>k__BackingField

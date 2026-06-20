@@ -19,17 +19,6 @@ public static class LevelCheckPointMaker
 	private static readonly Coordinates Invalid = new Coordinates(-1, -1);
 
 	/// <summary>
-	/// 4-neighbor step offsets (right, left, up, down) for road traversal.
-	/// </summary>
-	private static readonly Coordinates[] offsets = new Coordinates[]
-	{
-		new Coordinates(1, 0),
-		new Coordinates(-1, 0),
-		new Coordinates(0, 1),
-		new Coordinates(0, -1)
-	};
-
-	/// <summary>
 	/// Walks the road network in <paramref name="levelMap"/> and converts the midpoint of each
 	/// sufficiently long straight segment into a checkpoint tile (-2).
 	/// </summary>
@@ -116,7 +105,7 @@ public static class LevelCheckPointMaker
 	/// </returns>
 	private static Coordinates Step(LevelMap levelMap, ref Coordinates position, ref Coordinates lastVisited)
 	{
-		foreach (var offset in offsets)
+		foreach (var offset in LevelMap.CardinalDirections)
 		{
 			var next = position + offset;
 

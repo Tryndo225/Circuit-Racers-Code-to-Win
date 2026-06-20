@@ -211,7 +211,8 @@ public class RaceTrackPlacer : MonoBehaviour
 		HashSet<Coordinates> visited = new HashSet<Coordinates>();
 
 		var trackManager = FindFirstObjectByType<TrackManager>();
-		CheckPointManager.Instance.ClearCheckPoints();
+
+		int checkpointAmount = 0;
 
 		while (true)
 		{
@@ -220,14 +221,12 @@ public class RaceTrackPlacer : MonoBehaviour
 
 			if (piecesToPlace[position.Value.X, position.Value.Y].Prefab != null && piecesToPlace[position.Value.X, position.Value.Y].Prefab != traversalPrefab)
 			{
-				var newGameObject = Instantiate(piecesToPlace[position.Value.X, position.Value.Y].Prefab,
-							piecesToPlace[position.Value.X, position.Value.Y].Position,
-							piecesToPlace[position.Value.X, position.Value.Y].Rotation,
-							this.transform);
+				var newGameObject = Instantiate(piecesToPlace[position.Value.X, position.Value.Y].Prefab, piecesToPlace[position.Value.X, position.Value.Y].Position, piecesToPlace[position.Value.X, position.Value.Y].Rotation, this.transform);
 
 				if (piecesToPlace[position.Value.X, position.Value.Y].Prefab == raceTrackStartFinishPrefab || piecesToPlace[position.Value.X, position.Value.Y].Prefab == checkpointPrefab)
 				{
-					CheckPointManager.Instance.AddCheckPoint(newGameObject.GetComponentInChildren<CheckPointListener>());
+					newGameObject.GetComponentInChildren<CheckPointListener>().CheckpointOrder = checkpointAmount;
+					++checkpointAmount;
 
 					if (position.Value == levelMap.StartPoint)
 					{

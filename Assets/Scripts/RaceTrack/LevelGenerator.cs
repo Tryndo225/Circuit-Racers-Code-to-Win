@@ -136,6 +136,8 @@ public static class LevelGenerator
 		new Coordinates(0, -1)
 	};
 
+	private const int startPadding = 2;
+
 	/// <summary>
 	/// Generates a level using an explicit seed to initialize <see cref="Random"/>.
 	/// </summary>
@@ -165,13 +167,12 @@ public static class LevelGenerator
 	/// <returns>A populated <see cref="LevelMap"/>.</returns>
 	public static LevelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLenght, int maxAttempts, Random rng)
 	{
-		//UnityEngine.Debug.Log("Generating Level");
 
 		LevelMap levelMap = new LevelMap();
-		levelMap.StartPoint = new Coordinates(width / 2, height / 2);
+		levelMap.StartPoint = new Coordinates(rng.Next(0 + startPadding, width - startPadding), rng.Next(0 + startPadding, height - startPadding));
 		levelMap.Width = width;
 		levelMap.Height = height;
-		levelMap.Circular = isCircuit;
+		levelMap.Circuit = isCircuit;
 		levelMap.Tiles = new int[width, height];
 
 		for (int x = 0; x < width; ++x)
@@ -184,17 +185,12 @@ public static class LevelGenerator
 
 		levelMap.Tiles.At(levelMap.StartPoint) = 1; // Set start point as track
 		var lastValidPoint = levelMap.StartPoint;
-
-		if (isCircuit)
-		{
-			CircuitStarter(levelMap, rng);
-		}
+		TrackStarter(levelMap, rng);
 
 		Coordinates possiblePoint;
 
 		for (int i = 0; i < steps; ++i)
 		{
-			//UnityEngine.Debug.Log($"Step {i + 1}/{_steps}");
 
 			possiblePoint = TryStep(lastValidPoint, levelMap, stepLenght, maxAttempts, rng);
 
@@ -204,8 +200,6 @@ public static class LevelGenerator
 			}
 
 			lastValidPoint = possiblePoint;
-			//UnityEngine.Debug.Log($"Level progress:");
-			//UnityEngine.Debug.Log(levelMap.tiles.Print());
 		}
 
 		if (isCircuit)
@@ -215,16 +209,13 @@ public static class LevelGenerator
 		else
 		{
 			levelMap.FinishPoint = lastValidPoint;
-			//UnityEngine.Debug.Log($"Level finished at {levelMap.finishPoint}");
 		}
 
 		if (levelMap.RoadTileCount < levelMap.Height * levelMap.Width / 5)
 		{
-			//UnityEngine.Debug.Log("Generated track is too sparse, regenerating...");
 			return GenerateLevel(width, height, isCircuit, steps, stepLenght, maxAttempts, rng);
 		}
 
-		//UnityEngine.Debug.Log("Level generation complete");
 		return levelMap;
 	}
 
@@ -244,7 +235,6 @@ public static class LevelGenerator
 		var target = PickTarget(currentPoint, levelMap, stepLength, maxAttempts, rng);
 		if (target == new Coordinates(-1, -1))
 		{
-			//UnityEngine.Debug.Log("Failed to find a valid target");
 			return new Coordinates(-1, -1);
 		}
 
@@ -253,13 +243,11 @@ public static class LevelGenerator
 		{
 			levelMap.RoadTileCount += BackTrack(target, levelMap.Tiles);
 			RemovePlaceholders(levelMap.Tiles, modifiedPositions);
-			//UnityEngine.Debug.Log($"Step succeeded to {target}");
 			return target;
 		}
 		else
 		{
 			RemovePlaceholders(levelMap.Tiles, modifiedPositions);
-			//UnityEngine.Debug.Log("Flooding failed to reach target");
 			return new Coordinates(-1, -1);
 		}
 	}
@@ -332,7 +320,7 @@ public static class LevelGenerator
 		BackTrack(target, tilesCopy);
 		RemovePlaceholders(tilesCopy, modifiedPositions);
 
-		if (levelMap.Circular)
+		if (levelMap.Circuit)
 		{
 			return FloodingAlgorithm(target, levelMap.StartPoint, tilesCopy) && check;
 		}
@@ -348,7 +336,7 @@ public static class LevelGenerator
 	/// Prepares a circuit start area by clearing neighbors around <see cref="LevelMap.StartPoint"/>
 	/// and opening one axis to begin the loop.
 	/// </summary>
-	private static void CircuitStarter(LevelMap levelMap, Random rng)
+	private static void TrackStarter(LevelMap levelMap, Random rng)
 	{
 		for (int i = -1; i <= 1; ++i)
 		{
@@ -366,19 +354,34 @@ public static class LevelGenerator
 		if (rng.Next(0, 2) % 2 == 0 && levelMap.Tiles.InBounds(levelMap.StartPoint.X - 1, levelMap.StartPoint.Y) && levelMap.Tiles.InBounds(levelMap.StartPoint.X + 1, levelMap.StartPoint.Y))
 		{
 			// Horizontal start
-			levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = 0;
-			levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = 0;
+			if (levelMap.Circuit)
+			{
+				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = 0;
+				levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = 0;
+			}
+			else if (rng.Next(0, 2) % 2 == 0)
+				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = 0;
+			else
+				levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = 0;
 		}
 		else if (levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y - 1) && levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y + 1))
 		{
 			// Vertical start
-			levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y + 1] = 0;
-			levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y - 1] = 0;
+			if (levelMap.Circuit)
+			{
+				levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y + 1] = 0;
+				levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y - 1] = 0;
+			}
+			else if (rng.Next(0, 2) % 2 == 0)
+				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = 0;
+			else
+				levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = 0;
 		}
 		else
 		{
 			throw new Exception("Circuit starting failed");
 		}
+
 	}
 
 	#endregion Circuit Starting
@@ -391,16 +394,12 @@ public static class LevelGenerator
 	/// </summary>
 	private static void CircuitFinisher(LevelMap levelMap, Coordinates lastPoint)
 	{
-		UnityEngine.Debug.Log("Finishing Circuit");
-		UnityEngine.Debug.Log($"Current map {levelMap.Tiles.Print()}");
 		List<Coordinates> modifiedPositions = new List<Coordinates>();
 		if (FloodingAlgorithm(lastPoint, levelMap.StartPoint, levelMap.Tiles, modifiedPositions))
 		{
 			BackTrack(levelMap.StartPoint, levelMap.Tiles);
 			RemovePlaceholders(levelMap.Tiles, modifiedPositions);
 			levelMap.FinishPoint = levelMap.StartPoint;
-			UnityEngine.Debug.Log($"Circuit finished at {levelMap.FinishPoint}");
-			UnityEngine.Debug.Log($"Final map {levelMap.Tiles.Print()}");
 		}
 		else
 		{
@@ -453,8 +452,6 @@ public static class LevelGenerator
 		queue.Enqueue(step);
 		modifiedPositions.Add(step.position);
 
-		//UnityEngine.Debug.Log($"Starting flooding from {start}, {target}");
-
 		while (queue.Count != 0)
 		{
 			step = queue.Dequeue();
@@ -467,7 +464,6 @@ public static class LevelGenerator
 				{
 					if (newX == target.X && newY == target.Y)
 					{
-						//UnityEngine.Debug.Log($"Flooding reached target at {target}");
 						tiles.At(target) = step.turn + 1;
 						modifiedPositions?.Add(target);
 						return true;
@@ -482,7 +478,6 @@ public static class LevelGenerator
 				}
 			}
 		}
-		//UnityEngine.Debug.Log($"Flooding failed to reach target at {target}");
 		return false;
 	}
 
@@ -500,7 +495,6 @@ public static class LevelGenerator
 		tiles.At(start) = 1;
 		++roadsPlaced;
 
-		//UnityEngine.Debug.Log($"Starting backtrack from {start}");
 		while (1 < step)
 		{
 			foreach (var offset in offsets)
@@ -524,7 +518,6 @@ public static class LevelGenerator
 		}
 		RoadSpacer(backtrackPoint, tiles);
 		return roadsPlaced;
-		//UnityEngine.Debug.Log($"Backtrack ended");
 	}
 
 	/// <summary>
@@ -562,9 +555,6 @@ public static class LevelGenerator
 			}
 		}
 
-		//UnityEngine.Debug.Log($"Road tile at {tile} has {count} adjacent road tiles");
-		//UnityEngine.Debug.Log(tiles.Print());
-
 		if (count > 1)
 		{
 			foreach (var offset in offsets)
@@ -577,7 +567,6 @@ public static class LevelGenerator
 				}
 			}
 		}
-		//UnityEngine.Debug.Log(tiles.Print());
 	}
 
 	#endregion Road Spacing

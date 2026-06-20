@@ -1150,11 +1150,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: carSpawnVerticalOffset
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: carSpawnHorizontalOffset
-      value: 0
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: 'CheckPoints.Array.data[0]'
@@ -1198,35 +1198,35 @@ PrefabInstance:
       objectReference: {fileID: 1737816483}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_Id
-      value: c448388f-695d-42fb-bb2d-9eeff8813c24
+      value: 801424db-37de-4c59-971a-b6bcbd5b9c86
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_Id
-      value: 8ecdf43a-f53b-49fc-8a43-eabdf28546b5
+      value: 929a9efa-83fd-4377-ba84-842a13e3fe41
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: bf6ab76b-9744-4811-a410-e9efb9d4ef7f
+      value: 8fbb2803-1ae5-4665-b37f-d6aa5364cd3a
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: 58f1f173-8e64-4599-be13-37b63692c27a
+      value: 833e9195-314c-4ac9-9129-e6d2c1375bbe
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: restartRace.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: 868ad98a-2742-40ce-b6dc-1ca3a8d66ad3
+      value: e8d6194b-d5c2-492c-a924-97c5817aa0de
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[0].m_Id
-      value: 4b0c0a28-62af-443b-b26d-ee7582322530
+      value: f0551501-4284-4f15-bb4d-da15ff618801
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[1].m_Id
-      value: d019c96e-424c-4a54-b69a-19aaaf4ce4fc
+      value: dda13024-c2e7-430b-a7de-67b92be529c0
       objectReference: {fileID: 0}
     - target: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: respawnLastCheckPoint.m_Action.m_SingletonActionBindings.Array.data[2].m_Id
-      value: e1eff233-c609-47ef-81e4-edfc685b4f6b
+      value: a1ce1c71-cd78-40ba-a2d0-7ad150e01b02
       objectReference: {fileID: 0}
     - target: {fileID: 3181410861926696661, guid: a20932a0568b07b4892f211655947c37, type: 3}
       propertyPath: <CheckpointOrder>k__BackingField

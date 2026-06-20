@@ -249,17 +249,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.2
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.5
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 0.7
+    m_AsymptoteValue: 0.6
     m_Stiffness: 2
   m_SidewaysFriction:
-    m_ExtremumSlip: 0.28
-    m_ExtremumValue: 1.25
-    m_AsymptoteSlip: 1.1
-    m_AsymptoteValue: 1
-    m_Stiffness: 1.6
+    m_ExtremumSlip: 0.3
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 1
+    m_AsymptoteValue: 0.9
+    m_Stiffness: 2
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -285,7 +285,7 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.5
+  slipThreshold: 0.6
   maxEmissionRatePerSecond: 100
   maxEmissionRateAtSlip: 2
   groundOffset: 0.02
@@ -685,17 +685,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.2
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.5
-    m_Stiffness: 2.4
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 0.7
+    m_AsymptoteValue: 0.6
+    m_Stiffness: 2
   m_SidewaysFriction:
     m_ExtremumSlip: 0.3
-    m_ExtremumValue: 1.25
-    m_AsymptoteSlip: 0.8
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 1
     m_AsymptoteValue: 0.9
-    m_Stiffness: 2.5
+    m_Stiffness: 2
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -721,7 +721,7 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.5
+  slipThreshold: 0.6
   maxEmissionRatePerSecond: 100
   maxEmissionRateAtSlip: 2
   groundOffset: 0.02
@@ -1357,17 +1357,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.2
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.5
-    m_Stiffness: 2.4
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 0.7
+    m_AsymptoteValue: 0.6
+    m_Stiffness: 2
   m_SidewaysFriction:
     m_ExtremumSlip: 0.3
-    m_ExtremumValue: 1.25
-    m_AsymptoteSlip: 0.8
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 1
     m_AsymptoteValue: 0.9
-    m_Stiffness: 2.5
+    m_Stiffness: 2
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1393,7 +1393,7 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.5
+  slipThreshold: 0.6
   maxEmissionRatePerSecond: 100
   maxEmissionRateAtSlip: 2
   groundOffset: 0.02
@@ -1509,7 +1509,7 @@ Rigidbody:
   m_Mass: 1600
   m_LinearDamping: 0.05
   m_AngularDamping: 0.5
-  m_CenterOfMass: {x: 0, y: -0.3, z: 0}
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -1879,17 +1879,18 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: 0}
   autoCreateDefaultBindingsIfMissing: 1
-  coMPosition: {x: 0, y: -0.3, z: 0}
+  centreOfMassPosition: {x: 0, y: 0, z: 0}
   ackermannFactor: 0.8
-  maxSpeed: 250
-  maxReverseSpeed: 40
+  maxSpeed: 300
+  maxReverseSpeed: 60
   maxSteerAngleAtTopSpeed: 10
   maxSteerAngle: 30
-  steerSpeedDegPerSec: 90
-  inputExponent: 1.8
-  maxMotorPower: 15000
-  maxBrakeTorque: 17500
-  handbrakeTorque: 20000
+  steerSpeedDegPerSec: 300
+  inputExponent: 2.5
+  maxMotorPower: 8000
+  maxBrakeTorque: 10000
+  handbrakeTorque: 10000
+  redlineFadeStart: 0.9
   forwardGears:
   - 3.2
   - 2.1
@@ -1898,43 +1899,59 @@ MonoBehaviour:
   - 0.82
   finalDrive: 3.42
   idleRPM: 900
-  redlineRPM: 7000
+  redlineRPM: 8000
   shiftUpRPM: 6000
-  shiftDownRPM: 2000
+  shiftDownRPM: 1500
   shiftDuration: 0.2
-  shiftSlipThreshold: 1
-  antiRollStiffnessFront: 400
-  antiRollStiffnessRear: 500
-  tractionControlEnabled: 1
-  tractionSlipLimit: 0.4
-  absEnabled: 1
-  absSlipLimit: 0.55
-  rearSidewaysGripHandbrakeMultiplier: 0.5
-  rearForwardGripHandbrakeMultiplier: 0.85
-  frontSidewaysGripLockedMultiplier: 0.35
-  rearSidewaysGripLockedMultiplier: 0.35
-  lockForwardSlipThreshold: 0.75
-  lockBrakeTorqueThreshold: 0.6
-  frontForwardStiffness: 2
-  frontForwardExtremumSlip: 0.2
-  frontForwardExtremumValue: 1
-  frontForwardAsymptoteSlip: 0.8
-  frontForwardAsymptoteValue: 0.5
-  rearForwardStiffness: 2.4
-  rearForwardExtremumSlip: 0.2
-  rearForwardExtremumValue: 1
-  rearForwardAsymptoteSlip: 0.8
-  rearForwardAsymptoteValue: 0.5
-  frontSidewaysStiffness: 1.6
-  frontSidewaysExtremumSlip: 0.28
-  frontSidewaysExtremumValue: 1.25
-  frontSidewaysAsymptoteSlip: 1.1
-  frontSidewaysAsymptoteValue: 1
-  rearSidewaysStiffness: 2.5
-  rearSidewaysExtremumSlip: 0.3
-  rearSidewaysExtremumValue: 1.25
-  rearSidewaysAsymptoteSlip: 0.8
-  rearSidewaysAsymptoteValue: 0.9
+  shiftSlipThreshold: 0.5
+  antiRollToggle: 0
+  antiRollStiffnessFront: 0
+  antiRollStiffnessRear: 0
+  tractionControlEnabled: 0
+  tractionSlipLimit: 0.3
+  absEnabled: 0
+  absSlipLimit: 0.4
+  rearSidewaysGripHandbrakeMultiplier: 0.9
+  rearForwardGripHandbrakeMultiplier: 0.9
+  frontGripLockedMultiplier: 0.8
+  rearGripLockedMultiplier: 0.8
+  lockForwardSlipThreshold: 0.8
+  lockBrakeTorqueThreshold: 0.5
+  gripCircleEnabled: 1
+  gripCircleStartSlip: 1
+  gripCircleFullSlip: 2
+  minForwardGripCircleMultiplier: 0.9
+  minSidewaysGripCircleMultiplier: 0.9
+  limitedSlipEnabled: 1
+  limitedSlipStartRpmDifference: 120
+  limitedSlipFullRpmDifference: 700
+  limitedSlipMaxTorqueCut: 0.65
+  limitedSlipGripWheelBoost: 1.25
+  limitedSlipBrakeTorque: 250
+  frontForwardFriction:
+    stiffness: 2
+    extremumSlip: 0.4
+    extremumValue: 1.2
+    asymptoteSlip: 0.7
+    asymptoteValue: 0.6
+  rearForwardFriction:
+    stiffness: 2
+    extremumSlip: 0.4
+    extremumValue: 1.2
+    asymptoteSlip: 0.7
+    asymptoteValue: 0.6
+  frontSidewaysFriction:
+    stiffness: 2
+    extremumSlip: 0.3
+    extremumValue: 1.2
+    asymptoteSlip: 1
+    asymptoteValue: 0.9
+  rearSidewaysFriction:
+    stiffness: 2
+    extremumSlip: 0.3
+    extremumValue: 1.2
+    asymptoteSlip: 1
+    asymptoteValue: 0.9
   frontLightsIntensity: 1000
   frontLightsColor: {r: 1, g: 0.7529412, b: 0, a: 0}
   frontLights:
@@ -2006,8 +2023,8 @@ MonoBehaviour:
   bandSharpness: 6
   throttleShape: 1.25
   onThrottleBoost: 1
-  shiftFlareAmount: 0.06
-  limiterStart: 0.96
+  shiftFlareAmount: 0.1
+  limiterStart: 0.95
   limiterDepth: 0.25
   _engineSound: {fileID: 5877857321910121407}
   _driveTrainController: {fileID: 7486225427794663479}
@@ -2028,7 +2045,7 @@ MonoBehaviour:
   RPM: 900
   throttle: 0
   minRPM: 900
-  maxRPM: 7000
+  maxRPM: 8000
   outputGroup: {fileID: 5835183508414100833, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
   masterVolume: 0.5
   spatialBlend: 1
@@ -2071,9 +2088,9 @@ MonoBehaviour:
   bandSharpness: 6
   throttleShape: 1.25
   onThrottleBoost: 1
-  shiftFlareAmount: 0.06
+  shiftFlareAmount: 0.1
   shiftFlareTime: 0.2
-  limiterStart: 0.96
+  limiterStart: 0.95
   limiterDepth: 0.25
 --- !u!114 &7486225427794663479
 MonoBehaviour:
@@ -2087,52 +2104,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82c9a0912e470934aaf5a1acb6a38e61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 250
-  maxReverseSpeed: 40
+  maxSpeed: 300
+  maxReverseSpeed: 60
   maxSteerAngleAtTopSpeed: 10
   maxSteerAngle: 30
-  steerSpeedDegPerSec: 90
-  inputExponent: 1.8
-  maxMotorPower: 15000
-  maxBrakeTorque: 17500
-  handbrakeTorque: 20000
-  antiRollStiffnessFront: 400
-  antiRollStiffnessRear: 500
-  tractionControlEnabled: 1
-  tractionSlipLimit: 0.4
-  absEnabled: 1
-  absSlipLimit: 0.55
-  rearSidewaysGripHandbrakeMultiplier: 0.5
-  rearForwardGripHandbrakeMultiplier: 0.85
-  frontSidewaysGripLockedMultiplier: 0.35
-  rearSidewaysGripLockedMultiplier: 0.35
-  lockForwardSlipThreshold: 0.75
-  lockBrakeTorqueThreshold: 0.6
+  steerSpeedDegPerSec: 300
+  inputExponent: 2.5
+  maxMotorPower: 8000
+  maxBrakeTorque: 10000
+  handbrakeTorque: 10000
+  redlineFadeStart: 0.9
+  antiRollToggle: 0
+  antiRollStiffnessFront: 0
+  antiRollStiffnessRear: 0
+  tractionControlEnabled: 0
+  tractionSlipLimit: 0.3
+  absEnabled: 0
+  absSlipLimit: 0.4
+  rearSidewaysGripHandbrakeMultiplier: 0.9
+  rearForwardGripHandbrakeMultiplier: 0.9
+  frontGripLockedMultiplier: 0.8
+  rearGripLockedMultiplier: 0.8
+  lockForwardSlipThreshold: 0.8
+  lockBrakeTorqueThreshold: 0.5
+  gripCircleEnabled: 1
+  gripCircleStartSlip: 1
+  gripCircleFullSlip: 2
+  minForwardGripCircleMultiplier: 0.9
+  minSidewaysGripCircleMultiplier: 0.9
   frontForwardFriction:
-  - 2
-  - 0.8
-  - 0.2
-  - 0.5
-  - 1
+    stiffness: 2
+    extremumSlip: 0.4
+    extremumValue: 1.2
+    asymptoteSlip: 0.7
+    asymptoteValue: 0.6
   rearForwardFriction:
-  - 2.4
-  - 0.8
-  - 0.2
-  - 0.5
-  - 1
+    stiffness: 2
+    extremumSlip: 0.4
+    extremumValue: 1.2
+    asymptoteSlip: 0.7
+    asymptoteValue: 0.6
   frontSidewaysFriction:
-  - 1.6
-  - 1.1
-  - 0.28
-  - 1
-  - 1.25
+    stiffness: 2
+    extremumSlip: 0.3
+    extremumValue: 1.2
+    asymptoteSlip: 1
+    asymptoteValue: 0.9
   rearSidewaysFriction:
-  - 2.5
-  - 0.8
-  - 0.3
-  - 0.9
-  - 1.25
-  coMPosition: {x: 0, y: -0.3, z: 0}
+    stiffness: 2
+    extremumSlip: 0.3
+    extremumValue: 1.2
+    asymptoteSlip: 1
+    asymptoteValue: 0.9
+  limitedSlipEnabled: 1
+  limitedSlipStartRpmDifference: 120
+  limitedSlipFullRpmDifference: 700
+  limitedSlipMaxTorqueCut: 0.65
+  limitedSlipGripWheelBoost: 1.25
+  limitedSlipBrakeTorque: 250
+  coMPosition: {x: 0, y: 0, z: 0}
   ackermannFactor: 0.8
 --- !u!114 &8633431643041831171
 MonoBehaviour:
@@ -2154,11 +2184,11 @@ MonoBehaviour:
   - 0.82
   finalDrive: 3.42
   idleRPM: 900
-  redlineRPM: 7000
+  redlineRPM: 8000
   shiftUpRPM: 6000
-  shiftDownRPM: 2000
+  shiftDownRPM: 1500
   shiftDuration: 0.2
-  slipThreshold: 1
+  slipThreshold: 0.5
 --- !u!114 &4071285767021976057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2182,9 +2212,9 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.5
       inSlope: 0
-      outSlope: 1
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -2192,7 +2222,7 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1
+      inSlope: 0
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
@@ -2480,17 +2510,17 @@ WheelCollider:
   m_Mass: 20
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
-    m_ExtremumSlip: 0.2
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.8
-    m_AsymptoteValue: 0.5
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 0.7
+    m_AsymptoteValue: 0.6
     m_Stiffness: 2
   m_SidewaysFriction:
-    m_ExtremumSlip: 0.28
-    m_ExtremumValue: 1.25
-    m_AsymptoteSlip: 1.1
-    m_AsymptoteValue: 1
-    m_Stiffness: 1.6
+    m_ExtremumSlip: 0.3
+    m_ExtremumValue: 1.2
+    m_AsymptoteSlip: 1
+    m_AsymptoteValue: 0.9
+    m_Stiffness: 2
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2516,7 +2546,7 @@ MonoBehaviour:
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
-  slipThreshold: 0.5
+  slipThreshold: 0.6
   maxEmissionRatePerSecond: 100
   maxEmissionRateAtSlip: 2
   groundOffset: 0.02

@@ -24,7 +24,7 @@ using UnityEngine;
 public class CheckPointListener : MonoBehaviour
 {
 	[Header("Checkpoint Settings")]
-	[field: SerializeField] public int CheckpointOrder { get; private set; }
+	[field: SerializeField] public int CheckpointOrder { get; set; }
 
 	[Header("Check Point Reference")]
 	/// <summary>

@@ -401,7 +401,7 @@ MonoBehaviour:
     Name: Unnamed
     Width: 50
     Height: 50
-    Circular: 1
+    Circuit: 0
     StartPoint:
       X: 25
       Y: 25
@@ -598,6 +598,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 210883683}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &597946972 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1548257931340314316, guid: a20932a0568b07b4892f211655947c37, type: 3}
+  m_PrefabInstance: {fileID: 1846803827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa94a2457f77a24f83ebbd9ce7ea242, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &630992152
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -606,6 +617,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 253771779235658738, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 253771779235658738, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2418046248732683640, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
       propertyPath: m_Name
       value: Race OverLay
@@ -690,6 +709,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6398011153562856579, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6398011153562856579, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6398011153562856579, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7037233749740719284, guid: bd744c5dae643db4d9a9f5ee328c5ed7, type: 3}
+      propertyPath: trackManager
+      value: 
+      objectReference: {fileID: 597946972}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -52,8 +52,6 @@ public class RaceOverLay : MonoBehaviour
 	[SerializeField] private float cpVisibleTime;
 	[SerializeField] private float cpFadeDuration;
 
-	private Coroutine fadeCoroutine = null;
-
 	#endregion Inspector : Splits
 
 	#region Inspector : Timers
@@ -93,8 +91,17 @@ public class RaceOverLay : MonoBehaviour
 
 	#endregion References
 
+	#region Private Members
+
 	/// <summary>Tracks whether Overlay was shown to avoid repeated toggling.</summary>
-	private bool toggled = false;
+	private bool _toggled = false;
+
+	private Coroutine _fadeCoroutine = null;
+
+	private Graphic[] _splitGraphics;
+	private Color[] _splitBaseColors;
+
+	#endregion
 
 	#region Unity Methods
 
@@ -125,9 +132,15 @@ public class RaceOverLay : MonoBehaviour
 		trackTime.text = "";
 		finalTime.text = "";
 		startTimer.text = "";
-		toggled = false;
+		_toggled = false;
 		startFilter.SetActive(false);
 		finishScreen.SetActive(false);
+
+		_splitGraphics = new Graphic[] { cpPanelOverlay, cpTimeText, cpDiffText };
+		_splitBaseColors = StoreBaseColors(_splitGraphics);
+		RestoreBaseColors(_splitGraphics, _splitBaseColors);
+
+		cpSplitScreen.SetActive(false);
 	}
 
 	/// <summary>
@@ -136,7 +149,7 @@ public class RaceOverLay : MonoBehaviour
 	/// </summary>
 	private void Update()
 	{
-		if (!toggled)
+		if (!_toggled)
 		{
 			if (trackManager == null) return;
 			if (trackManager.RespawnTimer > 0)
@@ -168,13 +181,13 @@ public class RaceOverLay : MonoBehaviour
 			{
 				finishScreen.SetActive(true);
 				finalTime.text = $"Final Time: {FormatTime(RaceTimeManager.Instance.RaceEndTime)}";
-				toggled = true;
+				_toggled = true;
 			}
 			else if (Input.GetKeyDown(KeyCode.Escape) && !finishScreen.activeSelf)
 			{
 				finishScreen.SetActive(true);
 				finalTime.text = $"Unfinished";
-				toggled = true;
+				_toggled = true;
 			}
 			else
 			{
@@ -190,75 +203,107 @@ public class RaceOverLay : MonoBehaviour
 
 	public void DisplaySplit(float splitTime, float splitDiff)
 	{
-		if (fadeCoroutine != null)
+		if (_fadeCoroutine != null)
 		{
-			StopCoroutine(fadeCoroutine);
-			fadeCoroutine = null;
-		}
-		if (splitDiff > 0)
-		{
-			cpDiffText.color = Color.red;
-		}
-		else if (splitDiff < 0)
-		{
-			cpDiffText.color = Color.green;
-		}
-		else
-		{
-			cpDiffText.color = Color.blue;
+			StopCoroutine(_fadeCoroutine);
+			_fadeCoroutine = null;
 		}
 
+		RestoreBaseColors(_splitGraphics, _splitBaseColors);
+
+		SetCheckpointDifferenceColor(splitDiff);
+
 		cpTimeText.text = FormatTime(splitTime);
+
 		char symbol = splitDiff > 0 ? '+' : '-';
 		cpDiffText.text = $"{symbol}{FormatTime(Mathf.Abs(splitDiff))}";
 
 		cpSplitScreen.SetActive(true);
 
-		fadeCoroutine = StartCoroutine(FadeOutCoroutine(cpVisibleTime, cpFadeDuration, new Graphic[] { cpPanelOverlay, cpTimeText, cpDiffText }, cpSplitScreen));
+		_fadeCoroutine = StartCoroutine(FadeOutCoroutine(cpVisibleTime, cpFadeDuration, _splitGraphics, _splitBaseColors, cpSplitScreen));
 	}
 
 	#endregion Public API
 
 	#region Helper
-	#region Coroutine
-	private static IEnumerator FadeOutCoroutine(float timeVisible, float fadeTime, Graphic[] graphics, GameObject gameObject)
-	{
-		Color[] originalColors = new Color[graphics.Length];
-		for (int i = 0; i < graphics.Length; ++i)
-		{
-			originalColors[i] = graphics[i].color;
-		}
 
+	#region Coroutine
+
+	private static IEnumerator FadeOutCoroutine(float timeVisible, float fadeTime, Graphic[] graphics, Color[] baseColors, GameObject gameObject)
+	{
 		float startTime = Time.time;
+
 		while (Time.time - startTime < timeVisible)
 		{
 			yield return null;
 		}
 
-		float alphaCoefficient = 1;
 		startTime = Time.time;
+
 		while (Time.time - startTime < fadeTime)
 		{
-			alphaCoefficient = Mathf.Lerp(1, 0, Mathf.Clamp01((Time.time - startTime) / fadeTime));
+			float t = Mathf.Clamp01((Time.time - startTime) / fadeTime);
+			float alphaCoefficient = Mathf.Lerp(1f, 0f, t);
+
 			for (int i = 0; i < graphics.Length; ++i)
 			{
-				Color color = originalColors[i];
-				color.a *= alphaCoefficient;
+				Color color = baseColors[i];
+				color.a = baseColors[i].a * alphaCoefficient;
 				graphics[i].color = color;
 			}
+
 			yield return null;
 		}
 
 		gameObject.SetActive(false);
 
-		for (int i = 0; i < graphics.Length; ++i)
-		{
-			graphics[i].color = originalColors[i];
-		}
+		RestoreBaseColors(graphics, baseColors);
 	}
 
-
 	#endregion Coroutine
+
+	private void SetCheckpointDifferenceColor(float splitDiff)
+	{
+		Color color;
+
+		if (splitDiff > 0)
+		{
+			color = Color.red;
+		}
+		else if (splitDiff < 0)
+		{
+			color = Color.green;
+		}
+		else
+		{
+			color = Color.blue;
+		}
+
+		color.a = _splitBaseColors[2].a;
+
+		cpDiffText.color = color;
+		_splitBaseColors[2] = color;
+	}
+
+	private static Color[] StoreBaseColors(Graphic[] graphics)
+	{
+		Color[] colors = new Color[graphics.Length];
+
+		for (int i = 0; i < graphics.Length; ++i)
+		{
+			colors[i] = graphics[i].color;
+		}
+
+		return colors;
+	}
+
+	private static void RestoreBaseColors(Graphic[] graphics, Color[] baseColors)
+	{
+		for (int i = 0; i < graphics.Length; ++i)
+		{
+			graphics[i].color = baseColors[i];
+		}
+	}
 
 	#endregion Helper
 

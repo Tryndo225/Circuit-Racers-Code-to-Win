@@ -18,6 +18,17 @@ using System.Text;
 [Serializable]
 public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceiver
 {
+	/// <summary>
+	/// 4-neighbor step offsets (right, left, up, down) for road traversal.
+	/// </summary>
+	public static readonly Coordinates[] CardinalDirections = new Coordinates[]
+	{
+		new Coordinates(1, 0),
+		new Coordinates(-1, 0),
+		new Coordinates(0, 1),
+		new Coordinates(0, -1)
+	};
+
 	/// <summary>Display name for the level.</summary>
 	public string Name;
 
@@ -28,7 +39,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	public int Height;
 
 	/// <summary>True for looped circuits; false for point-to-point tracks.</summary>
-	public bool Circular;
+	public bool Circuit;
 
 	/// <summary>Start cell coordinates.</summary>
 	public Coordinates StartPoint;
@@ -54,6 +65,15 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	/// </summary>
 	[NonSerialized] public int[,] Tiles; // -2 = checkpoint, -1 = spacer, 0 = grass, 1 = road, 2 and up = placeholder during generation
 
+	public enum LevelTileTypes
+	{
+		CP = -2,
+		Spacer = -1,
+		Grass = 0,
+		Track = 1,
+		PlaceHolder = 2
+	}
+
 	/// <summary>Flattened array used for Unity serialization of <see cref="Tiles"/>.</summary>
 	[UnityEngine.SerializeField] private int[] tilesFlat;
 
@@ -65,7 +85,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		Name = "Unnamed";
 		Width = 0;
 		Height = 0;
-		Circular = false;
+		Circuit = false;
 		StartPoint = new Coordinates(0, 0);
 		FinishPoint = new Coordinates(0, 0);
 		Tiles = new int[0, 0];
@@ -82,7 +102,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		Name = info.GetString("name");
 		Width = info.GetInt32("width");
 		Height = info.GetInt32("height");
-		Circular = info.GetBoolean("circular");
+		Circuit = info.GetBoolean("circular");
 		StartPoint = (Coordinates)info.GetValue("startPoint", typeof(Coordinates));
 		FinishPoint = (Coordinates)info.GetValue("finishPoint", typeof(Coordinates));
 		tilesFlat = (int[])info.GetValue("tilesFlat", typeof(int[]));
@@ -97,7 +117,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		info.AddValue("name", Name);
 		info.AddValue("width", Width);
 		info.AddValue("height", Height);
-		info.AddValue("circular", Circular);
+		info.AddValue("circular", Circuit);
 		info.AddValue("startPoint", StartPoint);
 		info.AddValue("finishPoint", FinishPoint);
 		FlattenTiles();
@@ -169,13 +189,18 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	public LevelMap Copy()
 	{
 		LevelMap newMap = new LevelMap();
+
 		newMap.Name = this.Name;
 		newMap.Width = this.Width;
 		newMap.Height = this.Height;
-		newMap.Circular = this.Circular;
+		newMap.Circuit = this.Circuit;
 		newMap.StartPoint = this.StartPoint;
 		newMap.FinishPoint = this.FinishPoint;
+		newMap.Laps = this.Laps;
+		newMap.CheckpointCountPerLap = this.CheckpointCountPerLap;
+		newMap.RoadTileCount = this.RoadTileCount;
 		newMap.Tiles = this.Tiles.Copy();
+
 		return newMap;
 	}
 

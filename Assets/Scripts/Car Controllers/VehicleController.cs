@@ -84,7 +84,7 @@ public class VehicleController : MonoBehaviour
 	[Header("Vehicle")]
 	/// <summary>Center of Mass offset in local space (tuning for handling).</summary>
 	[Tooltip("Center of Mass position relative to the vehicle's transform. Adjust for better handling.")]
-	[SerializeField] private Vector3 coMPosition = new Vector3(0f, -0.4f, 0.5f);
+	[SerializeField] private Vector3 centreOfMassPosition = new Vector3(0f, -0.4f, 0.5f);
 
 	/// <summary>
 	/// Ackermann steering factor. 1 ~ perfect Ackerman; lower prone to understeer, higher to oversteer.
@@ -130,6 +130,14 @@ public class VehicleController : MonoBehaviour
 
 	#endregion
 
+	#region Inspector: Engine / Drivetrain
+
+	[Header("Engine / Drivetrain")]
+
+	[SerializeField, Range(0f, 1f)] private float redlineFadeStart = 0.92f;
+
+	#endregion
+
 	#region Inspector: Transmission & RPM
 
 	[Header("Transmission & RPM")]
@@ -169,11 +177,14 @@ public class VehicleController : MonoBehaviour
 	#region Inspector: Stability & Limits
 
 	[Header("Stability")]
+	/// <summary>Anti-roll force toggle.</summary>
+	[SerializeField] private bool antiRollToggle = false;
+
 	/// <summary>Anti-roll stiffness for the front axle.</summary>
-	[SerializeField] private float antiRollStiffnessFront = 400f;
+	[SerializeField] private float antiRollStiffnessFront = 40f;
 
 	/// <summary>Anti-roll stiffness for the rear axle.</summary>
-	[SerializeField] private float antiRollStiffnessRear = 500f;
+	[SerializeField] private float antiRollStiffnessRear = 50f;
 
 	[Header("Traction Control & ABS Limits")]
 	/// <summary>Enable traction control (reduces torque on high slip).</summary>
@@ -191,60 +202,65 @@ public class VehicleController : MonoBehaviour
 	[Header("Dynamic Grip")]
 	[SerializeField] private float rearSidewaysGripHandbrakeMultiplier = 0.35f;
 	[SerializeField] private float rearForwardGripHandbrakeMultiplier = 0.85f;
-	[SerializeField] private float frontSidewaysGripLockedMultiplier = 0.45f;
-	[SerializeField] private float rearSidewaysGripLockedMultiplier = 0.60f;
+	[SerializeField] private float frontGripLockedMultiplier = 0.45f;
+	[SerializeField] private float rearGripLockedMultiplier = 0.60f;
 	[SerializeField] private float lockForwardSlipThreshold = 0.35f;
 	[SerializeField, Range(0f, 1f)] private float lockBrakeTorqueThreshold = 0.90f;
+
+	#region Inspector: Grip Circle
+
+	[Header("Grip Circle")]
+	[Tooltip("When enabled, combined forward/sideways tire usage reduces available grip.")]
+	public bool gripCircleEnabled = true;
+
+	[Tooltip("Combined slip value where grip-circle reduction starts.")]
+	public float gripCircleStartSlip = 1f;
+
+	[Tooltip("Combined slip value where grip-circle reduction reaches its maximum.")]
+	public float gripCircleFullSlip = 2f;
+
+	[Tooltip("Minimum forward grip multiplier when the tire is overloaded.")]
+	[Range(0f, 1f)] public float minForwardGripCircleMultiplier = 0.9f;
+
+	[Tooltip("Minimum sideways grip multiplier when the tire is overloaded.")]
+	[Range(0f, 1f)] public float minSidewaysGripCircleMultiplier = 0.9f;
+
+	#endregion
+
+	#endregion
+
+	#region Inspector: Limited Slip Differential
+
+	[Header("Limited Slip Differential")]
+	[Tooltip("When enabled, driven wheels are torque-balanced to prevent one wheel from spinning much faster than the others.")]
+	[SerializeField] private bool limitedSlipEnabled = true;
+
+	[Tooltip("Driven-wheel RPM difference above which limited-slip correction starts.")]
+	[SerializeField] private float limitedSlipStartRpmDifference = 120f;
+
+	[Tooltip("Driven-wheel RPM difference at which limited-slip correction reaches full strength.")]
+	[SerializeField] private float limitedSlipFullRpmDifference = 700f;
+
+	[Tooltip("Maximum fraction of motor torque removed from an over-spinning driven wheel.")]
+	[SerializeField, Range(0f, 1f)] private float limitedSlipMaxTorqueCut = 0.65f;
+
+	[Tooltip("Torque multiplier applied to slower driven wheels when another driven wheel is over-spinning.")]
+	[SerializeField, Range(1f, 2f)] private float limitedSlipGripWheelBoost = 1.25f;
+
+	[Tooltip("Optional brake torque applied to an over-spinning driven wheel.")]
+	[SerializeField] private float limitedSlipBrakeTorque = 250f;
 
 	#endregion
 
 	#region Inspector: Friction
 
 	[Header("Forward Friction")]
-	/// <summary>Front forward-friction stiffness.</summary>
-	[SerializeField] private float frontForwardStiffness = 2.0f;
-	/// <summary>Front forward-friction extremum slip.</summary>
-	[SerializeField] private float frontForwardExtremumSlip = 0.4f;
-	/// <summary>Front forward-friction extremum value.</summary>
-	[SerializeField] private float frontForwardExtremumValue = 1f;
-	/// <summary>Front forward-friction asymptote slip.</summary>
-	[SerializeField] private float frontForwardAsymptoteSlip = 0.8f;
-	/// <summary>Front forward-friction asymptote value.</summary>
-	[SerializeField] private float frontForwardAsymptoteValue = 0.6f;
-
-	/// <summary>Rear forward-friction stiffness.</summary>
-	[SerializeField] private float rearForwardStiffness = 2.0f;
-	/// <summary>Rear forward-friction extremum slip.</summary>
-	[SerializeField] private float rearForwardExtremumSlip = 0.4f;
-	/// <summary>Rear forward-friction extremum value.</summary>
-	[SerializeField] private float rearForwardExtremumValue = 1f;
-	/// <summary>Rear forward-friction asymptote slip.</summary>
-	[SerializeField] private float rearForwardAsymptoteSlip = 0.8f;
-	/// <summary>Rear forward-friction asymptote value.</summary>
-	[SerializeField] private float rearForwardAsymptoteValue = 0.6f;
+	[SerializeField] private WheelFrictionSettings frontForwardFriction;
+	[SerializeField] private WheelFrictionSettings rearForwardFriction;
 
 	[Header("Sideways Friction")]
-	/// <summary>Front sideways-friction stiffness.</summary>
-	[SerializeField] private float frontSidewaysStiffness = 2.1f;
-	/// <summary>Front sideways-friction extremum slip.</summary>
-	[SerializeField] private float frontSidewaysExtremumSlip = 0.3f;
-	/// <summary>Front sideways-friction extremum value.</summary>
-	[SerializeField] private float frontSidewaysExtremumValue = 1f;
-	/// <summary>Front sideways-friction asymptote slip.</summary>
-	[SerializeField] private float frontSidewaysAsymptoteSlip = 0.7f;
-	/// <summary>Front sideways-friction asymptote value.</summary>
-	[SerializeField] private float frontSidewaysAsymptoteValue = 0.5f;
-
-	/// <summary>Rear sideways-friction stiffness.</summary>
-	[SerializeField] private float rearSidewaysStiffness = 2.1f;
-	/// <summary>Rear sideways-friction extremum slip.</summary>
-	[SerializeField] private float rearSidewaysExtremumSlip = 0.3f;
-	/// <summary>Rear sideways-friction extremum value.</summary>
-	[SerializeField] private float rearSidewaysExtremumValue = 1f;
-	/// <summary>Rear sideways-friction asymptote slip.</summary>
-	[SerializeField] private float rearSidewaysAsymptoteSlip = 0.7f;
-	/// <summary>Rear sideways-friction asymptote value.</summary>
-	[SerializeField] private float rearSidewaysAsymptoteValue = 0.5f;
+	[SerializeField] private WheelFrictionSettings frontSidewaysFriction;
+	[SerializeField] private WheelFrictionSettings rearSidewaysFriction;
 
 	#endregion
 
@@ -507,14 +523,14 @@ public class VehicleController : MonoBehaviour
 	{
 		float throttle = ReadFloat(throttleAction);
 		float steer = ReadFloat(steerAction);
-		bool braking = ReadBool(brakeAction);
+		float braking = ReadFloat(brakeAction);
 		bool handbrake = ReadBool(handbrakeAction);
 
 		_driveTrainController.ApplyWheelControls(throttle, braking, handbrake, steer, currentInputDevice == InputSource.Gamepad);
 		_lightsController.SetBrakeLights(_driveTrainController.Braking);
 		_lightsController.SetReverseLights(_driveTrainController.Reversing);
 
-		UpdateAudio();
+		UpdateAudio(throttle);
 	}
 
 	#endregion
@@ -531,10 +547,17 @@ public class VehicleController : MonoBehaviour
 		if (!carRigidbody) carRigidbody = GetComponent<Rigidbody>();
 		if (!carRigidbody) Debug.LogError("VehicleController requires a Rigidbody component on the same GameObject.");
 
-		_engineSound ??= gameObject.GetComponent<EngineSound>();
-		_transmissionController ??= gameObject.GetComponent<TransmissionController>();
-		_driveTrainController ??= gameObject.GetComponent<DriveTrainController>();
-		_lightsController ??= gameObject.GetComponent<LightsController>();
+		if (_engineSound == null)
+			_engineSound = GetOrAddComponent<EngineSound>();
+
+		if (_transmissionController == null)
+			_transmissionController = GetOrAddComponent<TransmissionController>();
+
+		if (_driveTrainController == null)
+			_driveTrainController = GetOrAddComponent<DriveTrainController>();
+
+		if (_lightsController == null)
+			_lightsController = GetOrAddComponent<LightsController>();
 
 		SetUpLightsController();
 		SetUpEngineSoundController();
@@ -542,6 +565,18 @@ public class VehicleController : MonoBehaviour
 		SetUpDriveTrainController(_transmissionController);
 
 		CreateDefaultInputActions();
+	}
+
+	private T GetOrAddComponent<T>() where T : Component
+	{
+		T component = GetComponent<T>();
+
+		if (component == null)
+		{
+			component = gameObject.AddComponent<T>();
+		}
+
+		return component;
 	}
 
 	/// <summary>
@@ -659,6 +694,7 @@ public class VehicleController : MonoBehaviour
 		_driveTrainController.maxMotorPower = maxMotorPower;
 		_driveTrainController.maxBrakeTorque = maxBrakeTorque;
 		_driveTrainController.handbrakeTorque = handbrakeTorque;
+		_driveTrainController.antiRollToggle = antiRollToggle;
 		_driveTrainController.antiRollStiffnessFront = antiRollStiffnessFront;
 		_driveTrainController.antiRollStiffnessRear = antiRollStiffnessRear;
 		_driveTrainController.tractionControlEnabled = tractionControlEnabled;
@@ -667,52 +703,33 @@ public class VehicleController : MonoBehaviour
 		_driveTrainController.absSlipLimit = absSlipLimit;
 		_driveTrainController.rearSidewaysGripHandbrakeMultiplier = rearSidewaysGripHandbrakeMultiplier;
 		_driveTrainController.rearForwardGripHandbrakeMultiplier = rearForwardGripHandbrakeMultiplier;
-		_driveTrainController.frontSidewaysGripLockedMultiplier = frontSidewaysGripLockedMultiplier;
-		_driveTrainController.rearSidewaysGripLockedMultiplier = rearSidewaysGripLockedMultiplier;
+
+		_driveTrainController.frontGripLockedMultiplier = frontGripLockedMultiplier;
+		_driveTrainController.rearGripLockedMultiplier = rearGripLockedMultiplier;
 		_driveTrainController.lockForwardSlipThreshold = lockForwardSlipThreshold;
 		_driveTrainController.lockBrakeTorqueThreshold = lockBrakeTorqueThreshold;
 
-		var frontForewardFriction = new float[]
-		{
-			frontForwardStiffness,
-			frontForwardAsymptoteSlip,
-			frontForwardExtremumSlip,
-			frontForwardAsymptoteValue,
-			frontForwardExtremumValue
-		};
-		_driveTrainController.frontForwardFriction = frontForewardFriction;
+		_driveTrainController.gripCircleEnabled = gripCircleEnabled;
+		_driveTrainController.gripCircleStartSlip = gripCircleStartSlip;
+		_driveTrainController.gripCircleFullSlip = gripCircleFullSlip;
+		_driveTrainController.minForwardGripCircleMultiplier = minForwardGripCircleMultiplier;
+		_driveTrainController.minSidewaysGripCircleMultiplier = minSidewaysGripCircleMultiplier;
 
-		var rearForwardFriction = new float[]
-		{
-			rearForwardStiffness,
-			rearForwardAsymptoteSlip,
-			rearForwardExtremumSlip,
-			rearForwardAsymptoteValue,
-			rearForwardExtremumValue
-		};
+		_driveTrainController.frontForwardFriction = frontForwardFriction;
 		_driveTrainController.rearForwardFriction = rearForwardFriction;
-
-		var frontSidewaysFriction = new float[]
-		{
-			frontSidewaysStiffness,
-			frontSidewaysAsymptoteSlip,
-			frontSidewaysExtremumSlip,
-			frontSidewaysAsymptoteValue,
-			frontSidewaysExtremumValue
-		};
 		_driveTrainController.frontSidewaysFriction = frontSidewaysFriction;
-
-		var rearSidewaysFriction = new float[]
-		{
-			rearSidewaysStiffness,
-			rearSidewaysAsymptoteSlip,
-			rearSidewaysExtremumSlip,
-			rearSidewaysAsymptoteValue,
-			rearSidewaysExtremumValue
-		};
 		_driveTrainController.rearSidewaysFriction = rearSidewaysFriction;
 
-		_driveTrainController.coMPosition = coMPosition;
+		_driveTrainController.limitedSlipEnabled = limitedSlipEnabled;
+		_driveTrainController.limitedSlipStartRpmDifference = limitedSlipStartRpmDifference;
+		_driveTrainController.limitedSlipFullRpmDifference = limitedSlipFullRpmDifference;
+		_driveTrainController.limitedSlipMaxTorqueCut = limitedSlipMaxTorqueCut;
+		_driveTrainController.limitedSlipGripWheelBoost = limitedSlipGripWheelBoost;
+		_driveTrainController.limitedSlipBrakeTorque = limitedSlipBrakeTorque;
+
+		_driveTrainController.redlineFadeStart = redlineFadeStart;
+
+		_driveTrainController.coMPosition = centreOfMassPosition;
 		_driveTrainController.ackermannFactor = ackermannFactor;
 
 		_driveTrainController.SetUp();
@@ -725,16 +742,16 @@ public class VehicleController : MonoBehaviour
 	/// <summary>
 	/// Pushes current engine RPM from transmission and current throttle to the engine sound system.
 	/// </summary>
-	private void UpdateAudio()
+	private void UpdateAudio(float throttle)
 	{
 		_engineSound.RPM = _transmissionController.EngineRPM;
-		_engineSound.throttle = ReadFloat(throttleAction);
+		_engineSound.throttle = throttle;
 	}
 
 	#endregion
 
 	#region Input Helpers
-	#region Input Detection
+
 	/// <summary>
 	/// Action callback used to detect the active input device and switch steering model if needed.
 	/// </summary>
@@ -753,7 +770,6 @@ public class VehicleController : MonoBehaviour
 			Debug.Log($"Switched to: {currentInputDevice} via {device.displayName}");
 		}
 	}
-	#endregion
 
 	#region Input Action Creation
 	/// <summary>
@@ -869,7 +885,7 @@ public class VehicleController : MonoBehaviour
 		lights.AddBinding("<Gamepad>/dpad/up").WithInteraction("Press");
 		return lights;
 	}
-	#endregion
+
 	#endregion
 
 	#region Input Action Deletion & Cleanup
@@ -960,3 +976,4 @@ public class VehicleController : MonoBehaviour
 	#endregion
 	#endregion
 }
+	#endregion

@@ -169,16 +169,14 @@ public class TrackManager : MonoBehaviour
 		restartRace.action.Disable();
 	}
 
-	/// <summary>Initialization hook (unused).</summary>
-	private void Awake() { }
 
 	/// <summary>
 	/// Starts the race automatically if at least one checkpoint is assigned.
 	/// </summary>
 	private void Start()
 	{
-		if (CheckPointManager.Instance.TotalCheckpoints == 0)
-			CheckPointManager.Instance.AutoAddCheckpoints();
+		CheckPointManager.Instance.ClearCheckPoints();
+		CheckPointManager.Instance.AutoAddCheckpoints();
 
 		StartRace();
 	}
