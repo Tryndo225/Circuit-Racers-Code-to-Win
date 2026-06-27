@@ -61,3 +61,11 @@ MonoBehaviour:
     scenePath: Assets/Scenes/Level.unity
     sceneAsset: {fileID: 102900000, guid: d5c2cae3d201b1546bfbddc0f1a01656, type: 3}
     audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+  - sceneName: Level Editor
+    scenePath: Assets/Scenes/Level Editor.unity
+    sceneAsset: {fileID: 102900000, guid: 4e013c97c16cf254e8c58ce652e1acc0, type: 3}
+    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+  - sceneName: Level Replay
+    scenePath: Assets/Scenes/Level Replay.unity
+    sceneAsset: {fileID: 102900000, guid: ef8c864e9603e1141bf2d39867121505, type: 3}
+    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}

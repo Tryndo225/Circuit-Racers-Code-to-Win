@@ -217,6 +217,109 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		}
 		return sb.ToString();
 	}
+
+	public static bool operator ==(LevelMap a, LevelMap b)
+	{
+		if (ReferenceEquals(a, b))
+		{
+			return true;
+		}
+
+		if (a is null || b is null)
+		{
+			return false;
+		}
+
+		return a.Equals(b);
+	}
+
+	public static bool operator !=(LevelMap a, LevelMap b)
+	{
+		return !(a == b);
+	}
+
+	public override bool Equals(object obj)
+	{
+		if (obj is not LevelMap other)
+		{
+			return false;
+		}
+
+		if (Name != other.Name ||
+			Width != other.Width ||
+			Height != other.Height ||
+			Circuit != other.Circuit ||
+			StartPoint != other.StartPoint ||
+			FinishPoint != other.FinishPoint ||
+			Laps != other.Laps ||
+			CheckpointCountPerLap != other.CheckpointCountPerLap ||
+			RoadTileCount != other.RoadTileCount)
+		{
+			return false;
+		}
+
+		return TilesEqual(Tiles, other.Tiles, Width, Height);
+	}
+
+	private static bool TilesEqual(int[,] first, int[,] second, int width, int height)
+	{
+		if (ReferenceEquals(first, second))
+		{
+			return true;
+		}
+
+		if (first == null || second == null)
+		{
+			return false;
+		}
+
+		if (first.GetLength(0) != second.GetLength(0) ||
+			first.GetLength(1) != second.GetLength(1))
+		{
+			return false;
+		}
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				if (first[x, y] != second[x, y])
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public override int GetHashCode()
+	{
+		HashCode hash = new HashCode();
+
+		hash.Add(Name);
+		hash.Add(Width);
+		hash.Add(Height);
+		hash.Add(Circuit);
+		hash.Add(StartPoint);
+		hash.Add(FinishPoint);
+		hash.Add(Laps);
+		hash.Add(CheckpointCountPerLap);
+		hash.Add(RoadTileCount);
+
+		if (Tiles != null)
+		{
+			for (int y = 0; y < Height; y++)
+			{
+				for (int x = 0; x < Width; x++)
+				{
+					hash.Add(Tiles[x, y]);
+				}
+			}
+		}
+
+		return hash.ToHashCode();
+	}
 }
 
 #endregion Level Map Class

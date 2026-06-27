@@ -1887,7 +1887,7 @@ MonoBehaviour:
   maxSteerAngle: 30
   steerSpeedDegPerSec: 300
   inputExponent: 2.5
-  maxMotorPower: 8000
+  maxMotorPower: 10000
   maxBrakeTorque: 10000
   handbrakeTorque: 10000
   redlineFadeStart: 0.9
@@ -2110,7 +2110,7 @@ MonoBehaviour:
   maxSteerAngle: 30
   steerSpeedDegPerSec: 300
   inputExponent: 2.5
-  maxMotorPower: 8000
+  maxMotorPower: 10000
   maxBrakeTorque: 10000
   handbrakeTorque: 10000
   redlineFadeStart: 0.9

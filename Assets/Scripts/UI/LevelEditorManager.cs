@@ -1,10 +1,17 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class LevelEditorManager : MonoBehaviour
 {
-	[SerializeField] private LevelPreviewer levelPreviewer_;
-	[SerializeField] private RectTransform levelGridRect_;
+	[SerializeField] private LevelPreviewer levelPreviewer;
+	[SerializeField] private RectTransform levelGridRect;
+	[SerializeField] private TMP_InputField levelNameField;
+	[SerializeField] private Toggle circuitToggle;
+	[SerializeField] private Slider lapSlider;
+	[SerializeField] private GameObject lapSliderParent;
 
 
 	private LevelMap editedLevel_;
@@ -14,7 +21,17 @@ public class LevelEditorManager : MonoBehaviour
 
 	void Start()
 	{
+		SetUp();
+	}
+
+	private void SetUp()
+	{
 		editedLevel_ = GameDataManager.Instance.CreateEditableCopy(GameDataManager.Instance.CurrentLevelMap);
+		StartCoroutine(ShowPreviewAfterLayout());
+		levelNameField.text = editedLevel_.Name;
+		circuitToggle.isOn = editedLevel_.Circuit;
+		lapSlider.value = editedLevel_.Laps;
+		lapSliderParent.SetActive(editedLevel_.Circuit);
 	}
 
 	public void OnLevelGridClick(BaseEventData eventData)
@@ -31,19 +48,14 @@ public class LevelEditorManager : MonoBehaviour
 			return;
 		}
 
-		bool converted = RectTransformUtility.ScreenPointToLocalPointInRectangle(
-			levelGridRect_,
-			pointerData.position,
-			pointerData.pressEventCamera,
-			out Vector2 localPoint
-		);
+		bool converted = RectTransformUtility.ScreenPointToLocalPointInRectangle(levelGridRect, pointerData.position, pointerData.pressEventCamera, out Vector2 localPoint);
 
 		if (!converted)
 		{
 			return;
 		}
 
-		Rect rect = levelGridRect_.rect;
+		Rect rect = levelGridRect.rect;
 
 		if (!rect.Contains(localPoint))
 		{
@@ -81,7 +93,16 @@ public class LevelEditorManager : MonoBehaviour
 
 	private void UpdateLevelPreview()
 	{
-		_ = levelPreviewer_.ShowPreviewAsync(editedLevel_);
+		_ = levelPreviewer.ShowPreviewAsync(editedLevel_);
+	}
+
+	private IEnumerator ShowPreviewAfterLayout()
+	{
+		yield return null;
+
+		Canvas.ForceUpdateCanvases();
+
+		_ = levelPreviewer.ShowPreviewAsync(editedLevel_);
 	}
 
 	public void OnGrassSelected()
@@ -117,6 +138,24 @@ public class LevelEditorManager : MonoBehaviour
 		finishSelected_ = true;
 	}
 
+	public void SetCircuit(bool isCircuit)
+	{
+		editedLevel_.Circuit = isCircuit;
+		lapSliderParent.SetActive(isCircuit);
+
+	}
+
+	public void SetLaps(float laps)
+	{
+		editedLevel_.Laps = Mathf.RoundToInt(laps);
+	}
+
+	public void OnLevelNameChange(string name)
+	{
+		editedLevel_.Name = name;
+		Debug.Log($"Name is: {name}");
+	}
+
 	public void AutomaticCPGeneration()
 	{
 		LevelCheckPointMaker.GenerateCheckPoints(editedLevel_);
@@ -128,10 +167,14 @@ public class LevelEditorManager : MonoBehaviour
 		if (!LevelMapValidator.Validate(editedLevel_))
 		{
 			Debug.LogWarning("Edited level is invalid.");
+			NotificationManager.Instance.Show("Edited level is invalid.", Color.red);
 			return;
 		}
 
 		GameDataManager.Instance.AddLevel(editedLevel_);
+		NotificationManager.Instance.Show("New Level Saved.", Color.green);
+		GameDataManager.Instance.SelectingLevelMap(editedLevel_);
+		SetUp();
 	}
 
 	public void ReplaceEditedLevel()
@@ -139,9 +182,13 @@ public class LevelEditorManager : MonoBehaviour
 		if (!LevelMapValidator.Validate(editedLevel_))
 		{
 			Debug.LogWarning("Edited level is invalid.");
+			NotificationManager.Instance.Show("Edited level is invalid.", Color.red);
 			return;
 		}
 
 		GameDataManager.Instance.ReplaceLevel(GameDataManager.Instance.CurrentLevelMap, editedLevel_);
+		NotificationManager.Instance.Show("Level Replaced.", Color.green);
+		GameDataManager.Instance.SelectingLevelMap(editedLevel_);
+		SetUp();
 	}
 }

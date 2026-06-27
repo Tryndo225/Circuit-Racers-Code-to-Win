@@ -1,8 +1,26 @@
+using Generic;
 using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
+public struct RaceOverlayState
+{
+	public bool HasData;
+
+	public float RespawnTimer;
+
+	public float LapTime;
+	public float TrackTime;
+	public bool ShowTrackTime;
+
+	public string LapCounterText;
+	public string CheckpointCounterText;
+
+	public bool IsFinished;
+	public string FinalText;
+}
 
 /// <summary>
 /// HUD controller for race status: start countdown overlay, lap & total time, lap/checkpoint counters,
@@ -31,7 +49,7 @@ using UnityEngine.UI;
 /// - Wire all serialized fields in the Inspector (labels and overlay panels).
 /// - Optionally leave <see cref="trackManager"/> unassigned; it will be discovered on validate/start.
 /// </remarks>
-public class RaceOverLay : MonoBehaviour
+public class RaceOverLay : SceneSingleton<RaceOverLay>
 {
 	#region Inspector : Start Overlay
 
@@ -87,7 +105,7 @@ public class RaceOverLay : MonoBehaviour
 	#region References
 
 	/// <summary>Source of race state. Auto-assigned via <see cref="FindFirstObjectByType{T}"/> when missing.</summary>
-	[SerializeField, ReadOnly] private TrackManager trackManager;
+	[SerializeField] private RaceOverlaySource overlaySource;
 
 	#endregion References
 
@@ -110,9 +128,9 @@ public class RaceOverLay : MonoBehaviour
 	/// </summary>
 	private void OnValidate()
 	{
-		if (trackManager == null)
+		if (overlaySource == null)
 		{
-			trackManager = FindFirstObjectByType<TrackManager>();
+			overlaySource = FindFirstObjectByType<RaceOverlaySource>();
 		}
 	}
 
@@ -121,9 +139,9 @@ public class RaceOverLay : MonoBehaviour
 	/// </summary>
 	private void Start()
 	{
-		if (trackManager == null)
+		if (overlaySource == null)
 		{
-			trackManager = FindFirstObjectByType<TrackManager>();
+			overlaySource = FindFirstObjectByType<RaceOverlaySource>();
 		}
 
 		lapCounter.text = "";
@@ -132,7 +150,9 @@ public class RaceOverLay : MonoBehaviour
 		trackTime.text = "";
 		finalTime.text = "";
 		startTimer.text = "";
+
 		_toggled = false;
+
 		startFilter.SetActive(false);
 		finishScreen.SetActive(false);
 
@@ -149,51 +169,71 @@ public class RaceOverLay : MonoBehaviour
 	/// </summary>
 	private void Update()
 	{
-		if (!_toggled)
+		if (_toggled)
 		{
-			if (trackManager == null) return;
-			if (trackManager.RespawnTimer > 0)
-			{
-				startFilter.SetActive(true);
-				startTimer.text = $"{trackManager.RespawnTimer:0}";
-			}
-			else
-			{
-				startTimer.text = "";
-				startFilter.SetActive(false);
-			}
+			return;
+		}
 
-			lapTime.text = FormatTime(RaceTimeManager.Instance.GetCurrentLapTime());
+		if (overlaySource == null)
+		{
+			return;
+		}
 
-			if (trackManager.CurrentLap > 0)
-			{
-				trackTime.text = FormatTime(RaceTimeManager.Instance.GetCurrentRaceTime());
-			}
-			else
-			{
-				trackTime.text = "";
-			}
+		if (!overlaySource.TryGetState(out RaceOverlayState state) || !state.HasData)
+		{
+			return;
+		}
 
-			lapCounter.text = $"{trackManager.CurrentLap}/{trackManager.TotalLaps}";
-			checkPointCount.text = $"{trackManager.CurrentCheckPointIndex}/{CheckPointManager.Instance.TotalCheckpoints}";
+		UpdateStartOverlay(state);
+		UpdateTimers(state);
+		UpdateCounters(state);
+		UpdateFinishScreen(state);
+	}
 
-			if (trackManager.IsRaceFinished)
-			{
-				finishScreen.SetActive(true);
-				finalTime.text = $"Final Time: {FormatTime(RaceTimeManager.Instance.RaceEndTime)}";
-				_toggled = true;
-			}
-			else if (Input.GetKeyDown(KeyCode.Escape) && !finishScreen.activeSelf)
-			{
-				finishScreen.SetActive(true);
-				finalTime.text = $"Unfinished";
-				_toggled = true;
-			}
-			else
-			{
-				finalTime.text = "";
-				finishScreen.SetActive(false);
-			}
+	private void UpdateStartOverlay(RaceOverlayState state)
+	{
+		if (state.RespawnTimer > 0f)
+		{
+			startFilter.SetActive(true);
+			startTimer.text = $"{state.RespawnTimer:0}";
+		}
+		else
+		{
+			startTimer.text = "";
+			startFilter.SetActive(false);
+		}
+	}
+
+	private void UpdateTimers(RaceOverlayState state)
+	{
+		lapTime.text = FormatTime(state.LapTime);
+		trackTime.text = state.ShowTrackTime ? FormatTime(state.TrackTime) : "";
+	}
+
+	private void UpdateCounters(RaceOverlayState state)
+	{
+		lapCounter.text = state.LapCounterText ?? "";
+		checkPointCount.text = state.CheckpointCounterText ?? "";
+	}
+
+	private void UpdateFinishScreen(RaceOverlayState state)
+	{
+		if (state.IsFinished)
+		{
+			finishScreen.SetActive(true);
+			finalTime.text = state.FinalText;
+			_toggled = true;
+		}
+		else if (Input.GetKeyDown(KeyCode.Escape) && !finishScreen.activeSelf)
+		{
+			finishScreen.SetActive(true);
+			finalTime.text = "Unfinished";
+			_toggled = true;
+		}
+		else
+		{
+			finalTime.text = "";
+			finishScreen.SetActive(false);
 		}
 	}
 
@@ -314,7 +354,7 @@ public class RaceOverLay : MonoBehaviour
 	/// </summary>
 	/// <param name="time">Seconds to format.</param>
 	/// <returns>Human-readable time string.</returns>
-	private static string FormatTime(float time)
+	public static string FormatTime(float time)
 	{
 		TimeSpan t = TimeSpan.FromSeconds(time);
 		if (t.Hours > 0)

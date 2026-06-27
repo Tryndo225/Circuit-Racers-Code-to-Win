@@ -6,6 +6,13 @@ public class Speedometer : MonoBehaviour
 {
 	[SerializeField] private Slider speedometerGauge;
 	[SerializeField] private TextMeshProUGUI speedText;
+	[SerializeField] private SpeedSource source;
+
+	public enum SpeedSource
+	{
+		DriveTrain,
+		Replay
+	}
 
 	private DriveTrainController controller_;
 	private float maxSpeed = 250f;
@@ -40,7 +47,11 @@ public class Speedometer : MonoBehaviour
 			}
 		}
 
-		float currentSpeed = controller_.GetSpeed();
+		float currentSpeed = 0;
+		if (source == SpeedSource.DriveTrain)
+			currentSpeed = controller_.GetSpeed();
+		else if (source == SpeedSource.Replay)
+			currentSpeed = ReplayPreviewer.Instance.GetCurrentSpeed();
 
 		if (currentSpeed > maxSpeed)
 		{

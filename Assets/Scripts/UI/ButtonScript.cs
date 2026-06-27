@@ -376,14 +376,16 @@ public class OpenPopUpButton : ButtonType
 public class ImportLevelFromClipboardButton : OpenPopUpButton
 {
 	/// <summary>Parameterless ctor for serialization.</summary>
-	public ImportLevelFromClipboardButton()
-	{ }
+	public ImportLevelFromClipboardButton() { }
+
+
 	/// <inheritdoc/>
 	public override void Action()
 	{
 		if (ImportExportManager.TryImportLevelFromClipboard(out var levelMap))
 		{
 			GameDataManager.Instance.AddLevel(levelMap);
+			NotificationManager.Instance.Show("Level Imported From ClipBoard.", Color.lightBlue);
 		}
 		else
 		{
@@ -408,6 +410,43 @@ public class ImportLevelButton : ClosePopUpButton
 		{
 			base.Action();
 		}
+	}
+}
+
+[Serializable]
+public class ReplayButton : ChangeSceneButton
+{
+	public override void Action()
+	{
+		if (GameDataManager.Instance.CurrentGameData.GetBestReplay(GameDataManager.Instance.CurrentLevelMap) != null)
+			base.Action();
+		else
+			NotificationManager.Instance.Show("No available replay.", Color.red);
+	}
+}
+
+
+[Serializable]
+public class EditButton : ChangeSceneButton
+{
+	public override void Action()
+	{
+		if (GameDataManager.Instance.CurrentLevelMap != null)
+			base.Action();
+		else
+			NotificationManager.Instance.Show("No level selected.", Color.red);
+	}
+}
+
+[Serializable]
+public class NotificationButton : ButtonType
+{
+	[SerializeField] private Color notificationColor;
+	[SerializeField] private string notificationText;
+
+	public override void Action()
+	{
+		NotificationManager.Instance.Show(notificationText, notificationColor);
 	}
 }
 

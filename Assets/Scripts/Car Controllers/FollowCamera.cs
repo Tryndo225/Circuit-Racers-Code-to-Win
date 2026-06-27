@@ -16,7 +16,7 @@ public class FollowCamera : MonoBehaviour
 
 	[Header("Target")]
 	/// <summary>Transform to follow. If null, camera update is skipped.</summary>
-	public Transform target;
+	[SerializeField] public Transform target;
 
 	[Header("Physics")]
 	/// <summary>

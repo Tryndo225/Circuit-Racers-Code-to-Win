@@ -2,7 +2,7 @@ using Generic;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RaceTimeManager : Singleton<RaceTimeManager>
+public class RaceTimeManager : SceneSingleton<RaceTimeManager>
 {
 	public float RaceStartTime { get; private set; }
 	public float LapStartTime { get; private set; }
@@ -23,6 +23,7 @@ public class RaceTimeManager : Singleton<RaceTimeManager>
 		LapTimes.Clear();
 		CheckPointSplitsTimes.Clear();
 		CheckPointManager.Instance.AddListenerToCheckpoints(CheckpointPassed);
+		ReplayManager.Instance.StartReplay();
 	}
 
 	public void LapPassed()
@@ -40,12 +41,11 @@ public class RaceTimeManager : Singleton<RaceTimeManager>
 		CheckPointSplitsTimes.Add(currentCpSplit);
 
 		float lastSplitTime = GameDataManager.Instance.GetCurrentMapSplit(CheckPointSplitsTimes.Count - 1);
-		var rcO = FindFirstObjectByType<RaceOverLay>();
 
 		if (lastSplitTime == 0)
-			rcO.DisplaySplit(currentCpSplit, 0);
+			RaceOverLay.Instance.DisplaySplit(currentCpSplit, 0);
 		else
-			rcO.DisplaySplit(currentCpSplit, currentCpSplit - lastSplitTime);
+			RaceOverLay.Instance.DisplaySplit(currentCpSplit, currentCpSplit - lastSplitTime);
 	}
 
 	public float GetCurrentRaceTime()
@@ -65,7 +65,8 @@ public class RaceTimeManager : Singleton<RaceTimeManager>
 		LapPassed();
 		float totalRaceTime = Time.time - RaceStartTime;
 		Debug.Log($"Race finished! Total time: {totalRaceTime} seconds");
-		GameDataManager.Instance.CompleteLevel(totalRaceTime, CheckPointSplitsTimes.ToArray());
+		Replay replay = ReplayManager.Instance.SaveReplay();
+		GameDataManager.Instance.CompleteLevel(totalRaceTime, CheckPointSplitsTimes.ToArray(), replay);
 		RaceStartTime = 0f;
 		LapStartTime = 0f;
 		RaceEndTime = totalRaceTime;

@@ -104,10 +104,13 @@ namespace IEnumerableExtention
 
 #endregion IEnumerableExtensions
 
-#region Generic.Singleton
+#region Generic
 
 namespace Generic
 {
+
+	#region Singleton
+
 	/// <summary>
 	/// Minimal <c>DontDestroyOnLoad</c> singleton base.
 	/// Ensures a single live instance of <typeparamref name="T"/>; duplicates self-destruct in <see cref="Awake"/>.
@@ -123,7 +126,7 @@ namespace Generic
 	public class Singleton<T> : MonoBehaviour where T : Singleton<T>
 	{
 		/// <summary>Backer for <see cref="Instance"/>.</summary>
-		private static T _instance;
+		protected static T _instance;
 
 		/// <summary>
 		/// Global accessor to the current singleton instance (or null if none has awoken yet).
@@ -137,17 +140,29 @@ namespace Generic
 		/// </summary>
 		protected virtual void Awake()
 		{
-			// If an instance already exists and it's not this one, destroy this duplicate.
+			if (!Coalesce())
+				return;
+
+			Persist();
+		}
+
+		protected virtual bool Coalesce()
+		{
 			if (_instance != null && _instance != this)
 			{
 				Destroy(gameObject);
-				return;
+				return false;
 			}
 
-			// This object becomes the live instance and persists across scene loads.
 			_instance = (T)this;
+			return true;
+		}
+
+		protected virtual void Persist()
+		{
 			DontDestroyOnLoad(gameObject);
 		}
+
 
 		/// <summary>
 		/// Unity method: clears the static instance reference if this object owned it.
@@ -160,6 +175,22 @@ namespace Generic
 
 		#endregion Unity Methods
 	}
+
+	#endregion Singleton
+
+	#region SceneSingleton
+
+	public class SceneSingleton<T> : Singleton<T> where T : SceneSingleton<T>
+	{
+		protected override void Persist()
+		{
+			// Intentionally empty.
+			// SceneSingleton objects should be destroyed normally on scene load.
+		}
+	}
+
+	#endregion SceneSingleton
+
 }
 
-#endregion Generic.Singleton
+#endregion Generic

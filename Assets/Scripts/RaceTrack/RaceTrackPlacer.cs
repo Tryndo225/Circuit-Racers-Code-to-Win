@@ -154,6 +154,9 @@ public class RaceTrackPlacer : MonoBehaviour
 	/// <summary>Runtime copy of the level layout pulled from <see cref="GameDataManager"/> at start.</summary>
 	[SerializeField, ReadOnly] private LevelMap levelMap;
 
+	[Header("Build Options")]
+	[SerializeField] private bool isBuildForReplay;
+
 	/// <summary>All supported pattern sizes (e.g., 5, 3) derived from legend keys.</summary>
 	private List<int> possibleSizes = new List<int>();
 
@@ -210,8 +213,6 @@ public class RaceTrackPlacer : MonoBehaviour
 		Coordinates? position = levelMap.StartPoint;
 		HashSet<Coordinates> visited = new HashSet<Coordinates>();
 
-		var trackManager = FindFirstObjectByType<TrackManager>();
-
 		int checkpointAmount = 0;
 
 		while (true)
@@ -228,9 +229,9 @@ public class RaceTrackPlacer : MonoBehaviour
 					newGameObject.GetComponentInChildren<CheckPointListener>().CheckpointOrder = checkpointAmount;
 					++checkpointAmount;
 
-					if (position.Value == levelMap.StartPoint)
+					if (position.Value == levelMap.StartPoint && !isBuildForReplay)
 					{
-						trackManager.CarSpawn = newGameObject.transform;
+						TrackManager.Instance.CarSpawn = newGameObject.transform;
 					}
 				}
 			}
@@ -239,7 +240,19 @@ public class RaceTrackPlacer : MonoBehaviour
 			position = Step(piecesToPlace, position.Value, visited);
 		}
 
-		trackManager.StartRace();
+		CheckPointManager.Instance.ClearCheckPoints();
+		CheckPointManager.Instance.AutoAddCheckpoints();
+
+		if (!isBuildForReplay)
+			TrackManager.Instance.StartRace(levelMap);
+		else
+		{
+			Debug.Log("Building finished setting Replay");
+			ReplayPreviewer.Instance.SetReplay(GameDataManager.Instance.CurrentGameData.GetBestReplay(GameDataManager.Instance.CurrentLevelMap));
+			Debug.Log("Replay Set.");
+		}
+
+
 	}
 
 	private void StopOverlaying(TrackPiece[,] pieces)

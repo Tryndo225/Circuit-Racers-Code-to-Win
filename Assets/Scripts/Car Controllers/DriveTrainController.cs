@@ -377,6 +377,19 @@ public class DriveTrainController : MonoBehaviour
 		return maxSteerAngleAtTopSpeed;
 	}
 
+	public void ApplyReplayWheelVisuals(float replaySteeringAngle)
+	{
+		steeringAngle = replaySteeringAngle;
+
+		if (_wheelColliders == null || _wheelMeshes == null || _steering == null)
+		{
+			return;
+		}
+
+		ApplySteering(steeringAngle);
+		SyncMeshes();
+	}
+
 	#endregion
 
 	#region Private Helpers: Setup

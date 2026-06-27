@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CheckPointManager : Singleton<CheckPointManager>
+public class CheckPointManager : SceneSingleton<CheckPointManager>
 {
 	public List<CheckPointListener> CheckPoints { get; private set; } = new List<CheckPointListener>();
 	public int TotalCheckpoints => CheckPoints.Count;

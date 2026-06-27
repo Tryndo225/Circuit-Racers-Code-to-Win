@@ -72,9 +72,9 @@ public class LevelEntry : MonoBehaviour
 		GameDataManager.Instance.RemoveLevel(levelData.LevelMap);
 	}
 
-	public void OnLevelNameChange()
+	public void OnLevelNameChange(string name)
 	{
-		levelData.LevelMap.Name = levelName.text;
+		levelData.LevelMap.Name = name;
 	}
 
 	#endregion

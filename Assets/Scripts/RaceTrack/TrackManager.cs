@@ -14,8 +14,10 @@ using UnityEngine.InputSystem;
 /// @invariant When circuit mode is enabled (isCircuit), laps >= 1.
 /// @thread Unity main thread (lifecycle, physics callbacks, coroutines).
 /// </remarks>
-public class TrackManager : MonoBehaviour
+public class TrackManager : Generic.SceneSingleton<TrackManager>
 {
+
+
 	/// <summary>
 	/// Optional explicit spawn transform for the car; if null, this object's transform is used.
 	/// </summary>
@@ -65,15 +67,17 @@ public class TrackManager : MonoBehaviour
 	#region Inspector: Track Settings
 
 	[Header("Track Settings")]
+	[SerializeField, ReadOnly] private LevelMap levelMap;
 	/// <summary>
 	/// True for lap-based circuit; false for point-to-point (finish at last checkpoint).
 	/// </summary>
-	[SerializeField] private bool isCircuit = false;
+	[SerializeField, ReadOnly] private bool isCircuit = false;
 
 	/// <summary>
 	/// Number of laps to complete (circuit mode only).
 	/// </summary>
-	[SerializeField, ShowIf(nameof(isCircuit))] private int laps = 3;
+	[SerializeField, ReadOnly, ShowIf(nameof(isCircuit))] private int laps = 3;
+
 
 	#endregion
 
@@ -167,18 +171,6 @@ public class TrackManager : MonoBehaviour
 
 		respawnLastCheckPoint.action.Disable();
 		restartRace.action.Disable();
-	}
-
-
-	/// <summary>
-	/// Starts the race automatically if at least one checkpoint is assigned.
-	/// </summary>
-	private void Start()
-	{
-		CheckPointManager.Instance.ClearCheckPoints();
-		CheckPointManager.Instance.AutoAddCheckpoints();
-
-		StartRace();
 	}
 
 	/// <summary>
@@ -309,10 +301,7 @@ public class TrackManager : MonoBehaviour
 			_carStartPosition = transform.position;
 			_carStartRotation = transform.rotation;
 		}
-		_carInstance = Instantiate(
-			carPrefab,
-			_carStartPosition + (_carStartRotation * Vector3.forward * carSpawnHorizontalOffset) + (Vector3.up * carSpawnVerticalOffset),
-			_carStartRotation);
+		_carInstance = Instantiate(carPrefab, _carStartPosition + (_carStartRotation * Vector3.forward * carSpawnHorizontalOffset) + (Vector3.up * carSpawnVerticalOffset), _carStartRotation);
 		_carInstance.tag = "Player";
 		Camera.main.GetComponent<FollowCamera>().SetTarget(_carInstance.transform);
 
@@ -379,9 +368,14 @@ public class TrackManager : MonoBehaviour
 	/// <summary>
 	/// Initializes the race: subscribes to checkpoint events and starts the restart countdown.
 	/// </summary>
-	/// <param name="carPosition">Optional explicit car position (unused in current flow).</param>
-	public void StartRace(Vector3? carPosition = null)
+	public void StartRace(LevelMap lvlMap)
 	{
+		levelMap = lvlMap;
+
+		laps = levelMap.Laps;
+
+		isCircuit = levelMap.Circuit;
+
 		if (CheckPointManager.Instance.TotalCheckpoints == 0)
 		{
 			Debug.LogError("No checkpoints assigned to TrackManager.");

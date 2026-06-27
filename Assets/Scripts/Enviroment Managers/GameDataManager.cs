@@ -42,11 +42,13 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 
 		public float[] CheckpointTimeSplits;
 
+		public Replay BestReplay;
+
 		/// <summary>
 		/// Creates a record with an unknown best time.
 		/// </summary>
 		/// <param name="levelMap">Target level map.</param>
-		public LevelData(LevelMap levelMap) : this(levelMap, 0) { }
+		public LevelData(LevelMap levelMap) : this(levelMap, float.MaxValue) { }
 
 		/// <summary>
 		/// Creates a record with a specified best time.
@@ -54,15 +56,18 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		/// <param name="levelMap">Target level map.</param>
 		/// <param name="time">Best time in seconds.</param>
 		/// <param name="checkpointTimeSplits">Optional array of checkpoint time splits; if null, initialized to default size.</param>
-		public LevelData(LevelMap levelMap, float time, float[] checkpointTimeSplits = null)
+		public LevelData(LevelMap levelMap, float time, float[] checkpointTimeSplits = null, Replay replay = null)
 		{
 			LevelMap = levelMap;
 			Time = time;
 
 			if (checkpointTimeSplits == null)
+			{
 				checkpointTimeSplits = new float[levelMap.CheckpointCountPerLap * levelMap.Laps + 1];
+			}
 
 			CheckpointTimeSplits = checkpointTimeSplits;
+			BestReplay = replay;
 		}
 
 		/// <summary>
@@ -110,8 +115,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	{
 		/// <summary>List of known levels and their best times.</summary>
 		public List<LevelData> Levels;
-		public float PracticeMapTime = 0;
+		public float PracticeMapTime = float.MaxValue;
 		public float[] PracticeMapSplits = new float[11];
+		public Replay PracticeMapReplay;
 
 		/// <summary>Creates an empty game data set.</summary>
 		public GameData() => Levels = new List<LevelData>();
@@ -161,27 +167,33 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		/// </summary>
 		/// <param name="map">Target level map.</param>
 		/// <param name="time">New completion time (seconds).</param>
-		public void UpdateLevelTime(LevelMap map, float time, float[] splits)
+		public void UpdateLevelTime(LevelMap map, float time, float[] splits, Replay replay)
 		{
 			int index = Levels.FindIndex(ld => ld.LevelMap == map);
+
 			if (index >= 0)
 			{
 				if (time < Levels[index].Time)
 				{
 					Levels[index].Time = time;
 					Levels[index].CheckpointTimeSplits = splits;
+					Levels[index].BestReplay = replay;
 				}
 			}
 			else
 			{
-				Levels.Add(new LevelData(map, time, splits));
+				Levels.Add(new LevelData(map, time, splits, replay));
 			}
 		}
 
-		public void UpdateTestLevelTime(float time, float[] splits)
+		public void UpdateTestLevelTime(float time, float[] splits, Replay replay)
 		{
-			PracticeMapSplits = splits;
-			PracticeMapTime = time;
+			if (time < PracticeMapTime)
+			{
+				PracticeMapSplits = splits;
+				PracticeMapTime = time;
+				PracticeMapReplay = replay;
+			}
 		}
 
 		public float GetBestLevelTime(LevelMap map)
@@ -200,6 +212,23 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		public float GetBestTestLevelTime()
 		{
 			return PracticeMapTime;
+		}
+
+		public Replay GetBestReplay(LevelMap map)
+		{
+			int index = Levels.FindIndex(ld => ld.LevelMap == map);
+
+			if (index >= 0 && Levels[index].BestReplay != null && Levels[index].BestReplay.Duration > 0 && Levels[index].BestReplay.Snapshots.Count > 0)
+			{
+				return Levels[index].BestReplay;
+			}
+
+			return null;
+		}
+
+		public Replay GetBestTestLevelReplay()
+		{
+			return PracticeMapReplay;
 		}
 
 		/// <summary>
@@ -222,6 +251,8 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	/// The currently selected level to be played (may be null if not selected).
 	/// </summary>
 	public LevelMap CurrentLevelMap { get; private set; } = null;
+
+	public Replay CurrentLevelReplay => CurrentGameData.GetBestReplay(CurrentLevelMap);
 
 	/// <summary>
 	/// Hash of <see cref="CurrentGameData"/>.Levels content for change detection.
@@ -362,6 +393,16 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		return CurrentGameData.GetCheckpointSplit(CurrentLevelMap, splitIndex);
 	}
 
+	public Replay GetCurrentMapReplay()
+	{
+		if (CurrentLevelMap == null)
+		{
+			return CurrentGameData.GetBestTestLevelReplay();
+		}
+
+		return CurrentGameData.GetBestReplay(CurrentLevelMap);
+	}
+
 	/// <summary>
 	/// Selects a level for play, provided it exists in <see cref="CurrentGameData"/>.
 	/// </summary>
@@ -392,17 +433,18 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	/// Automatically saves the data set.
 	/// </summary>
 	/// <param name="time">Completion time in seconds.</param>
-	public void CompleteLevel(float time, float[] checkpointSplits)
+	public void CompleteLevel(float time, float[] checkpointSplits, Replay replay)
 	{
 		if (CurrentLevelMap == null)
 		{
 			Debug.Log("[GameDataManager] No level selected, assuming Test Track.");
-			CurrentGameData.UpdateTestLevelTime(time, checkpointSplits);
+			CurrentGameData.UpdateTestLevelTime(time, checkpointSplits, replay);
+			SaveGameData();
 			return;
 		}
 
-		CurrentGameData.UpdateLevelTime(CurrentLevelMap, time, checkpointSplits);
-		SaveGameData(); // Persist immediately after improvement
+		CurrentGameData.UpdateLevelTime(CurrentLevelMap, time, checkpointSplits, replay);
+		SaveGameData();
 	}
 
 	/// <summary>
@@ -446,6 +488,10 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			if (CurrentGameData.Levels[i].LevelMap == levelMap)
 			{
 				CurrentGameData.Levels.RemoveAt(i);
+
+				if (CurrentLevelMap == levelMap)
+					CurrentLevelMap = null;
+
 				PotentialHashChange(CurrentGameData.Levels.GetContentHash());
 				return;
 			}
@@ -461,6 +507,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	{
 		CurrentGameData.Levels.Clear();
 		PotentialHashChange(CurrentGameData.Levels.GetContentHash());
+		CurrentLevelMap = null;
 	}
 
 	#endregion
@@ -508,11 +555,13 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			return false;
 		}
 
-		CurrentGameData.Levels[index] = new LevelData(editedMap);
+		LevelMap savedMap = editedMap.Copy();
+
+		CurrentGameData.Levels[index] = new LevelData(savedMap);
 
 		if (CurrentLevelMap == originalMap)
 		{
-			CurrentLevelMap = editedMap;
+			CurrentLevelMap = savedMap;
 		}
 
 		PotentialHashChange(CurrentGameData.Levels.GetContentHash());
@@ -546,4 +595,23 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	}
 
 	#endregion
+
+	#region Context Menu
+
+	[ContextMenu("Copy Saved GameData To Clipboard")]
+	public void CopySavedGameDataToClipboard()
+	{
+		string json = PlayerPrefs.GetString("GameData", "");
+
+		if (string.IsNullOrEmpty(json))
+		{
+			Debug.LogWarning("[GameDataManager] No saved GameData found.");
+			return;
+		}
+
+		GUIUtility.systemCopyBuffer = json;
+		Debug.Log("[GameDataManager] Saved GameData copied to clipboard.");
+	}
+
+	#endregion Context Menu
 }
