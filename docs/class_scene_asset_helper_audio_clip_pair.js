@@ -2,7 +2,6 @@ var class_scene_asset_helper_audio_clip_pair =
 [
     [ "Equals", "class_scene_asset_helper_audio_clip_pair.html#a041028b7028f9d9aa2c829724c67c268", null ],
     [ "GetHashCode", "class_scene_asset_helper_audio_clip_pair.html#ac6fc39fa1df9847a0844b42a07845253", null ],
-    [ "GetObjectData", "class_scene_asset_helper_audio_clip_pair.html#af893aa815c3f67aedf7d8f4fea38264b", null ],
     [ "OnAfterDeserialize", "class_scene_asset_helper_audio_clip_pair.html#a598323ceaa42d8c32b9f27e12637d797", null ],
     [ "OnBeforeSerialize", "class_scene_asset_helper_audio_clip_pair.html#af007c1671af31e451902038b9a2d5c99", null ],
     [ "operator Scene", "class_scene_asset_helper_audio_clip_pair.html#a521029dfd1a7a8ba2f9e95ba7c35270e", null ],

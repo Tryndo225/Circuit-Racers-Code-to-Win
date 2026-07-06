@@ -1,11 +1,27 @@
 <map id="Generic.Singleton&lt; T &gt;" name="Generic.Singleton&lt; T &gt;">
-<area shape="rect" id="Node000001" title="Minimal DontDestroyOnLoad singleton base." alt="" coords="163,123,308,213"/>
-<area shape="rect" id="Node000003" href="$class_game_data_manager.html" title=" " alt="" coords="5,304,150,565"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,227,164,263,139,306,135,303,160,260,185,224"/>
-<area shape="rect" id="Node000004" href="$class_scene_management.html" title="Centralized scene loader and background&#45;music router." alt="" coords="174,389,296,480"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="238,228,238,390,232,390,232,228"/>
-<area shape="rect" id="Node000005" href="$class_sound_manager.html" title="Centralized audio service for background music and pooled 3D SFX playback, with per&#45;clip continuation..." alt="" coords="321,261,454,608"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="285,223,311,260,323,281,319,284,306,263,281,226"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="185,5,286,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,89,238,123,232,123,232,89"/>
+<area shape="rect" id="Node000001" title="Minimal persistent singleton base for Unity components." alt="" coords="651,123,795,277"/>
+<area shape="rect" id="Node000003" href="$class_game_data_manager.html" title="Runtime manager for persistent game progression data." alt="" coords="198,325,430,693"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="634,228,539,268,489,295,443,327,431,338,427,334,440,323,487,290,537,263,638,224"/>
+<area shape="rect" id="Node000004" href="$class_generic_1_1_scene_singleton-1-g.html" title="Scene&#45;local singleton base for Unity components." alt="" coords="454,475,635,544"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="670,288,649,327,565,476,560,473,645,324,667,292"/>
+<area shape="rect" id="Node000011" href="$class_notification_manager.html" title="Persistent UI notification manager that displays one text popup at a time." alt="" coords="660,400,786,619"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="724,290,726,401,720,399,722,295"/>
+<area shape="rect" id="Node000012" href="$class_scene_management.html" title="Centralized scene loader and background&#45;music router." alt="" coords="811,464,934,555"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="780,287,801,324,834,397,860,465,855,464,829,399,797,327,779,293"/>
+<area shape="rect" id="Node000013" href="$class_sound_manager.html" title="Centralized audio service for background music and pooled sound&#45;effect playback." alt="" coords="958,336,1091,683"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="809,231,882,269,917,294,948,324,961,341,955,340,944,327,913,299,879,274,809,236"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="673,5,773,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="724,87,726,124,720,122,722,92"/>
+<area shape="rect" id="Node000005" href="$class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene." alt="" coords="5,773,235,1035"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="531,556,518,593,499,630,474,665,443,695,417,711,393,719,347,722,300,724,276,730,250,744,211,775,207,772,247,739,274,725,300,719,346,717,392,714,415,706,440,691,470,662,495,627,514,591,528,560"/>
+<area shape="rect" id="Node000006" href="$class_race_overlay.html" title="HUD controller for race status, countdown, timing, checkpoint splits, counters, and final results." alt="" coords="260,859,362,949"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="527,555,493,626,470,662,444,695,426,710,409,719,393,728,377,743,359,771,344,801,323,860,319,857,339,799,354,768,373,740,390,723,406,714,423,706,440,691,465,659,488,623,523,559"/>
+<area shape="rect" id="Node000007" href="$class_race_time_manager.html" title="Manages race timing, lap timing, checkpoint splits, and race completion." alt="" coords="386,741,548,1067"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="537,557,501,743,496,740,533,561"/>
+<area shape="rect" id="Node000008" href="$class_replay_manager.html" title="Records replay snapshots during a race." alt="" coords="572,859,674,949"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="556,557,617,860,612,859,552,560"/>
+<area shape="rect" id="Node000009" href="$class_replay_previewer.html" title="Plays back recorded race replays by moving a replay car through recorded snapshots." alt="" coords="698,752,876,1056"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="568,555,605,622,649,692,689,740,701,758,696,757,685,743,645,695,601,624,567,560"/>
+<area shape="rect" id="Node000010" href="$class_track_manager.html" title="Manages race flow for a track with sequential checkpoints." alt="" coords="900,805,1066,1003"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="559,555,574,591,593,628,618,662,649,691,680,709,710,716,738,717,766,715,795,713,825,714,856,721,889,739,920,769,945,806,940,805,916,772,885,743,854,726,824,719,795,718,767,720,738,723,709,722,678,714,645,695,614,666,589,630,570,593,558,560"/>
 </map>

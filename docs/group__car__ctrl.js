@@ -1,32 +1,57 @@
 var group__car__ctrl =
 [
-    [ "Deprecated Wheel Controller", "group__car__ctrl__deprecated.html", "group__car__ctrl__deprecated" ],
     [ "CollisionDetection", "class_collision_detection.html", [
       [ "baseVolume", "class_collision_detection.html#ab7631c78f59c3446d822d5c536f21c49", null ],
       [ "volumeCurve", "class_collision_detection.html#a48614daff46d7d0e6ffd32dde40e1b13", null ]
     ] ],
     [ "DriveTrainController", "class_drive_train_controller.html", [
-      [ "ApplyWheelControls", "class_drive_train_controller.html#a80478870bd62af77add29c21f1c7364a", null ],
-      [ "Init", "class_drive_train_controller.html#a3ed88834109510399474d595fe18e555", null ],
+      [ "ApplyReplayWheelVisuals", "class_drive_train_controller.html#a2ea4cff80d1e847ba628969c5e5ff261", null ],
+      [ "ApplyWheelControls", "class_drive_train_controller.html#a24ff4aab894997807f1b0bda51af4ac6", null ],
+      [ "GetMaxReverseSpeed", "class_drive_train_controller.html#adb4e343bd916621727e758ba8e67f72a", null ],
+      [ "GetMaxSpeed", "class_drive_train_controller.html#ae4003ad5cb4ca14a6613248a2de2644f", null ],
+      [ "GetMaxSteeringAngle", "class_drive_train_controller.html#a0f5b640886e3b5efa7c6d2279558f7e7", null ],
+      [ "GetMaxSteeringAngleAtTopSpeed", "class_drive_train_controller.html#a01490a0db798a41a9bb2617f54ef89ac", null ],
+      [ "GetSpeed", "class_drive_train_controller.html#adc32771de23b487a8cc1aedebd9986e5", null ],
+      [ "GetSteeringAngle", "class_drive_train_controller.html#a9c62dac6527a57b07aaa68f88367bb2c", null ],
+      [ "Init", "class_drive_train_controller.html#a794aaa7adbe046c3675c85573e3fa49b", null ],
       [ "SetUp", "class_drive_train_controller.html#a5d221b06dacf1dfd9ea9257e49be8033", null ],
       [ "absEnabled", "class_drive_train_controller.html#ad1e4ae4643476202d93ef08dc44e187e", null ],
       [ "absSlipLimit", "class_drive_train_controller.html#a40f7919bf9259f99435001aca7186785", null ],
       [ "ackermannFactor", "class_drive_train_controller.html#a91c0e98fbf9d1a06e8c0d9bd4a884152", null ],
       [ "antiRollStiffnessFront", "class_drive_train_controller.html#a674cea6762c9dd56f04790733f7e7096", null ],
       [ "antiRollStiffnessRear", "class_drive_train_controller.html#a9742ec95f1733d15020493ca28addae9", null ],
+      [ "antiRollToggle", "class_drive_train_controller.html#aec1c114c9e9707c07b0e15eeec131cd3", null ],
       [ "coMPosition", "class_drive_train_controller.html#a72d9ddcf3d8d256fb126a73bee6680ca", null ],
-      [ "frontForwardFriction", "class_drive_train_controller.html#a8105ea606211a0ea042c6d011444ace5", null ],
-      [ "frontSidewaysFriction", "class_drive_train_controller.html#a98ea6019dcaa877e376408d42d67e4d6", null ],
+      [ "forwardGripLockedMultiplier", "class_drive_train_controller.html#ac76d40d6563dd6357231569e1892165c", null ],
+      [ "frontForwardFriction", "class_drive_train_controller.html#a6e7d688499ed4d3cffd3710c562061da", null ],
+      [ "frontSidewaysFriction", "class_drive_train_controller.html#a44b6d61b97f12163fca6842ab9528bda", null ],
+      [ "gripCircleEnabled", "class_drive_train_controller.html#a6d65760a158ec2e0b5750a42197b412b", null ],
+      [ "gripCircleFullSlip", "class_drive_train_controller.html#aacf417e8155cafdf6f574e7416921d7e", null ],
+      [ "gripCircleStartSlip", "class_drive_train_controller.html#a0d8fb6dbae2b6aed09caa26f47b1b738", null ],
       [ "handbrakeTorque", "class_drive_train_controller.html#ab443fc7cf7aea8a6741d51a0b1813803", null ],
       [ "inputExponent", "class_drive_train_controller.html#af129e226e1c63d22cc98867cb772500e", null ],
+      [ "limitedSlipBrakeTorque", "class_drive_train_controller.html#a09d4473b3a1c041e998dfee32303d62d", null ],
+      [ "limitedSlipEnabled", "class_drive_train_controller.html#acbbde71c6c3c8e490fc717adfe164358", null ],
+      [ "limitedSlipFullRpmDifference", "class_drive_train_controller.html#a3341e000b5f10db4d36316d080fb7ce2", null ],
+      [ "limitedSlipGripWheelBoost", "class_drive_train_controller.html#aa027964ff5af031780e70b2429ce1a00", null ],
+      [ "limitedSlipMaxTorqueCut", "class_drive_train_controller.html#a7bc91efc0572e07c6c4bbbad64da6393", null ],
+      [ "limitedSlipStartRpmDifference", "class_drive_train_controller.html#a2e0513e87b8b0df71ae4dd7e77ccfbad", null ],
+      [ "lockBrakeTorqueThreshold", "class_drive_train_controller.html#a2316af7cbfe70028ec0bad8188f21619", null ],
+      [ "lockForwardSlipThreshold", "class_drive_train_controller.html#a4761eb202bff648afd4506ae68641a24", null ],
       [ "maxBrakeTorque", "class_drive_train_controller.html#a12277b3a7fb8625281f1d7df7f53dbf1", null ],
       [ "maxMotorPower", "class_drive_train_controller.html#abd08d8b8b05fb4be90ee21378289cb60", null ],
       [ "maxReverseSpeed", "class_drive_train_controller.html#aa4b9ace94e2965c92bf2fe8a314b64f3", null ],
       [ "maxSpeed", "class_drive_train_controller.html#a3f73af3cff3e322bf39b30563f5a449a", null ],
       [ "maxSteerAngle", "class_drive_train_controller.html#acc97774c601c4e582452f60dad1db316", null ],
       [ "maxSteerAngleAtTopSpeed", "class_drive_train_controller.html#a314b470e4c67b75fbe6b988c27637ad6", null ],
-      [ "rearForwardFriction", "class_drive_train_controller.html#a1cca943616938aae385a81c21d0da30e", null ],
-      [ "rearSidewaysFriction", "class_drive_train_controller.html#a1c1d05c5116fcd7dfe9c43f3c1d89c0d", null ],
+      [ "minForwardGripCircleMultiplier", "class_drive_train_controller.html#a442eeb2a42f81e1964cb9dc119a3114c", null ],
+      [ "minSidewaysGripCircleMultiplier", "class_drive_train_controller.html#ab98e9e8b2d1d461deb0708c5777746c5", null ],
+      [ "rearForwardFriction", "class_drive_train_controller.html#a6e9cfb2a4e765dafd4cee62828a9bcfc", null ],
+      [ "rearForwardGripHandbrakeMultiplier", "class_drive_train_controller.html#a4d45f6db4624d053269a69190ce3ab98", null ],
+      [ "rearSidewaysFriction", "class_drive_train_controller.html#a884cdb523443cfdd9e8b940ab7a1c84d", null ],
+      [ "rearSidewaysGripHandbrakeMultiplier", "class_drive_train_controller.html#a0de455a45380cf10862ddfc6f6efced8", null ],
+      [ "redlineFadeStart", "class_drive_train_controller.html#a1eadf1fb28aeeec2dadc0bfa3d5bc362", null ],
+      [ "sidewaysGripLockedMultiplier", "class_drive_train_controller.html#a186c3e20811e04b55ae2cdc27b9b5893", null ],
       [ "steerSpeedDegPerSec", "class_drive_train_controller.html#a60b35ead21dc5d01af87a60a164bd1ab", null ],
       [ "tractionControlEnabled", "class_drive_train_controller.html#a2f73f6068efd5be8b3d145f5a3092f33", null ],
       [ "tractionSlipLimit", "class_drive_train_controller.html#a631f99ba797f658b4be45be6eb849ea9", null ],
@@ -65,12 +90,16 @@ var group__car__ctrl =
       [ "throttleShape", "class_engine_sound.html#a62c083ad5b3e3d04541b40adfd7a90d2", null ]
     ] ],
     [ "FollowCamera", "class_follow_camera.html", [
+      [ "SetTarget", "class_follow_camera.html#afd0af7875b84bc26ace30fc994c1ff1b", null ],
       [ "SyncCamera", "class_follow_camera.html#a89ca9b6a3a3b77ee4b29c4221e7b4c25", null ],
       [ "fixedPitchAngle", "class_follow_camera.html#ac34fab62a02f619c693ed73e3adc91bb", null ],
-      [ "followSpeed", "class_follow_camera.html#a715c8c739047883b18fe3925be98dce0", null ],
+      [ "lookAheadDistance", "class_follow_camera.html#acf1759e173366a3f79d1f4e873bfd7fc", null ],
+      [ "minVelocityForDirection", "class_follow_camera.html#a1f3da35a5e2f77241b32d69444ad10a0", null ],
       [ "offset", "class_follow_camera.html#aca4e3d9abbde16a748984a13eaae047c", null ],
+      [ "positionSmoothTime", "class_follow_camera.html#a73970db875db84418d7e125afcdb5de2", null ],
+      [ "rotationSmoothTime", "class_follow_camera.html#a00f6582017f3eb5b2848eb68ddbea8ce", null ],
       [ "target", "class_follow_camera.html#a1f40de2fcb3cf671ae4f4234e7b75376", null ],
-      [ "yawSmoothness", "class_follow_camera.html#ab9920532e0fa92ebfb5f2ff61080c558", null ]
+      [ "targetRb", "class_follow_camera.html#a8deb674b880f3bbf2e2f6f193566f4c5", null ]
     ] ],
     [ "LightsController", "class_lights_controller.html", [
       [ "SetBrakeLights", "class_lights_controller.html#a6696343e0479e2fae6c143f25356586f", null ],
@@ -99,6 +128,7 @@ var group__car__ctrl =
       [ "startLightsOn", "class_lights_controller.html#a77e91f7de768c5744d98d32e4a4d22ed", null ]
     ] ],
     [ "TransmissionController", "class_transmission_controller.html", [
+      [ "GetNormalizedRPM", "class_transmission_controller.html#aee222daf955a09e3b3cee6ef1dfcc8d9", null ],
       [ "HandleShifting", "class_transmission_controller.html#abda2347948d263cb836db7f4b475d795", null ],
       [ "finalDrive", "class_transmission_controller.html#a99cc70e20b905d2627e24a4350374df5", null ],
       [ "forwardGears", "class_transmission_controller.html#ae7c7b44734702999ce847defadf3d483", null ],
@@ -113,5 +143,28 @@ var group__car__ctrl =
       [ "EngineRPM", "class_transmission_controller.html#a70cb683d21dcd4846c164fce4492dc67", null ]
     ] ],
     [ "TyreEffects", "class_tyre_effects.html", null ],
-    [ "VehicleController", "class_vehicle_controller.html", null ]
+    [ "VehicleController", "class_vehicle_controller.html", [
+      [ "gripCircleEnabled", "class_vehicle_controller.html#aeec7b87c7f6ab9270d635b457632560e", null ],
+      [ "gripCircleFullSlip", "class_vehicle_controller.html#a5f023fc3f48adfa50ce360cdcba18eec", null ],
+      [ "gripCircleStartSlip", "class_vehicle_controller.html#a5a6cdd4545990cce8c25fe9eff3d1ec9", null ],
+      [ "minForwardGripCircleMultiplier", "class_vehicle_controller.html#a991d7b7457257813ac3fe1f8060dd784", null ],
+      [ "minSidewaysGripCircleMultiplier", "class_vehicle_controller.html#acd02b9cf92c14a85657529a2dfa0a5cc", null ]
+    ] ],
+    [ "WheelFrictionSettings", "struct_wheel_friction_settings.html", [
+      [ "asymptoteSlip", "struct_wheel_friction_settings.html#af1c131ffe14a4710fe1f86efac1405fc", null ],
+      [ "asymptoteValue", "struct_wheel_friction_settings.html#a766c65bb2299746585b07fa333331982", null ],
+      [ "extremumSlip", "struct_wheel_friction_settings.html#a40a7b1556edd2c39a3cac49bdbc712eb", null ],
+      [ "extremumValue", "struct_wheel_friction_settings.html#a77a150b410465000f298b997afe4930e", null ],
+      [ "stiffness", "struct_wheel_friction_settings.html#a7880c85a148e984bf526bc5d7dd08680", null ]
+    ] ],
+    [ "WheelSpec", "struct_wheel_spec.html", [
+      [ "Equals", "struct_wheel_spec.html#a28505e9b629ab9a13a0385fab7d6dae4", null ],
+      [ "GetHashCode", "struct_wheel_spec.html#a7dbb03de62f35b1da53884fe8d5eff5f", null ],
+      [ "operator!=", "struct_wheel_spec.html#ae7e062c46f4990f82d1fea936f4ce827", null ],
+      [ "operator==", "struct_wheel_spec.html#a5a5eb5a765f6fcd0994b0c0c14186463", null ],
+      [ "collider", "struct_wheel_spec.html#ad1b546943a5abdb9ffff5b4eab98dc97", null ],
+      [ "powered", "struct_wheel_spec.html#ab42c7bb8b7bfd8833e89d4a0f7d411ca", null ],
+      [ "steering", "struct_wheel_spec.html#aab28570c1be4cf6c12cb6b7bac682f58", null ],
+      [ "visual", "struct_wheel_spec.html#a927fe831e5506c4211c8f4606cefced4", null ]
+    ] ]
 ];

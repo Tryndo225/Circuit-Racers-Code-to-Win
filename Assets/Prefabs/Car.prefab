@@ -1918,7 +1918,7 @@ MonoBehaviour:
   lockForwardSlipThreshold: 0.8
   lockBrakeTorqueThreshold: 0.5
   gripCircleEnabled: 1
-  gripCircleStartSlip: 0.5
+  gripCircleStartSlip: 0.4
   gripCircleFullSlip: 1.5
   minForwardGripCircleMultiplier: 0.7
   minSidewaysGripCircleMultiplier: 0.7
@@ -2124,11 +2124,11 @@ MonoBehaviour:
   rearSidewaysGripHandbrakeMultiplier: 0.5
   rearForwardGripHandbrakeMultiplier: 0.5
   forwardGripLockedMultiplier: 0.9
-  sidewaysGripLockedMultiplier: 0.5
+  sidewaysGripLockedMultiplier: 0.6
   lockForwardSlipThreshold: 0.8
   lockBrakeTorqueThreshold: 0.5
   gripCircleEnabled: 1
-  gripCircleStartSlip: 0.5
+  gripCircleStartSlip: 0.4
   gripCircleFullSlip: 1.5
   minForwardGripCircleMultiplier: 0.7
   minSidewaysGripCircleMultiplier: 0.7

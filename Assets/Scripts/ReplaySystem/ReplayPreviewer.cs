@@ -1,46 +1,132 @@
 using Generic;
 using UnityEngine;
 
+/// <summary>
+/// Plays back recorded race replays by moving a replay car through recorded snapshots.
+/// </summary>
+/// <remarks>
+/// @ingroup replay_system
+/// @brief Instantiates or reuses a replay vehicle, samples <see cref="ReplaySnapshot"/> data over time, and updates replay playback state.
+///
+/// This component is responsible for previewing a recorded <see cref="Replay"/>. It advances replay time,
+/// interpolates between recorded snapshots, applies the interpolated position/rotation to a replay vehicle,
+/// updates replay wheel visuals when possible, and displays checkpoint split information through
+/// <see cref="RaceOverlay"/>.
+///
+/// The previewer can either instantiate a configured replay car prefab or use its own transform when no prefab
+/// is assigned.
+/// </remarks>
 public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 {
 	#region Inspector
 
+	/// <summary>
+	/// Replay data currently loaded for playback.
+	/// </summary>
+	[Tooltip("Replay data currently loaded for playback.")]
 	[SerializeField] private Replay replay;
 
+	/// <summary>
+	/// Prefab instantiated as the visible replay car.
+	/// </summary>
+	[Tooltip("Prefab used as the visible replay car. If empty, this object's transform is used instead.")]
 	[SerializeField] private GameObject replayCarPrefab;
 
+	/// <summary>
+	/// Whether playback starts automatically after a replay is assigned.
+	/// </summary>
+	[Tooltip("If enabled, playback starts automatically when a replay is assigned.")]
 	[SerializeField] private bool playOnSetReplay = true;
 
+	/// <summary>
+	/// Whether playback loops after reaching the replay duration.
+	/// </summary>
+	[Tooltip("If enabled, the replay restarts from the beginning after reaching the end.")]
 	[SerializeField] private bool loopReplay = false;
 
+	/// <summary>
+	/// Whether the instantiated replay car is destroyed when the replay is cleared.
+	/// </summary>
+	[Tooltip("If enabled, the instantiated replay car is destroyed when the replay is cleared.")]
 	[SerializeField] private bool destroyCarWhenCleared = true;
 
+	/// <summary>
+	/// Whether most MonoBehaviour scripts on the instantiated replay car should be disabled for playback.
+	/// </summary>
+	[Tooltip("If enabled, scripts on the replay car are disabled so recorded playback controls the car.")]
 	[SerializeField] private bool disableScriptsOnReplayCar = true;
 
+	/// <summary>
+	/// Playback speed multiplier applied to replay time.
+	/// </summary>
+	[Tooltip("Replay playback speed multiplier.")]
 	[SerializeField] private float playbackSpeed = 1f;
 
 	#endregion
 
 	#region State
 
+	/// <summary>
+	/// Instantiated replay car GameObject, if a prefab is used.
+	/// </summary>
 	private GameObject replayCarInstance_;
+
+	/// <summary>
+	/// Transform moved during replay playback.
+	/// </summary>
 	private Transform replayCarTransform_;
 
+	/// <summary>
+	/// Current replay playback time in seconds.
+	/// </summary>
 	private float replayTime_;
+
+	/// <summary>
+	/// Whether replay playback is currently advancing.
+	/// </summary>
 	private bool isPlaying_;
 
+	/// <summary>
+	/// Cached index of the current replay snapshot used for interpolation.
+	/// </summary>
 	private int currentSnapshotIndex_;
+
+	/// <summary>
+	/// Index of the next checkpoint snapshot that should trigger a split display.
+	/// </summary>
 	private int nextCheckpointSnapshotIndex_;
 
+	/// <summary>
+	/// Current interpolated vehicle speed from replay data.
+	/// </summary>
 	private float currentVehicleSpeed_;
+
+	/// <summary>
+	/// Current interpolated steering angle from replay data.
+	/// </summary>
 	private float currentSteeringAngle_;
 
+	/// <summary>
+	/// Drive train controller on the replay car, used to update wheel visuals during playback.
+	/// </summary>
 	private DriveTrainController replayDriveTrainController_;
 
+	/// <summary>
+	/// Gets whether a replay with at least one snapshot is currently loaded.
+	/// </summary>
 	public bool HasReplay => replay != null && replay.Snapshots != null && replay.Snapshots.Count > 0;
 
+	/// <summary>
+	/// Gets the current replay playback time in seconds.
+	/// </summary>
 	public float CurrentReplayTime => replayTime_;
 
+	/// <summary>
+	/// Gets the duration of the loaded replay.
+	/// </summary>
+	/// <remarks>
+	/// Returns zero when no replay is loaded.
+	/// </remarks>
 	public float ReplayDuration
 	{
 		get
@@ -54,14 +140,23 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		}
 	}
 
+	/// <summary>
+	/// Gets whether replay playback is currently active.
+	/// </summary>
 	public bool IsPlaying => isPlaying_;
 
+	/// <summary>
+	/// Gets whether a non-looping replay has reached its end.
+	/// </summary>
 	public bool IsReplayFinished => HasReplay && !loopReplay && replayTime_ >= ReplayDuration;
 
 	#endregion
 
 	#region Unity Methods
 
+	/// <summary>
+	/// Advances replay playback and applies the current replay pose once per frame.
+	/// </summary>
 	private void Update()
 	{
 		if (!isPlaying_ || !HasReplay || replayCarTransform_ == null)
@@ -78,6 +173,13 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 
 	#region Public API
 
+	/// <summary>
+	/// Assigns replay data, resets playback state, creates the replay car, and optionally starts playback.
+	/// </summary>
+	/// <param name="newReplay">Replay data to preview. If null, the current replay is cleared.</param>
+	/// <remarks>
+	/// The replay is copied before being stored so later changes to the original replay object do not affect playback.
+	/// </remarks>
 	public void SetReplay(Replay newReplay)
 	{
 		replay = newReplay != null ? newReplay.Copy() : null;
@@ -105,12 +207,20 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		}
 	}
 
+	/// <summary>
+	/// Assigns replay data and overrides the replay car prefab used for playback.
+	/// </summary>
+	/// <param name="newReplay">Replay data to preview.</param>
+	/// <param name="carPrefab">Replay car prefab to instantiate for this replay.</param>
 	public void SetReplay(Replay newReplay, GameObject carPrefab)
 	{
 		replayCarPrefab = carPrefab;
 		SetReplay(newReplay);
 	}
 
+	/// <summary>
+	/// Starts or resumes replay playback.
+	/// </summary>
 	public void Play()
 	{
 		if (!HasReplay || replayCarTransform_ == null)
@@ -121,11 +231,17 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		isPlaying_ = true;
 	}
 
+	/// <summary>
+	/// Pauses replay playback without resetting replay time.
+	/// </summary>
 	public void Pause()
 	{
 		isPlaying_ = false;
 	}
 
+	/// <summary>
+	/// Stops replay playback and returns to the beginning of the replay.
+	/// </summary>
 	public void Stop()
 	{
 		isPlaying_ = false;
@@ -137,6 +253,9 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		}
 	}
 
+	/// <summary>
+	/// Clears the loaded replay and optionally destroys the replay car.
+	/// </summary>
 	public void ClearReplay()
 	{
 		replay = null;
@@ -149,11 +268,19 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		}
 	}
 
+	/// <summary>
+	/// Gets the current replay speed converted to kilometers per hour.
+	/// </summary>
+	/// <returns>Current replay vehicle speed multiplied by 3.6.</returns>
 	public float GetCurrentSpeed()
 	{
 		return currentVehicleSpeed_ * 3.6f;
 	}
 
+	/// <summary>
+	/// Gets the current interpolated steering angle from replay playback.
+	/// </summary>
+	/// <returns>Current replay steering angle.</returns>
 	public float GetCurrentSteeringAngle()
 	{
 		return currentSteeringAngle_;
@@ -163,6 +290,12 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 
 	#region Replay Timer
 
+	/// <summary>
+	/// Advances replay time according to <see cref="playbackSpeed"/> and handles looping/end-of-replay behavior.
+	/// </summary>
+	/// <remarks>
+	/// Also processes checkpoint split snapshots crossed between the previous and current replay time.
+	/// </remarks>
 	private void UpdateReplayTimer()
 	{
 		float duration = ReplayDuration;
@@ -206,6 +339,13 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 
 	#region Replay Car
 
+	/// <summary>
+	/// Creates the replay car and positions it at the first recorded snapshot.
+	/// </summary>
+	/// <remarks>
+	/// If <see cref="replayCarPrefab"/> is assigned, it is instantiated as a child of this object.
+	/// Otherwise, this component's own transform is used as the replay transform.
+	/// </remarks>
 	private void CreateReplayCar()
 	{
 		ClearReplayCar();
@@ -232,11 +372,19 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 			replayCarTransform_.SetPositionAndRotation(first.TrackPosition, first.TrackRotation);
 		}
 
-		FindFirstObjectByType<FloatCamera>().SetTarget(replayCarTransform_);
+		FloatCamera floatCamera = FindFirstObjectByType<FloatCamera>();
+
+		if (floatCamera != null)
+		{
+			floatCamera.SetTarget(replayCarTransform_);
+		}
 
 		Debug.Log("Replay Car Created");
 	}
 
+	/// <summary>
+	/// Destroys the instantiated replay car and clears cached replay car references.
+	/// </summary>
 	private void ClearReplayCar()
 	{
 		if (replayCarInstance_ != null)
@@ -249,6 +397,14 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		replayDriveTrainController_ = null;
 	}
 
+	/// <summary>
+	/// Prepares the instantiated replay car so it is controlled by replay data instead of physics or gameplay scripts.
+	/// </summary>
+	/// <remarks>
+	/// Rigidbody components are made kinematic and collision detection is disabled. When
+	/// <see cref="disableScriptsOnReplayCar"/> is enabled, MonoBehaviours on the replay car are disabled except
+	/// for the cached <see cref="DriveTrainController"/>, which may still be used for wheel visuals.
+	/// </remarks>
 	private void PrepareReplayCar()
 	{
 		if (replayCarInstance_ == null)
@@ -291,6 +447,9 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 
 	#region Replay Sampling
 
+	/// <summary>
+	/// Resets replay playback time and cached snapshot indices.
+	/// </summary>
 	private void ResetReplayState()
 	{
 		replayTime_ = 0f;
@@ -298,6 +457,10 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		nextCheckpointSnapshotIndex_ = FindNextCheckpointSnapshotIndex(0f);
 	}
 
+	/// <summary>
+	/// Applies the interpolated replay pose and replay visual state for a specific replay time.
+	/// </summary>
+	/// <param name="trackTime">Replay time, in seconds, to sample.</param>
 	private void ApplyReplayAtTime(float trackTime)
 	{
 		if (!TryGetReplayPose(trackTime, out Vector3 position, out Quaternion rotation, out float vehicleSpeed, out float steeringAngle))
@@ -316,6 +479,15 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		}
 	}
 
+	/// <summary>
+	/// Samples replay data at a specific time by selecting or interpolating between snapshots.
+	/// </summary>
+	/// <param name="trackTime">Replay time, in seconds, to sample.</param>
+	/// <param name="position">Interpolated replay position.</param>
+	/// <param name="rotation">Interpolated replay rotation.</param>
+	/// <param name="vehicleSpeed">Interpolated replay vehicle speed.</param>
+	/// <param name="steeringAngle">Interpolated replay steering angle.</param>
+	/// <returns><c>true</c> if replay pose data was available; otherwise <c>false</c>.</returns>
 	private bool TryGetReplayPose(float trackTime, out Vector3 position, out Quaternion rotation, out float vehicleSpeed, out float steeringAngle)
 	{
 		position = replayCarTransform_ != null ? replayCarTransform_.position : transform.position;
@@ -396,6 +568,11 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 
 	#region Checkpoint Splits
 
+	/// <summary>
+	/// Finds the next checkpoint snapshot after the given replay time.
+	/// </summary>
+	/// <param name="currentTime">Replay time, in seconds, after which the next checkpoint should be found.</param>
+	/// <returns>Index of the next checkpoint snapshot, or <c>-1</c> if none exists.</returns>
 	private int FindNextCheckpointSnapshotIndex(float currentTime)
 	{
 		if (!HasReplay)
@@ -419,6 +596,11 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		return -1;
 	}
 
+	/// <summary>
+	/// Displays checkpoint split popups for checkpoint snapshots crossed between two replay times.
+	/// </summary>
+	/// <param name="previousTime">Previous replay time before the latest timer update.</param>
+	/// <param name="currentTime">Current replay time after the latest timer update.</param>
 	private void ProcessCheckpointSplits(float previousTime, float currentTime)
 	{
 		if (!HasReplay || nextCheckpointSnapshotIndex_ < 0)
@@ -442,14 +624,18 @@ public class ReplayPreviewer : SceneSingleton<ReplayPreviewer>
 		}
 	}
 
+	/// <summary>
+	/// Displays a checkpoint split for a replay checkpoint snapshot.
+	/// </summary>
+	/// <param name="checkpointSnapshot">Checkpoint snapshot whose time should be displayed.</param>
 	private void DisplayCheckpointSplit(ReplaySnapshot checkpointSnapshot)
 	{
-		if (RaceOverLay.Instance == null)
+		if (RaceOverlay.Instance == null)
 		{
 			return;
 		}
 
-		RaceOverLay.Instance.DisplaySplit(checkpointSnapshot.TrackTime, 0f);
+		RaceOverlay.Instance.DisplaySplit(checkpointSnapshot.TrackTime, 0f);
 	}
 
 	#endregion

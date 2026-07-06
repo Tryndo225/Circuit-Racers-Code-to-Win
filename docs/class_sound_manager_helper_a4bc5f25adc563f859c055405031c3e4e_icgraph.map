@@ -1,0 +1,15 @@
+<map id="SoundManagerHelper.PlaySound" name="SoundManagerHelper.PlaySound">
+<area shape="rect" id="Node000001" title="Starts playback using the currently assigned clip and playback parameters." alt="" coords="502,107,715,133"/>
+<area shape="rect" id="Node000002" href="$class_sound_manager.html#acee4fcd517a94525dbf79b559fda0313" title="Plays a sound effect through the pooled helper system." alt="" coords="267,107,454,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="484,120,455,123,454,117,489,120"/>
+<area shape="rect" id="Node000003" href="$class_sound_manager.html#a8c8138d9537ee3b5a330be3549b2232b" title="Keeps a looping SFX clip playing for the configured continuation window." alt="" coords="5,5,219,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="322,98,274,73,218,46,183,35,182,30,220,42,277,68,327,98"/>
+<area shape="rect" id="Node000004" href="$class_sound_manager.html#ac8c641628ef7d5abe4d35381b7b7e9a7" title="Keeps a looping SFX clip playing for the configured continuation window with a custom volume." alt="" coords="5,56,219,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="274,104,181,86,181,81,279,102"/>
+<area shape="rect" id="Node000005" href="$class_sound_manager.html#a99e5ec8ffcb294ad7843f4b514112226" title="Plays a non&#45;looping sound effect at the manager position with default volume and pitch." alt="" coords="18,107,206,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="249,121,206,123,205,117,254,119"/>
+<area shape="rect" id="Node000006" href="$class_sound_manager.html#ae2088602ad947dc9d8f37013d42b1422" title="Plays a non&#45;looping sound effect at the manager position with a custom volume." alt="" coords="18,157,206,184"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="274,138,182,159,180,154,279,136"/>
+<area shape="rect" id="Node000007" href="$class_sound_manager.html#ac13c990f2baffcdeb9a0d187f023c6c1" title="Plays a non&#45;looping sound effect at the given target with default volume and pitch." alt="" coords="18,208,206,235"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="327,141,277,172,220,198,183,210,182,205,218,194,274,167,322,143"/>
+</map>

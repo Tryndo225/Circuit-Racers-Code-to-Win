@@ -1,0 +1,5 @@
+<map id="GoPlayButton" name="GoPlayButton">
+<area shape="rect" id="Node000001" title="Button strategy that starts gameplay by selecting either the day or night scene for the current level..." alt="" coords="5,123,97,192"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract base class for serialized UI button actions." alt="" coords="13,5,90,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="52,87,54,123,49,122,50,92"/>
+</map>

@@ -1,5 +1,5 @@
 <map id="LevelPreviewer" name="LevelPreviewer">
-<area shape="rect" id="Node000001" title="Renders a tiny top&#45;down preview image of a LevelMap into a UI RawImage: grass background,..." alt="" coords="5,123,154,213"/>
+<area shape="rect" id="Node000001" title="Renders a small top&#45;down preview image of a LevelMap into a UI RawImage." alt="" coords="5,123,154,213"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="30,5,130,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,89,82,123,77,123,77,89"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,87,82,124,77,123,79,92"/>
 </map>

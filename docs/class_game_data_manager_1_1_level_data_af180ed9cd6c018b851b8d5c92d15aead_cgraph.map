@@ -1,5 +1,5 @@
 <map id="GameDataManager.LevelData.Equals" name="GameDataManager.LevelData.Equals">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,207,48"/>
-<area shape="rect" id="Node000002" href="$class_game_data_manager_1_1_level_data.html#a3e100065efa7fc76a0d47d489a91b9d4" title="Creates a record with an unknown best time." alt="" coords="255,5,456,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,24,239,24,239,29,207,29"/>
+<area shape="rect" id="Node000001" title="Checks whether this level&#45;data record equals another object." alt="" coords="5,5,207,48"/>
+<area shape="rect" id="Node000002" href="$class_game_data_manager_1_1_level_data.html#a08fbd5daba156a8e83ae9deece00d5a5" title="Parameterless constructor for Unity serialization." alt="" coords="255,5,456,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,24,242,27,237,27,207,29"/>
 </map>

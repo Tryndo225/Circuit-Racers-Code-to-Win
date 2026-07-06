@@ -1,5 +1,5 @@
 <map id="ReadOnlyDrawer" name="ReadOnlyDrawer">
-<area shape="rect" id="Node000001" title="Inspector drawer that renders any field marked with ReadOnlyAttribute as disabled (grayed out) so it ..." alt="" coords="5,123,145,213"/>
+<area shape="rect" id="Node000001" title="Inspector drawer that renders fields marked with ReadOnlyAttribute as disabled." alt="" coords="5,123,145,213"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="24,5,126,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,89,78,123,73,123,73,89"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,87,78,124,73,123,74,92"/>
 </map>

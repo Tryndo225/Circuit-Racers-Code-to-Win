@@ -1,0 +1,7 @@
+<map id="ClosePopUpButton" name="ClosePopUpButton">
+<area shape="rect" id="Node000001" title="Button strategy that closes a configured popup GameObject." alt="" coords="5,123,149,213"/>
+<area shape="rect" id="Node000003" href="$class_import_level_button.html" title="Button strategy that imports a level from text entered into a TMP input field." alt="" coords="8,261,146,352"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="78,226,80,262,75,261,76,231"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract base class for serialized UI button actions." alt="" coords="39,5,116,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,87,80,123,75,123,77,92"/>
+</map>

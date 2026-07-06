@@ -1,0 +1,8 @@
+<map id="Game Data" name="Game Data">
+<area shape="rect" id="Node000001" title="Persistent progression data, selected level state, best times, checkpoint splits, replays,..." alt="" coords="128,209,216,236"/>
+<area shape="rect" id="Node000005" href="$group__level__gen.html" title="Procedural creation, representation, validation, and placement support for grid&#45;based race tracks." alt="" coords="426,18,546,45"/>
+<area shape="rect" id="Node000004" href="$group__scene__mgmt.html" title="Centralized scene loading with editor&#45;friendly scene references and scene&#45;to&#45;music pairing." alt="" coords="417,97,555,124"/>
+<area shape="rect" id="Node000003" href="$group__ui.html" title="Runtime UI widgets, menus, overlays, popups, settings, notifications, previews, and button actions." alt="" coords="434,320,538,346"/>
+<area shape="rect" id="Node000006" href="$group__ui__levels.html" title="Saved&#45;level browser, level&#45;entry cards, and level&#45;list layout UI." alt="" coords="451,370,521,397"/>
+<area shape="rect" id="Node000002" href="$group__systems.html" title="Runtime subsystems used by the racing game." alt="" coords="5,209,79,236"/>
+</map>

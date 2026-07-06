@@ -1,5 +1,5 @@
 <map id="SeedFactory.Next" name="SeedFactory.Next">
-<area shape="rect" id="Node000001" title="Returns the next integer seed, atomically advanced by a large odd constant." alt="" coords="238,5,364,32"/>
-<area shape="rect" id="Node000002" href="$class_generate_level_button.html#a1748a95d62b017914a650960b8edd7b2" title="Execute: generate a level, add checkpoints, and show the preview popup." alt="" coords="5,5,190,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,21,190,21,190,16,222,16"/>
+<area shape="rect" id="Node000001" title="Returns the next integer seed and advances the internal seed state atomically." alt="" coords="238,5,364,32"/>
+<area shape="rect" id="Node000002" href="$class_generate_level_button.html#a1748a95d62b017914a650960b8edd7b2" title="Generates a level, generates its checkpoints, and opens the preview popup." alt="" coords="5,5,190,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,19,190,21,190,16,224,19"/>
 </map>

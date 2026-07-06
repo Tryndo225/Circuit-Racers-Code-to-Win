@@ -1,5 +1,5 @@
 <map id="SceneAssetHelper.Equals" name="SceneAssetHelper.Equals">
-<area shape="rect" id="Node000001" title="Object equality override." alt="" coords="5,13,180,40"/>
-<area shape="rect" id="Node000002" href="$class_scene_asset_helper.html#a4a748304f4f992996ed2870a0e0ef874" title="Default constructor." alt="" coords="228,5,433,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,24,212,24,212,29,180,29"/>
+<area shape="rect" id="Node000001" title="Checks whether this scene helper equals another object." alt="" coords="5,13,180,40"/>
+<area shape="rect" id="Node000002" href="$class_scene_asset_helper.html#a4a748304f4f992996ed2870a0e0ef874" title="Creates an empty scene reference." alt="" coords="228,5,433,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,24,215,26,209,27,180,29"/>
 </map>

@@ -1,0 +1,5 @@
+<map id="ImportExportManager.TryImportLevelFromClipboard" name="ImportExportManager.TryImportLevelFromClipboard">
+<area shape="rect" id="Node000001" title="Attempts to decode a level map from the system clipboard." alt="" coords="228,5,434,48"/>
+<area shape="rect" id="Node000002" href="$class_import_level_from_clipboard_button.html#a38ee37684ccfbe2ac32c86a8f58d51f2" title=" " alt="" coords="5,5,180,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,27,180,29,180,24,215,26"/>
+</map>

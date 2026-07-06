@@ -1,5 +1,5 @@
 <map id="SceneAssetHelper.operator==" name="SceneAssetHelper.operator==">
-<area shape="rect" id="Node000001" title="Equality operator." alt="" coords="5,13,203,40"/>
-<area shape="rect" id="Node000002" href="$class_scene_asset_helper.html#a4a748304f4f992996ed2870a0e0ef874" title="Default constructor." alt="" coords="251,5,456,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,24,235,24,235,29,203,29"/>
+<area shape="rect" id="Node000001" title="Checks whether two scene helpers reference the same scene path." alt="" coords="5,13,203,40"/>
+<area shape="rect" id="Node000002" href="$class_scene_asset_helper.html#a4a748304f4f992996ed2870a0e0ef874" title="Creates an empty scene reference." alt="" coords="251,5,456,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,24,238,26,233,27,203,29"/>
 </map>

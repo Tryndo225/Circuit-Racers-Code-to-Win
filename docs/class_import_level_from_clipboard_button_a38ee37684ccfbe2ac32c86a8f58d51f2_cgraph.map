@@ -1,0 +1,7 @@
+<map id="ImportLevelFromClipboardButton.Action" name="ImportLevelFromClipboardButton.Action">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,180,48"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#af3dc16446e865c4f2d1b668750a9e20d" title="Attempts to decode a level map from the system clipboard." alt="" coords="228,5,434,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,24,215,26,209,27,180,29"/>
+<area shape="rect" id="Node000003" href="$class_import_export_manager.html#a0f56a9c1b0c5a0463aff81eef8346158" title="Attempts to decode a shareable level string into a LevelMap." alt="" coords="482,5,696,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="434,24,469,27,464,27,434,29"/>
+</map>

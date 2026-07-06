@@ -1,6 +1,6 @@
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Per-layer configuration for a UI parallax effect.
@@ -15,32 +15,36 @@ using System;
 [Serializable]
 public struct UIParallaxLayer
 {
-    /// <summary>
-    /// The RectTransform to move and optionally tilt.
-    /// </summary>
-    public RectTransform RTransform;
+	/// <summary>
+	/// The RectTransform to move and optionally tilt.
+	/// </summary>
+	[Tooltip("RectTransform moved and optionally tilted by this parallax layer.")]
+	public RectTransform RTransform;
 
-    /// <summary>
-    /// Normalized parallax influence per axis. (1,1) = full movement; (0,0) = frozen.
-    /// </summary>
-    public Vector2 Strength;
+	/// <summary>
+	/// Normalized parallax influence per axis. (1,1) = full movement; (0,0) = frozen.
+	/// </summary>
+	[Tooltip("Parallax influence per axis. Larger values move this layer more as the pointer moves.")]
+	public Vector2 Strength;
 
-    /// <summary>
-    /// Z-axis tilt (in degrees) applied based on normalized pointer X position.
-    /// </summary>
-    public float TiltZ;
+	/// <summary>
+	/// Z-axis tilt (in degrees) applied based on normalized pointer X position.
+	/// </summary>
+	[Tooltip("Z-axis tilt in degrees applied based on pointer X position.")]
+	public float TiltZ;
 
-    /// <summary>
-    /// If true, flips the sign of the Z-tilt response.
-    /// </summary>
-    public bool InvertedTilt;
+	/// <summary>
+	/// If true, flips the sign of the Z-tilt response.
+	/// </summary>
+	[Tooltip("If enabled, flips the Z-tilt direction.")]
+	public bool InvertedTilt;
 
-    /// <summary>
-    /// Convenience cast: treat a RectTransform as a layer with zero strength and no tilt.
-    /// </summary>
-    /// <param name="rt">Target RectTransform.</param>
-    /// <returns>A layer pointing at <paramref name="rt"/> with default settings.</returns>
-    public static implicit operator UIParallaxLayer(RectTransform rt) => new UIParallaxLayer { RTransform = rt, Strength = Vector2.zero, TiltZ = 0f, InvertedTilt = false };
+	/// <summary>
+	/// Convenience cast: treat a RectTransform as a layer with zero strength and no tilt.
+	/// </summary>
+	/// <param name="rt">Target RectTransform.</param>
+	/// <returns>A layer pointing at <paramref name="rt"/> with default settings.</returns>
+	public static implicit operator UIParallaxLayer(RectTransform rt) => new UIParallaxLayer { RTransform = rt, Strength = Vector2.zero, TiltZ = 0f, InvertedTilt = false };
 }
 
 /// <summary>
@@ -70,96 +74,100 @@ public struct UIParallaxLayer
 /// </remarks>
 public class UIParallax : MonoBehaviour
 {
-    [Header("Setup")]
-    /// <summary>
-    /// Reference canvas defining the parallax area and scale. Auto-resolved from parents on <see cref="Awake"/> if not set.
-    /// </summary>
-    [SerializeField] private Canvas canvas;
+	[Header("Setup")]
+	/// <summary>
+	/// Reference canvas defining the parallax area and scale. Auto-resolved from parents on <see cref="Awake"/> if not set.
+	/// </summary>
+	[Tooltip("Reference canvas defining the parallax area and scale. Auto-found from parents if left empty.")]
+	[SerializeField] private Canvas canvas;
 
-    /// <summary>
-    /// Ordered list of parallax layers to animate (near-to-far or vice versa as you prefer).
-    /// </summary>
-    [SerializeField] private List<UIParallaxLayer> layers = new();
+	/// <summary>
+	/// Ordered list of parallax layers to animate (near-to-far or vice versa as you prefer).
+	/// </summary>
+	[Tooltip("List of RectTransform layers animated by the parallax effect.")]
+	[SerializeField] private List<UIParallaxLayer> layers = new();
 
-    [Header("Motion")]
-    /// <summary>
-    /// Maximum pixel offset (at Strength = 1) applied at the canvas edges (normalized ±1),
-    /// before division by <see cref="Canvas.scaleFactor"/>.
-    /// </summary>
-    [SerializeField] private float maxOffset = 40f;
+	[Header("Motion")]
+	/// <summary>
+	/// Maximum pixel offset (at Strength = 1) applied at the canvas edges (normalized +/-1),
+	/// before division by <see cref="Canvas.scaleFactor"/>.
+	/// </summary>
+	[Tooltip("Maximum pixel offset applied at full pointer movement before canvas scale correction.")]
+	[SerializeField] private float maxOffset = 40f;
 
-    /// <summary>
-    /// Exponential smoothing factor (units: 1/seconds). Higher values converge faster.
-    /// </summary>
-    [SerializeField] private float damping = 8f;
+	/// <summary>
+	/// Exponential smoothing factor (units: 1/seconds). Higher values converge faster.
+	/// </summary>
+	[Tooltip("Smoothing speed for parallax movement. Higher values make layers follow the pointer faster.")]
+	[SerializeField] private float damping = 8f;
 
-    /// <summary>
-    /// Cached initial anchored positions per layer (set in <see cref="Awake"/>).
-    /// </summary>
-    private Vector2[] initialAnchored;
+	/// <summary>
+	/// Cached initial anchored positions per layer (set in <see cref="Awake"/>).
+	/// </summary>
+	private Vector2[] initialAnchored;
 
-    /// <summary>
-    /// Cached initial local rotations per layer (set in <see cref="Awake"/>).
-    /// </summary>
-    private Quaternion[] initialRot;
+	/// <summary>
+	/// Cached initial local rotations per layer (set in <see cref="Awake"/>).
+	/// </summary>
+	private Quaternion[] initialRot;
 
-    /// <summary>
-    /// Unity Awake: cache the reference canvas (if missing) and per-layer initial transforms.
-    /// </summary>
-    void Awake()
-    {
-        if (!canvas) canvas = GetComponentInParent<Canvas>();
-        int n = layers.Count;
-        initialAnchored = new Vector2[n];
-        initialRot = new Quaternion[n];
+	/// <summary>
+	/// Unity Awake: cache the reference canvas (if missing) and per-layer initial transforms.
+	/// </summary>
+	void Awake()
+	{
+		if (!canvas) canvas = GetComponentInParent<Canvas>();
+		int n = layers.Count;
+		initialAnchored = new Vector2[n];
+		initialRot = new Quaternion[n];
 
-        for (int i = 0; i < n; i++)
-        {
-            if (!layers[i].RTransform) continue;
-            initialAnchored[i] = layers[i].RTransform.anchoredPosition;
-            initialRot[i] = layers[i].RTransform.localRotation;
-        }
-    }
+		for (int i = 0; i < n; i++)
+		{
+			if (!layers[i].RTransform) continue;
+			initialAnchored[i] = layers[i].RTransform.anchoredPosition;
+			initialRot[i] = layers[i].RTransform.localRotation;
+		}
+	}
 
-    /// <summary>
-    /// Unity Update: compute normalized pointer position in canvas space and ease layers toward their targets.
-    /// </summary>
-    void Update()
-    {
-        if (!canvas || layers.Count == 0) return;
+	/// <summary>
+	/// Unity Update: compute normalized pointer position in canvas space and ease layers toward their targets.
+	/// </summary>
+	void Update()
+	{
+		if (!canvas || layers.Count == 0) return;
 
-        RectTransform canvasRect = canvas.transform as RectTransform;
-        Vector2 local;
-        Camera cam = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, Input.mousePosition, cam, out local);
+		RectTransform canvasRect = canvas.transform as RectTransform;
+		Vector2 local;
+		Camera cam = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+		RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, Input.mousePosition, cam, out local);
 
-        Vector2 half = canvasRect.rect.size * 0.5f;
-        float nx = Mathf.Clamp(half.x > 0 ? local.x / half.x : 0f, -1f, 1f);
-        float ny = Mathf.Clamp(half.y > 0 ? local.y / half.y : 0f, -1f, 1f);
+		Vector2 half = canvasRect.rect.size * 0.5f;
+		float nx = Mathf.Clamp(half.x > 0 ? local.x / half.x : 0f, -1f, 1f);
+		float ny = Mathf.Clamp(half.y > 0 ? local.y / half.y : 0f, -1f, 1f);
 
-        float scale = canvas.scaleFactor;
-        float px = (maxOffset / Mathf.Max(scale, 0.0001f));
+		float scale = canvas.scaleFactor;
+		float px = (maxOffset / Mathf.Max(scale, 0.0001f));
 
-        // Exponential smoothing toward the target each frame (unscaled time for UI responsiveness).
-        float t = 1f - Mathf.Exp(-damping * Time.unscaledDeltaTime);
+		// Exponential smoothing toward the target each frame (unscaled time for UI responsiveness).
+		float t = 1f - Mathf.Exp(-damping * Time.unscaledDeltaTime);
 
-        for (int i = 0; i < layers.Count; i++)
-        {
-            var layer = layers[i];
-            if (!layer.RTransform) continue;
+		for (int i = 0; i < layers.Count; i++)
+		{
+			var layer = layers[i];
+			if (!layer.RTransform) continue;
 
-            Vector2 target = initialAnchored[i] + new Vector2(
-                nx * layer.Strength.x * px,
-                ny * layer.Strength.y * px
-            );
+			Vector2 target = initialAnchored[i] + new Vector2(
+				nx * layer.Strength.x * px,
+				ny * layer.Strength.y * px
+			);
 
-            layer.RTransform.anchoredPosition = Vector2.Lerp(layer.RTransform.anchoredPosition, target, t);
+			layer.RTransform.anchoredPosition = Vector2.Lerp(layer.RTransform.anchoredPosition, target, t);
 
-            if (layer.TiltZ != 0f)
-            {
-                Quaternion targetRot = Quaternion.Euler(0f, 0f, nx * layer.TiltZ * (layer.InvertedTilt ? -1f : 1f)) * initialRot[i];
-                layer.RTransform.localRotation = Quaternion.Slerp(layer.RTransform.localRotation, targetRot, t);
-            }
-        }
-    }
+			if (layer.TiltZ != 0f)
+			{
+				Quaternion targetRot = Quaternion.Euler(0f, 0f, nx * layer.TiltZ * (layer.InvertedTilt ? -1f : 1f)) * initialRot[i];
+				layer.RTransform.localRotation = Quaternion.Slerp(layer.RTransform.localRotation, targetRot, t);
+			}
+		}
+	}
 }

@@ -1,0 +1,5 @@
+<map id="LevelMap.Copy" name="LevelMap.Copy">
+<area shape="rect" id="Node000001" title="Creates a copy of this level map." alt="" coords="271,5,383,32"/>
+<area shape="rect" id="Node000002" href="$class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9" title="Replaces a stored level with an edited version." alt="" coords="5,5,223,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,19,223,21,223,16,258,19"/>
+</map>

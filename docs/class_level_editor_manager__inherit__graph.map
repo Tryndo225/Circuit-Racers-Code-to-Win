@@ -1,0 +1,5 @@
+<map id="LevelEditorManager" name="LevelEditorManager">
+<area shape="rect" id="Node000001" title="Manages the level editor UI and applies user edits to an editable LevelMap copy." alt="" coords="5,123,178,448"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="42,5,142,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,87,94,123,89,122,91,93"/>
+</map>

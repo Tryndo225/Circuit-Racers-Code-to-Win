@@ -1,0 +1,5 @@
+<map id="Generic.Singleton&#45;1&#45;g.Persist" name="Generic.Singleton&#45;1&#45;g.Persist">
+<area shape="rect" id="Node000001" title="Applies persistence behavior to the active singleton instance." alt="" coords="189,5,324,48"/>
+<area shape="rect" id="Node000002" href="$class_generic_1_1_singleton-1-g.html#ab33c07a8f672bad5f18b586904d35dde" title="Enforces the singleton rule and applies persistence to the surviving instance." alt="" coords="5,5,141,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,27,141,29,141,24,176,26"/>
+</map>

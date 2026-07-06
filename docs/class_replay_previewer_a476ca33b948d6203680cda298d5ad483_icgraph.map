@@ -1,0 +1,5 @@
+<map id="ReplayPreviewer.SetReplay" name="ReplayPreviewer.SetReplay">
+<area shape="rect" id="Node000001" title="Assigns replay data, resets playback state, creates the replay car, and optionally starts playback." alt="" coords="239,5,424,32"/>
+<area shape="rect" id="Node000002" href="$class_replay_previewer.html#a10117ffa8308ea57891c14251d9af9ec" title="Assigns replay data and overrides the replay car prefab used for playback." alt="" coords="5,5,191,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,19,191,21,191,16,226,19"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="RaceOverlay.FormatTime" name="RaceOverlay.FormatTime">
+<area shape="rect" id="Node000001" title="Formats seconds into a compact race timer string." alt="" coords="224,5,394,32"/>
+<area shape="rect" id="Node000002" href="$class_race_overlay.html#ada9b30a050d4105f2b559748bc8fcca3" title="Displays a checkpoint split popup with the split time and difference from the reference split." alt="" coords="5,5,176,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,19,176,21,176,16,211,19"/>
+</map>

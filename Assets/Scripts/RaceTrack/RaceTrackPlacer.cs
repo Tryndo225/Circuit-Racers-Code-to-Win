@@ -6,30 +6,46 @@ using UnityEngine;
 #region Helper Structures / Classes
 
 /// <summary>
-/// Describes a single placeable track piece: which prefab to spawn and the world-space pose
-/// (position and rotation) to apply at placement time.
+/// Describes a single placeable track piece: prefab, world-space pose, and pattern size.
 /// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// @brief Stores the prefab and placement data used by <see cref="RaceTrackPlacer"/>.
+/// </remarks>
 [Serializable]
 public struct TrackPiece
 {
-	/// <summary>Prefab to instantiate for this track cell (may be <c>null</c> if no spawn).</summary>
+	/// <summary>
+	/// Prefab to instantiate for this track cell.
+	/// </summary>
+	[Tooltip("Prefab to instantiate for this track cell.")]
 	public GameObject Prefab;
 
-	/// <summary>World-space position to place the prefab at.</summary>
+	/// <summary>
+	/// World-space position used when placing the prefab.
+	/// </summary>
+	[Tooltip("World-space position used when placing the prefab.")]
 	public Vector3 Position;
 
-	/// <summary>World-space rotation to apply to the prefab.</summary>
+	/// <summary>
+	/// World-space rotation used when placing the prefab.
+	/// </summary>
+	[Tooltip("World-space rotation used when placing the prefab.")]
 	public Quaternion Rotation;
 
-	/// <summary>Tile Size of the given prefab.</summary>
+	/// <summary>
+	/// Pattern size used by this piece, usually 3 or 5.
+	/// </summary>
+	[Tooltip("Pattern size used by this piece, usually 3 or 5.")]
 	public int Size;
 
 	/// <summary>
-	/// Creates a new <see cref="TrackPiece"/> with explicit prefab and pose.
+	/// Creates a new <see cref="TrackPiece"/> with explicit prefab, pose, and pattern size.
 	/// </summary>
-	/// <param name="prefab">Prefab reference (can be <c>null</c> for "no piece").</param>
+	/// <param name="prefab">Prefab reference. May be null for an empty/default legend entry.</param>
 	/// <param name="position">World-space placement position.</param>
 	/// <param name="rotation">World-space placement rotation.</param>
+	/// <param name="size">Pattern size used by this piece.</param>
 	public TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation, int size = 3)
 	{
 		Prefab = prefab;
@@ -41,8 +57,13 @@ public struct TrackPiece
 
 /// <summary>
 /// Serializable dictionary mapping a string pattern key to a <see cref="TrackPiece"/> descriptor.
-/// Keys are compact pattern encodings (e.g., 3x3 or 5x5 matrices concatenated into a string).
 /// </summary>
+/// <remarks>
+/// @ingroup level_gen
+/// @brief Stores the pattern legend used by <see cref="RaceTrackPlacer"/>.
+///
+/// Keys are compact pattern encodings, for example flattened 3x3 or 5x5 matrices.
+/// </remarks>
 [Serializable]
 public class StringTrackPieceDictionary : SerializableDictionary<string, TrackPiece>
 { }
@@ -50,20 +71,46 @@ public class StringTrackPieceDictionary : SerializableDictionary<string, TrackPi
 #endregion Helper Structures / Classes
 
 /// <summary>
-/// Procedural track placer: scans a <see cref="LevelMap"/> grid, matches local patterns
-/// around each path cell to a legend, and instantiates the appropriate track piece prefabs
-/// (including start/finish and checkpoints). Also wires checkpoints to <see cref="TrackManager"/>.
+/// Procedural track placer that scans a <see cref="LevelMap"/>, matches local tile patterns,
+/// and instantiates track-piece prefabs.
 /// </summary>
 /// <remarks>
 /// @ingroup level_gen
-/// @invariant <see cref="trackPieceLegend"/> keys must be perfect squares (3x3, 5x5, …).
-/// @invariant <see cref="LevelMap"/> is present in <see cref="GameDataManager.CurrentLevelMap"/> when placing starts.
-/// @thread Unity main thread (scene start and instantiation only).
+/// @brief Builds the visible track scene from a grid-based level map.
+///
+/// The placer reads the selected level from <see cref="GameDataManager.CurrentLevelMap"/>,
+/// creates a working placement map, walks the track from <see cref="LevelMap.StartPoint"/>,
+/// instantiates the matching prefabs, registers checkpoints, and either starts the race or
+/// initializes replay playback.
+///
+/// Requirements:
+/// - <see cref="trackPieceLegend"/> keys must represent square patterns such as 3x3 or 5x5.
+/// - <see cref="GameDataManager.CurrentLevelMap"/> must contain a valid <see cref="LevelMap"/> before placement starts.
+/// - Track cells use <see cref="LevelMap.LevelTileTypes.Track"/>.
+/// - Checkpoint cells use <see cref="LevelMap.LevelTileTypes.CP"/>.
+///
+/// Threading:
+/// - Unity main thread only, because this component instantiates prefabs and accesses scene objects.
 /// </remarks>
 public class RaceTrackPlacer : MonoBehaviour
 {
 	/// <summary>
-	/// Neighbor offsets for 4-way traversal and adjacency tests (right, left, up, down).
+	/// Integer tile value used for road/track cells.
+	/// </summary>
+	private const int TrackTile = (int)LevelMap.LevelTileTypes.Track;
+
+	/// <summary>
+	/// Integer tile value used for checkpoint cells.
+	/// </summary>
+	private const int CheckpointTile = (int)LevelMap.LevelTileTypes.CP;
+
+	/// <summary>
+	/// Internal marker used while placing larger pieces so overlapping road cells are not placed twice.
+	/// </summary>
+	private const int UsedTileValue = -5;
+
+	/// <summary>
+	/// Neighbor offsets for four-way traversal and adjacency tests: right, left, up, and down.
 	/// </summary>
 	private static readonly Coordinates[] offsets = new Coordinates[]
 	{
@@ -78,11 +125,16 @@ public class RaceTrackPlacer : MonoBehaviour
 	[Header("Track Piece Prefabs")]
 	/// <summary>
 	/// Legend mapping of string patterns to <see cref="TrackPiece"/> descriptors.
-	/// The string keys are flattened NxN character grids (e.g., '1' for track, 'X' for empty),
-	/// optionally containing special markers (e.g., 'C' during matching).
-	/// The associated <see cref="TrackPiece"/> carries default rotation for the shape; final world
-	/// position is filled at placement time.
 	/// </summary>
+	/// <remarks>
+	/// Pattern strings are flattened character grids. In these strings:
+	/// - <c>1</c> represents a track-compatible cell.
+	/// - <c>X</c> represents an empty cell.
+	/// - <c>C</c> may represent a checkpoint/start/finish marker during larger-pattern matching.
+	///
+	/// The associated <see cref="TrackPiece"/> carries the prefab and default rotation for the matched shape.
+	/// Final world position is filled during placement.
+	/// </remarks>
 	[SerializeField]
 	private StringTrackPieceDictionary trackPieceLegend = new StringTrackPieceDictionary()
 	{
@@ -90,111 +142,143 @@ public class RaceTrackPlacer : MonoBehaviour
 		  "X1X" +
 		  "X1X", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Straight Vertical
 
-        { "XXX" +
+		{ "XXX" +
 		  "111" +
 		  "XXX", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 90, 0)) }, // Straight Horizontal
 
-        { "X1X" +
+		{ "X1X" +
 		  "X11" +
 		  "XXX", new TrackPiece(null, Vector3.zero, Quaternion.identity) }, // Curve Up-Right
 
-        { "X1X" +
+		{ "X1X" +
 		  "11X" +
 		  "XXX", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 90, 0)) }, // Curve Up-Left
 
-        { "XXX" +
+		{ "XXX" +
 		  "11X" +
 		  "X1X", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 180, 0)) }, // Curve Down-Left
 
-        { "XXX" +
+		{ "XXX" +
 		  "X11" +
 		  "X1X", new TrackPiece(null, Vector3.zero, Quaternion.Euler(0, 270, 0)) }, // Curve Down-Right
 
-        { "XX1XX" +
+		{ "XX1XX" +
 		  "XX1XX" +
 		  "XX111" +
 		  "XXXXX" +
 		  "XXXXX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Up-Right
 
-        { "XX1XX" +
+		{ "XX1XX" +
 		  "XX1XX" +
 		  "111XX" +
 		  "XXXXX" +
 		  "XXXXX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Up-Left
 
-        { "XXXXX" +
+		{ "XXXXX" +
 		  "XXXXX" +
 		  "XX111" +
 		  "XX1XX" +
 		  "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Down-Right
 
-        { "XXXXX" +
+		{ "XXXXX" +
 		  "XXXXX" +
 		  "111XX" +
 		  "XX1XX" +
 		  "XX1XX", new TrackPiece(null, Vector3.zero, Quaternion.identity, 5) }, // Long Curve Down-Left
-    };
+	};
 
 	#endregion Legend
 
-	/// <summary>Prefab for cells next to larger pieces for no clipping/ovelap.</summary>
+	/// <summary>
+	/// Prefab used for cells covered by larger pieces so traversal can continue without visible overlap.
+	/// </summary>
+	[Tooltip("Prefab used for cells covered by larger pieces so traversal can continue without visible overlap.")]
 	[SerializeField] private GameObject traversalPrefab;
 
-	/// <summary>Prefab for start/finish cells (placed on <see cref="LevelMap.StartPoint"/> and <see cref="LevelMap.FinishPoint"/>).</summary>
+	/// <summary>
+	/// Prefab used for start/finish cells on circuit maps.
+	/// </summary>
+	[Tooltip("Prefab used for start/finish cells on circuit maps.")]
 	[SerializeField] private GameObject raceTrackStartFinishPrefab;
 
-	/// <summary>Prefab for start/finish cells (placed on <see cref="LevelMap.StartPoint"/> and <see cref="LevelMap.FinishPoint"/>) on Point-to-Point Maps.</summary>
+	/// <summary>
+	/// Prefab used for start/finish cells on point-to-point maps.
+	/// </summary>
+	[Tooltip("Prefab used for start/finish cells on point-to-point maps.")]
 	[SerializeField] private GameObject raceTrackStartFinishP2pPrefab;
 
-
-	/// <summary>Prefab for intermediate checkpoint cells (non-start/finish with special value).</summary>
+	/// <summary>
+	/// Prefab used for intermediate checkpoint cells.
+	/// </summary>
+	[Tooltip("Prefab used for intermediate checkpoint cells.")]
 	[SerializeField] private GameObject checkpointPrefab;
 
 	[Header("Track Settings")]
-	/// <summary>World-space spacing per grid step (meters) when placing pieces.</summary>
+	/// <summary>
+	/// World-space spacing per grid step.
+	/// </summary>
+	[Tooltip("World-space spacing per grid step.")]
 	[SerializeField] private float blockOffset = 15;
 
 	[Header("Track Layout")]
-	/// <summary>Runtime copy of the level layout pulled from <see cref="GameDataManager"/> at start.</summary>
+	/// <summary>
+	/// Runtime copy of the selected level layout.
+	/// </summary>
+	[Tooltip("Runtime copy of the selected level layout.")]
 	[SerializeField, ReadOnly] private LevelMap levelMap;
 
 	[Header("Build Options")]
+	/// <summary>
+	/// Whether this placer should build the track for replay playback instead of starting a live race.
+	/// </summary>
+	[Tooltip("If enabled, the track is built for replay playback instead of starting a live race.")]
 	[SerializeField] private bool isBuildForReplay;
 
-	/// <summary>All supported pattern sizes (e.g., 5, 3) derived from legend keys.</summary>
+	/// <summary>
+	/// Supported pattern sizes derived from the legend values.
+	/// </summary>
 	private List<int> possibleSizes = new List<int>();
 
-	/// <summary>Reusable string builder for pattern extraction to reduce allocations.</summary>
+	/// <summary>
+	/// Reusable string builder for pattern extraction.
+	/// </summary>
 	private StringBuilder patternBuilder = new StringBuilder();
 
+	/// <summary>
+	/// Traversal piece used for internally occupied cells.
+	/// </summary>
 	private TrackPiece traversalTrackPiece;
-	private const int usedTileValue = -5;
 
 	#region Setup
 
 	/// <summary>
-	/// Loads the current <see cref="LevelMap"/>, validates legend key sizes, and kicks off placement.
+	/// Loads the current <see cref="LevelMap"/>, collects supported pattern sizes, and starts placement.
 	/// </summary>
 	private void Start()
 	{
 		traversalTrackPiece = new TrackPiece(traversalPrefab, Vector3.zero, Quaternion.identity);
-		levelMap = GameDataManager.Instance.CurrentLevelMap.Copy();
 
-		if (levelMap == null)
+		LevelMap currentLevelMap = GameDataManager.Instance.CurrentLevelMap;
+
+		if (currentLevelMap == null)
 		{
+			Debug.LogError("[RaceTrackPlacer] No current level map selected.");
 			return;
 		}
-		else
-		{
-			foreach (var value in trackPieceLegend.Values)
-			{
-				if (!possibleSizes.Contains(value.Size))
-					possibleSizes.Add(value.Size);
-			}
-			possibleSizes.Sort((a, b) => b.CompareTo(a)); // Sort descending
 
-			PlaceTrackPieces();
+		levelMap = currentLevelMap.Copy();
+
+		foreach (var value in trackPieceLegend.Values)
+		{
+			if (!possibleSizes.Contains(value.Size))
+			{
+				possibleSizes.Add(value.Size);
+			}
 		}
+
+		possibleSizes.Sort((a, b) => b.CompareTo(a));
+
+		PlaceTrackPieces();
 	}
 
 	#endregion Setup
@@ -202,8 +286,8 @@ public class RaceTrackPlacer : MonoBehaviour
 	#region Track Placement
 
 	/// <summary>
-	/// Creates a placement map from the level tiles, then walks the path from StartPoint,
-	/// instantiating prefabs and registering checkpoints with <see cref="TrackManager"/>.
+	/// Creates a placement map, walks the track from the start point, instantiates prefabs,
+	/// registers checkpoints, and starts either race or replay mode.
 	/// </summary>
 	private void PlaceTrackPieces()
 	{
@@ -266,6 +350,10 @@ public class RaceTrackPlacer : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Replaces cells around larger placed pieces with traversal placeholders to avoid visual overlap.
+	/// </summary>
+	/// <param name="pieces">Placement map to adjust.</param>
 	private void StopOverlaying(TrackPiece[,] pieces)
 	{
 		int surroundingBlockOverlayed;
@@ -288,9 +376,12 @@ public class RaceTrackPlacer : MonoBehaviour
 	#region Track Traversal
 
 	/// <summary>
-	/// Chooses the next unvisited neighbor cell that has a placeable piece, using 4-way adjacency.
-	/// Returns <c>null</c> if no continuation exists.
+	/// Chooses the next unvisited neighboring cell with a placeable piece.
 	/// </summary>
+	/// <param name="piecesToPlace">Placement map being traversed.</param>
+	/// <param name="position">Current track coordinate.</param>
+	/// <param name="visited">Already visited coordinates.</param>
+	/// <returns>Next coordinate, or <c>null</c> when no continuation exists.</returns>
 	private Coordinates? Step(TrackPiece[,] piecesToPlace, Coordinates position, HashSet<Coordinates> visited)
 	{
 		foreach (var offset in offsets)
@@ -308,9 +399,9 @@ public class RaceTrackPlacer : MonoBehaviour
 	#region Track Creation
 
 	/// <summary>
-	/// Produces a 2D map of <see cref="TrackPiece"/> descriptors for all track cells (tile values 1 and -2).
-	/// Start/finish and checkpoints are assigned their dedicated prefabs in matching.
+	/// Produces a 2D map of <see cref="TrackPiece"/> descriptors for track and checkpoint cells.
 	/// </summary>
+	/// <returns>Placement map containing track-piece descriptors.</returns>
 	private TrackPiece[,] CreateTrack()
 	{
 		TrackPiece[,] piecesToPlace = new TrackPiece[levelMap.Tiles.GetLength(0), levelMap.Tiles.GetLength(1)];
@@ -323,7 +414,7 @@ public class RaceTrackPlacer : MonoBehaviour
 			{
 				for (int y = 0; y < levelMap.Tiles.GetLength(1); y++)
 				{
-					if (piecesToPlace[x, y].Prefab != null || (levelMap.Tiles[x, y] != 1 && levelMap.Tiles[x, y] != -2))
+					if (piecesToPlace[x, y].Prefab != null || !IsTrackOrCheckpointValue(levelMap.Tiles[x, y]))
 						continue;
 
 					coordinates = new Coordinates(x, y);
@@ -345,15 +436,15 @@ public class RaceTrackPlacer : MonoBehaviour
 	#region Pattern Matching
 
 	/// <summary>
-	/// Extracts local patterns of supported sizes around <paramref name="coordinates"/>, tries to find
-	/// a legend match, then returns a filled <see cref="TrackPiece"/> with world position and final prefab
-	/// (start/finish and checkpoints override the legend prefab).
+	/// Extracts a local pattern, finds a matching legend entry, and returns a filled <see cref="TrackPiece"/>.
 	/// </summary>
-	private TrackPiece? GetTrackPiece(Coordinates coordinates, int size, bool allowOverLap)
+	/// <param name="coordinates">Center coordinate to match.</param>
+	/// <param name="size">Pattern size to extract.</param>
+	/// <param name="allowOverlap">Whether internally used cells may still count as track while matching.</param>
+	/// <returns>Matched track piece, or <c>null</c> if no matching pattern exists.</returns>
+	private TrackPiece? GetTrackPiece(Coordinates coordinates, int size, bool allowOverlap)
 	{
-		string pattern = "";
-
-		pattern = ExtractPattern(coordinates, size, allowOverLap);
+		string pattern = ExtractPattern(coordinates, size, allowOverlap);
 		if (trackPieceLegend.TryGetValue(pattern, out TrackPiece trackPiece))
 		{
 			Vector3 positionOffset = transform.position + new Vector3(coordinates.X * blockOffset, 0f, coordinates.Y * blockOffset);
@@ -364,7 +455,7 @@ public class RaceTrackPlacer : MonoBehaviour
 				Debug.Log($"[RaceTrackPlacer] Assigning start/finish prefab at {coordinates}");
 				trackPiece.Prefab = levelMap.Circuit ? raceTrackStartFinishPrefab : raceTrackStartFinishP2pPrefab;
 			}
-			else if (levelMap.Tiles.At(coordinates) == -2)
+			else if (levelMap.Tiles.At(coordinates) == CheckpointTile)
 			{
 				trackPiece.Prefab = checkpointPrefab;
 			}
@@ -372,19 +463,25 @@ public class RaceTrackPlacer : MonoBehaviour
 			return trackPiece;
 		}
 
-		//Debug.Log($"No track piece found for pattern at {coordinates}: {pattern} for size: {size}");
-
 		return null;
 	}
 
 	/// <summary>
-	/// Builds a flattened NxN pattern string centered at <paramref name="center"/>:
-	/// - '1' marks track cells
-	/// - 'X' marks empty
-	/// - 'C' may mark checkpoints on larger kernels so they can be matched distinctly
-	/// Isolated singletons are treated as empty to avoid stray tiles.
+	/// Builds a flattened pattern string centered at the given coordinate.
 	/// </summary>
-	private string ExtractPattern(Coordinates center, int size, bool allowOverLap)
+	/// <param name="center">Center coordinate of the pattern.</param>
+	/// <param name="size">Pattern width and height.</param>
+	/// <param name="allowOverlap">Whether internally used cells may count as track.</param>
+	/// <returns>Flattened pattern string.</returns>
+	/// <remarks>
+	/// Pattern symbols:
+	/// - <c>1</c> marks track-compatible cells.
+	/// - <c>X</c> marks empty cells.
+	/// - <c>C</c> marks checkpoints, start, or finish in larger kernels.
+	///
+	/// Isolated single track symbols are converted to <c>X</c> to avoid stray matches.
+	/// </remarks>
+	private string ExtractPattern(Coordinates center, int size, bool allowOverlap)
 	{
 		int halfSize = size / 2;
 		char[,] pattern = new char[size, size];
@@ -402,20 +499,22 @@ public class RaceTrackPlacer : MonoBehaviour
 				char c = 'X';
 				if (dx != 0 && dy != 0)
 				{
-					c = 'X'; // Diagonal positions are always empty
+					c = 'X';
 				}
 				else if (levelMap.Tiles.InBounds(x, y))
 				{
-					if (levelMap.Tiles[x, y] == -2 || (x == levelMap.StartPoint.X && y == levelMap.StartPoint.Y) || (x == levelMap.FinishPoint.X && y == levelMap.FinishPoint.Y))
+					if (levelMap.Tiles[x, y] == CheckpointTile ||
+						(x == levelMap.StartPoint.X && y == levelMap.StartPoint.Y) ||
+						(x == levelMap.FinishPoint.X && y == levelMap.FinishPoint.Y))
 					{
 						if ((Mathf.Abs(dx) < 2 || Mathf.Abs(dy) < 2) && halfSize > 1)
-							c = 'C'; // Checkpoint treated as special piece in the center of larger patterns
+							c = 'C';
 						else
-							c = '1'; // Checkpoint treated as normal piece in smallest patterns
+							c = '1';
 					}
-					else if (levelMap.Tiles[x, y] == 1 || allowOverLap && levelMap.Tiles[x, y] == usedTileValue)
+					else if (levelMap.Tiles[x, y] == TrackTile || allowOverlap && levelMap.Tiles[x, y] == UsedTileValue)
 					{
-						c = '1'; // Track piece
+						c = '1';
 					}
 				}
 				pattern[py, px] = c;
@@ -428,7 +527,7 @@ public class RaceTrackPlacer : MonoBehaviour
 			{
 				if (pattern[y, x] == '1' && IsAlone(new Coordinates(y, x), pattern))
 				{
-					pattern[y, x] = 'X'; // Isolated track piece treated as empty
+					pattern[y, x] = 'X';
 				}
 			}
 		}
@@ -452,9 +551,21 @@ public class RaceTrackPlacer : MonoBehaviour
 	#region Helper Methods
 
 	/// <summary>
-	/// Returns true if the given cell has no 4-way neighbor that is not 'X' in the provided pattern.
-	/// Used to cull isolated track singles.
+	/// Checks whether a tile value should be treated as track during placement.
 	/// </summary>
+	/// <param name="tileValue">Tile value to check.</param>
+	/// <returns><c>true</c> for track and checkpoint tiles; otherwise <c>false</c>.</returns>
+	private static bool IsTrackOrCheckpointValue(int tileValue)
+	{
+		return tileValue == TrackTile || tileValue == CheckpointTile;
+	}
+
+	/// <summary>
+	/// Returns true if the given cell has no four-way neighbor that is not empty in the pattern.
+	/// </summary>
+	/// <param name="position">Pattern coordinate to check.</param>
+	/// <param name="pattern">Pattern grid.</param>
+	/// <returns><c>true</c> if the pattern cell is isolated; otherwise <c>false</c>.</returns>
 	private bool IsAlone(Coordinates position, char[,] pattern)
 	{
 		foreach (var offset in offsets)
@@ -468,6 +579,12 @@ public class RaceTrackPlacer : MonoBehaviour
 		return true;
 	}
 
+	/// <summary>
+	/// Replaces surrounding placed pieces with traversal placeholders.
+	/// </summary>
+	/// <param name="position">Center coordinate of the larger piece.</param>
+	/// <param name="pieces">Placement map to modify.</param>
+	/// <param name="halfSize">Radius of the surrounding area to replace.</param>
 	private void RemoveAllSurrounding(Coordinates position, TrackPiece[,] pieces, int halfSize)
 	{
 		for (int dx = -halfSize; dx <= halfSize; dx++)
@@ -487,6 +604,11 @@ public class RaceTrackPlacer : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Marks cells occupied by a larger piece so they are not placed as independent visible pieces.
+	/// </summary>
+	/// <param name="position">Center coordinate of the placed piece.</param>
+	/// <param name="size">Pattern size of the placed piece.</param>
 	private void MarkSpaceAsUsed(Coordinates position, int size)
 	{
 		int usedArea = (size / 2) - 1;
@@ -504,16 +626,21 @@ public class RaceTrackPlacer : MonoBehaviour
 				if (!levelMap.Tiles.InBounds(coords.X, coords.Y))
 					continue;
 
-				if (coords == levelMap.StartPoint || coords == levelMap.FinishPoint || levelMap.Tiles.At(coords) == -2)
+				if (coords == levelMap.StartPoint || coords == levelMap.FinishPoint || levelMap.Tiles.At(coords) == CheckpointTile)
 					continue;
 
-				if (levelMap.Tiles.At(coords) == 1)
-					levelMap.Tiles.At(coords) = usedTileValue;
-
+				if (levelMap.Tiles.At(coords) == TrackTile)
+					levelMap.Tiles.At(coords) = UsedTileValue;
 			}
 		}
 	}
 
+	/// <summary>
+	/// Adds traversal placeholders to the placement map for cells already covered by a larger piece.
+	/// </summary>
+	/// <param name="position">Center coordinate of the placed piece.</param>
+	/// <param name="size">Pattern size of the placed piece.</param>
+	/// <param name="pieces">Placement map to update.</param>
 	private void AddTraversalPlaceHolders(Coordinates position, int size, TrackPiece[,] pieces)
 	{
 		int usedArea = (size / 2) - 1;
@@ -528,7 +655,7 @@ public class RaceTrackPlacer : MonoBehaviour
 				int x = position.X + dx;
 				int y = position.Y + dy;
 
-				if (levelMap.Tiles.InBounds(x, y) && levelMap.Tiles[x, y] == usedTileValue)
+				if (levelMap.Tiles.InBounds(x, y) && levelMap.Tiles[x, y] == UsedTileValue)
 				{
 					if (pieces[x, y].Prefab == null)
 						pieces[x, y].Prefab = traversalPrefab;
@@ -540,16 +667,20 @@ public class RaceTrackPlacer : MonoBehaviour
 	/// <summary>
 	/// Returns true if the coordinate represents the start, finish, or an intermediate checkpoint.
 	/// </summary>
+	/// <param name="coordinates">Coordinate to check.</param>
+	/// <returns><c>true</c> if the coordinate should receive a checkpoint-style prefab.</returns>
 	private bool IsCheckpointTile(Coordinates coordinates)
 	{
 		return coordinates == levelMap.StartPoint ||
 			   coordinates == levelMap.FinishPoint ||
-			   levelMap.Tiles.At(coordinates) == -2;
+			   levelMap.Tiles.At(coordinates) == CheckpointTile;
 	}
 
 	/// <summary>
 	/// Returns true if the coordinate represents the race start.
 	/// </summary>
+	/// <param name="coordinates">Coordinate to check.</param>
+	/// <returns><c>true</c> if the coordinate is the level start point.</returns>
 	private bool IsStartTile(Coordinates coordinates)
 	{
 		return coordinates == levelMap.StartPoint;

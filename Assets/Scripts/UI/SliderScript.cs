@@ -1,45 +1,43 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 /// <summary>
-/// Simple UI slider label updater: formats the incoming float value as a zero-padded
-/// two-digit integer and writes it into a <see cref="TMP_Text"/>.
+/// Updates a TMP label from a slider value.
 /// </summary>
 /// <remarks>
 /// @ingroup ui
-/// @brief Lightweight helper intended for Options/Settings sliders.
+/// @brief Formats an incoming float value as a zero-padded integer and writes it into a <see cref="TMP_Text"/>.
 ///
 /// Behavior:
-/// - Rounds <paramref name="newValue"/> to the nearest integer, clamps to an int range implicitly,
-///   and formats as "00", "01", … "99", "100", etc. via <see cref="int.ToString(string)"/> with "00".
+/// - Rounds the incoming slider value to the nearest integer.
+/// - Formats the rounded value using the <c>00</c> format string.
+/// - Writes the result to the assigned label if the label reference exists.
 ///
 /// Dependencies:
-/// - TextMeshProUGUI (<see cref="TMP_Text"/>).
-///
-/// Threading:
-/// - Unity main thread only (driven by UI events).
+/// - TextMeshPro label component through <see cref="TMP_Text"/>.
 ///
 /// Usage:
-/// - Wire the slider's OnValueChanged(float) event to <see cref="OnChange(float)"/>.
-/// - Assign <see cref="_label"/> in the Inspector to the target TMP text element.
+/// - Assign <see cref="_label"/> in the Inspector.
+/// - Wire a slider's OnValueChanged(float) event to <see cref="OnChange(float)"/>.
 /// </remarks>
 public class SliderScript : MonoBehaviour
 {
-    /// <summary>
-    /// Target label that displays the formatted slider value.
-    /// </summary>
-    [SerializeField] private TMP_Text _label;
+	/// <summary>
+	/// Target label that displays the formatted slider value.
+	/// </summary>
+	[Tooltip("Text label that displays the rounded slider value.")]
+	[SerializeField] private TMP_Text _label;
 
-    /// <summary>
-    /// UI callback: updates <see cref="_label"/> with the rounded value formatted as two digits.
-    /// </summary>
-    /// <param name="newValue">Raw slider value (float) from the UI event.</param>
-    public void OnChange(float newValue)
-    {
-        if (_label != null)
-        {
-            _label.text = Mathf.RoundToInt(newValue).ToString("00");
-        }
+	/// <summary>
+	/// Updates <see cref="_label"/> with the rounded value formatted as two digits.
+	/// </summary>
+	/// <param name="newValue">Raw float value received from the UI event.</param>
+	public void OnChange(float newValue)
+	{
+		if (_label != null)
+		{
+			_label.text = Mathf.RoundToInt(newValue).ToString("00");
+		}
 
-    }
+	}
 }

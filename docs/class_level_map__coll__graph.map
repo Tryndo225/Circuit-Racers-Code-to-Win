@@ -1,12 +1,12 @@
 <map id="LevelMap" name="LevelMap">
-<area shape="rect" id="Node000001" title="Serializable level definition for a grid&#45;based track: dimensions, circuit flag, endpoints,..." alt="" coords="72,564,214,804"/>
+<area shape="rect" id="Node000001" title="Serializable level definition for a grid&#45;based race track." alt="" coords="60,585,226,1081"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,5,87,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="47,90,50,259,59,365,74,470,100,564,94,565,69,471,53,365,45,259,42,90"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="47,87,56,258,63,364,74,470,92,585,87,586,69,471,58,365,50,259,47,92"/>
 <area shape="rect" id="Node000004" href="$struct_coordinates.html" title="Integer coordinate pair with arithmetic, equality, and serialization support." alt="" coords="84,124,203,471"/>
-<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="67,88,87,140,82,142,62,90"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="64,86,87,140,81,141,65,92"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="226,255,391,340"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="297,355,270,444,233,541,217,573,212,570,228,539,265,442,292,354"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="146,470,146,547,141,547,141,470"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="307,353,298,453,288,508,274,562,253,621,229,679,224,676,249,619,269,561,282,507,292,452,305,358"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,468,146,568,141,568,143,473"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="111,5,278,75"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="187,90,180,125,175,124,182,89"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="184,92,180,125,175,124,185,87"/>
 </map>

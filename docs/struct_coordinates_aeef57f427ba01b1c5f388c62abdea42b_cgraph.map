@@ -1,5 +1,5 @@
 <map id="Coordinates.operator*" name="Coordinates.operator*">
-<area shape="rect" id="Node000001" title="Multiplies a coordinate by a scalar." alt="" coords="5,5,153,32"/>
-<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates (x, y)." alt="" coords="201,5,366,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,16,185,16,185,21,153,21"/>
+<area shape="rect" id="Node000001" title="Multiplies a coordinate by an integer scalar." alt="" coords="5,5,153,32"/>
+<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates from integer components." alt="" coords="201,5,366,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,16,188,19,182,19,153,21"/>
 </map>

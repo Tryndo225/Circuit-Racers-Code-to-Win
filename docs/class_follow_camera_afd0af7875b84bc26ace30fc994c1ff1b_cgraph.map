@@ -1,0 +1,5 @@
+<map id="FollowCamera.SetTarget" name="FollowCamera.SetTarget">
+<area shape="rect" id="Node000001" title="Assigns a new target transform and tries to cache its rigidbody." alt="" coords="5,5,171,32"/>
+<area shape="rect" id="Node000002" href="$class_follow_camera.html#a89ca9b6a3a3b77ee4b29c4221e7b4c25" title="Instantly snaps the camera to the target using the configured movement&#45;based offset." alt="" coords="219,5,404,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,16,206,19,200,19,171,21"/>
+</map>

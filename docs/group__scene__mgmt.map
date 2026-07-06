@@ -1,0 +1,7 @@
+<map id="Scene Management" name="Scene Management">
+<area shape="rect" id="Node000004" href="$group__game__data.html" title="Persistent progression data, selected level state, best times, checkpoint splits, replays,..." alt="" coords="543,35,631,62"/>
+<area shape="rect" id="Node000005" href="$group__replay__system.html" title="Race replay recording, replay data storage, replay playback, replay camera support,..." alt="" coords="531,86,643,112"/>
+<area shape="rect" id="Node000001" title="Centralized scene loading with editor&#45;friendly scene references and scene&#45;to&#45;music pairing." alt="" coords="128,86,265,112"/>
+<area shape="rect" id="Node000003" href="$group__ui.html" title="Runtime UI widgets, menus, overlays, popups, settings, notifications, previews, and button actions." alt="" coords="535,212,639,239"/>
+<area shape="rect" id="Node000002" href="$group__systems.html" title="Runtime subsystems used by the racing game." alt="" coords="5,86,79,112"/>
+</map>

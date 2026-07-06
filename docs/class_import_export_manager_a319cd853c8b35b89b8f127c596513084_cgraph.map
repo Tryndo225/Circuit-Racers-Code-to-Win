@@ -1,0 +1,9 @@
+<map id="ImportExportManager.TryImportLevelFromString" name="ImportExportManager.TryImportLevelFromString">
+<area shape="rect" id="Node000001" title="Attempts to decode a level string and add the resulting level to game data." alt="" coords="5,27,212,69"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#a0f56a9c1b0c5a0463aff81eef8346158" title="Attempts to decode a shareable level string into a LevelMap." alt="" coords="260,27,474,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,45,247,48,242,48,212,51"/>
+<area shape="rect" id="Node000003" href="$class_level_map.html#a9e3b9a924115f154db06464df2e9fd89" title="Rebuilds a 2D tile grid from a flattened tile array." alt="" coords="530,5,728,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="474,33,518,31,512,32,475,39"/>
+<area shape="rect" id="Node000004" href="$class_import_export_manager.html#ab35591231708cb968e4018a120e629a3" title="Attempts to decode run&#45;length encoded tile data into a flat integer tile array." alt="" coords="522,56,736,99"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="475,57,509,64,504,64,474,63"/>
+</map>

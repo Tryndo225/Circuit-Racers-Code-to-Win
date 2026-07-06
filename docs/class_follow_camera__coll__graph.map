@@ -1,5 +1,5 @@
 <map id="FollowCamera" name="FollowCamera">
-<area shape="rect" id="Node000001" title="Third&#45;person follow camera that tracks a target with a configurable local&#45;space offset,..." alt="" coords="5,123,126,277"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="16,5,116,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,90,68,123,63,123,63,90"/>
+<area shape="rect" id="Node000001" title="Third&#45;person follow camera for a racing vehicle." alt="" coords="5,123,167,363"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="36,5,137,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,87,89,123,84,122,86,92"/>
 </map>

@@ -1,13 +1,15 @@
 <map id="GameDataManager.LevelData" name="GameDataManager.LevelData">
-<area shape="rect" id="Node000001" title="Serializable record containing a LevelMap reference and its best (lowest) time." alt="" coords="5,876,192,1095"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="87,5,169,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,90,125,99,115,315,108,530,102,876,97,876,103,530,109,315,120,99,121,90"/>
-<area shape="rect" id="Node000003" href="$class_level_map.html" title="Serializable level definition for a grid&#45;based track: dimensions, circuit flag, endpoints,..." alt="" coords="134,564,276,804"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="131,90,136,259,143,364,156,470,175,563,170,565,151,471,138,365,130,259,125,90"/>
-<area shape="rect" id="Node000005" href="$struct_coordinates.html" title="Integer coordinate pair with arithmetic, equality, and serialization support." alt="" coords="166,124,285,471"/>
-<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="149,88,168,140,163,142,144,90"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,805,145,861,140,859,161,803"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="308,255,473,340"/>
-<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="377,355,346,444,304,541,278,585,274,583,299,539,341,442,372,353"/>
-<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="219,471,215,547,210,547,214,470"/>
+<area shape="rect" id="Node000001" title="Serializable record containing a level map and its best saved run data." alt="" coords="47,1153,233,1436"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="16,5,98,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,92,30,255,19,371,11,501,8,642,12,789,24,937,48,1081,70,1153,65,1154,43,1082,19,938,6,790,3,642,6,501,14,370,25,255,49,87"/>
+<area shape="rect" id="Node000003" href="$class_level_map.html" title="Serializable level definition for a grid&#45;based race track." alt="" coords="57,585,223,1081"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="59,87,69,258,85,470,100,585,95,586,80,471,63,258,59,92"/>
+<area shape="rect" id="Node000005" href="$struct_coordinates.html" title="Integer coordinate pair with arithmetic, equality, and serialization support." alt="" coords="95,124,214,471"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="75,86,98,140,93,141,76,92"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="141,1079,143,1137,137,1136,139,1084"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="238,255,402,340"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="325,353,326,403,320,457,305,512,279,563,269,572,258,576,248,580,238,587,225,603,220,601,234,583,245,575,256,571,266,568,275,560,300,510,314,456,321,403,324,358"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="150,468,150,568,145,568,150,473"/>
+<area shape="rect" id="Node000007" href="$class_replay.html" title="Serializable race replay containing an ordered list of recorded ReplaySnapshot values." alt="" coords="248,724,358,943"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="279,940,254,1035,220,1130,216,1139,211,1137,215,1128,249,1034,276,945"/>
 </map>

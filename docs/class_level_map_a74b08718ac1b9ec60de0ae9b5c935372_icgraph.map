@@ -1,0 +1,14 @@
+<map id="LevelMap.LevelMap" name="LevelMap.LevelMap">
+<area shape="rect" id="Node000001" title="Creates a default empty level map." alt="" coords="459,81,596,108"/>
+<area shape="rect" id="Node000002" href="$class_level_map.html#a0cc6441f610383baba061b75d97635f5" title="Creates a copy of this level map." alt="" coords="285,5,397,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="480,75,410,46,381,35,381,30,412,42,485,74"/>
+<area shape="rect" id="Node000004" href="$class_level_map.html#a98077ba8ec34f6fa10476cf3e49c6648" title="Checks whether this level map has the same data as another object." alt="" coords="280,56,402,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="441,84,402,80,402,75,446,83"/>
+<area shape="rect" id="Node000005" href="$class_level_map.html#a541d0d3d5460b37d9f50187b6cad9de3" title="Checks whether two level maps are equal." alt="" coords="42,81,186,108"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="442,97,187,97,187,92,445,92"/>
+<area shape="rect" id="Node000006" href="$class_level_map.html#a877e65daf02ef0d7002d7ff9038437c1" title="Checks whether two level maps are not equal." alt="" coords="271,157,411,184"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="481,114,376,159,375,154,476,115"/>
+<area shape="rect" id="Node000003" href="$class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9" title="Replaces a stored level with an edited version." alt="" coords="5,5,223,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="266,20,224,21,222,16,271,18"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="262,79,187,89,186,84,267,77"/>
+</map>

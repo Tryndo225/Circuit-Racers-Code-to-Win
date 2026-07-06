@@ -1,5 +1,5 @@
 <map id="TransmissionController" name="TransmissionController">
-<area shape="rect" id="Node000001" title="Simple automatic transmission: computes engine RPM from wheel RPM and current gear,..." alt="" coords="5,123,150,405"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="27,5,128,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,90,80,123,75,123,75,90"/>
+<area shape="rect" id="Node000001" title="Simple automatic transmission controller for a vehicle." alt="" coords="5,123,154,427"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="30,5,130,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,87,82,123,77,123,79,92"/>
 </map>

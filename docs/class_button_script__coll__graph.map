@@ -1,5 +1,5 @@
 <map id="ButtonScript" name="ButtonScript">
-<area shape="rect" id="Node000001" title="Generic UI button driver that delegates its click behavior to a pluggable ButtonType." alt="" coords="5,123,122,192"/>
+<area shape="rect" id="Node000001" title="Generic UI button driver that delegates its click behavior to a pluggable ButtonType strategy." alt="" coords="5,123,122,192"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="14,5,114,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="66,90,66,123,61,123,61,90"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,87,66,123,61,122,63,92"/>
 </map>

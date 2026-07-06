@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['audio_20manager_0',['Audio Manager',['../group__audio__mgr.html',1,'']]]
+  ['attributes_0',['Editor Attributes',['../group__editor__attrs.html',1,'']]],
+  ['audio_20manager_1',['Audio Manager',['../group__audio__mgr.html',1,'']]]
 ];

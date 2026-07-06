@@ -3,68 +3,122 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Simple automatic transmission: computes engine RPM from wheel RPM and current gear,
-/// auto-shifts up/down based on RPM thresholds and slip, and exposes shift coroutines
-/// that briefly cut torque while firing shift callbacks.
+/// Simple automatic transmission controller for a vehicle.
 /// </summary>
 /// <remarks>
 /// @ingroup car_ctrl
-/// @invariant forwardGears is non-null and length >= 1.
-/// @invariant 0 <= CurrentGear < forwardGears.Length.
-/// @invariant idleRPM <= redlineRPM and shiftDownRPM < shiftUpRPM (recommended).
-/// @thread Unity main thread (coroutines run on the main thread).
+/// @brief Computes engine RPM from wheel RPM, handles automatic gear changes, and exposes shift callbacks.
+///
+/// The controller maps driven-wheel RPM through the current gear ratio and final drive to estimate
+/// engine RPM. It then shifts up or down based on configured RPM thresholds, as long as wheel slip
+/// is below the configured slip threshold.
+///
+/// Behaviour:
+/// - Keeps track of the current forward gear.
+/// - Calculates clamped engine RPM.
+/// - Starts upshift/downshift coroutines when thresholds are reached.
+/// - Temporarily reports torque cut while shifting.
+/// - Invokes registered shift callbacks when a shift starts.
+///
+/// Requirements:
+/// - <see cref="forwardGears"/> should contain at least one gear ratio.
+/// - <see cref="idleRPM"/> should be less than or equal to <see cref="redlineRPM"/>.
+/// - <see cref="shiftDownRPM"/> should usually be lower than <see cref="shiftUpRPM"/>.
+///
+/// Threading:
+/// - Unity main thread only.
+/// - Shift timing uses Unity coroutines.
 /// </remarks>
 public class TransmissionController : MonoBehaviour
 {
 	#region Inspector: Transmission & RPM
 
 	[Header("Transmission & RPM")]
-	/// <summary>Forward gear ratios (index 0 is first gear).</summary>
-	[Tooltip("Forward gear ratios (1..N)")]
+	/// <summary>
+	/// Forward gear ratios.
+	/// </summary>
+	/// <remarks>
+	/// Index 0 is first gear.
+	/// </remarks>
+	[Tooltip("Forward gear ratios. Index 0 is first gear.")]
 	public float[] forwardGears;
 
-	/// <summary>Final drive ratio (multiplies the selected gear ratio).</summary>
+	/// <summary>
+	/// Final drive ratio.
+	/// </summary>
+	/// <remarks>
+	/// Multiplies the selected forward gear ratio when calculating engine RPM.
+	/// </remarks>
+	[Tooltip("Final drive ratio. Multiplies the selected gear ratio.")]
 	public float finalDrive;
 
-	/// <summary>Engine idle RPM.</summary>
-	[Tooltip("Engine idle RPM")]
+	/// <summary>
+	/// Engine idle RPM.
+	/// </summary>
+	[Tooltip("Engine idle RPM.")]
 	public float idleRPM;
 
-	/// <summary>Engine redline RPM (maximum RPM).</summary>
-	[Tooltip("Engine redline RPM (max RPM)")]
+	/// <summary>
+	/// Engine redline RPM.
+	/// </summary>
+	[Tooltip("Engine redline RPM.")]
 	public float redlineRPM;
 
-	/// <summary>Auto shift-up threshold (RPM).</summary>
-	[Tooltip("Auto shift up when RPM exceeds this")]
+	/// <summary>
+	/// RPM threshold used for automatic upshifts.
+	/// </summary>
+	[Tooltip("Automatic shift-up threshold in RPM.")]
 	public float shiftUpRPM;
 
-	/// <summary>Auto shift-down threshold (RPM).</summary>
-	[Tooltip("Auto shift down when RPM falls below this")]
+	/// <summary>
+	/// RPM threshold used for automatic downshifts.
+	/// </summary>
+	[Tooltip("Automatic shift-down threshold in RPM.")]
 	public float shiftDownRPM;
 
-	/// <summary>Seconds during which torque is cut while shifting.</summary>
-	[Tooltip("Seconds torque is cut during a shift")]
+	/// <summary>
+	/// Duration in seconds during which torque is cut while shifting.
+	/// </summary>
+	[Tooltip("Duration in seconds during which torque is cut while shifting.")]
 	public float shiftDuration;
 
-	/// <summary>Slip threshold above which shifting is suppressed.</summary>
-	[Tooltip("Slip threshold for shifting")]
+	/// <summary>
+	/// Wheel-slip threshold above which shifting is suppressed.
+	/// </summary>
+	[Tooltip("Wheel-slip threshold above which automatic shifting is suppressed.")]
 	public float slipThreshold;
 
-	/// <summary>Callbacks invoked each time a shift starts (up or down).</summary>
-	[Tooltip("Delegetes for shifting event")]
+	/// <summary>
+	/// Runtime callbacks invoked when a shift starts.
+	/// </summary>
+	/// <remarks>
+	/// This list is intended for runtime registration. Unity does not serialize delegate lists
+	/// as normal Inspector events.
+	/// </remarks>
+	[Tooltip("Runtime callbacks invoked when a shift starts.")]
 	public List<System.Action> OnShift;
 
 	#endregion
 
 	#region State & Properties
 
-	/// <summary>True while a shift is in progress.</summary>
+	/// <summary>
+	/// Whether a shift coroutine is currently active.
+	/// </summary>
 	private bool _isShifting = false;
 
-	/// <summary>Zero-based index of the current gear.</summary>
+	/// <summary>
+	/// Gets the zero-based index of the current gear.
+	/// </summary>
 	public int CurrentGear { get; private set; } = 0;
 
-	/// <summary>Current engine RPM after mapping from wheel RPM and clamping.</summary>
+	/// <summary>
+	/// Gets the current calculated engine RPM.
+	/// </summary>
+	/// <remarks>
+	/// This value is mapped from wheel RPM through the current gear and final drive,
+	/// then clamped between <see cref="idleRPM"/> and <see cref="redlineRPM"/>.
+	/// </remarks>
 	public float EngineRPM { get; private set; } = 0f;
 
 	#endregion
@@ -72,12 +126,17 @@ public class TransmissionController : MonoBehaviour
 	#region Public API
 
 	/// <summary>
-	/// Updates RPM and decides whether to start an upshift/downshift based on thresholds and slip.
-	/// Returns true if torque should be cut this frame (during shift or when starting one).
+	/// Updates engine RPM and handles automatic shifting.
 	/// </summary>
-	/// <param name="wheelRPM">Average RPM of driven wheels (grounded).</param>
-	/// <param name="wheelSlip">Average slip measure; higher means more slip.</param>
-	/// <returns>True if torque should be cut.</returns>
+	/// <param name="wheelRPM">Average RPM of grounded driven wheels.</param>
+	/// <param name="wheelSlip">Average wheel slip measure.</param>
+	/// <returns>
+	/// <c>true</c> if drive torque should be cut because a shift is active or has just started;
+	/// otherwise <c>false</c>.
+	/// </returns>
+	/// <remarks>
+	/// Shifting is suppressed while wheel slip is above <see cref="slipThreshold"/>.
+	/// </remarks>
 	public bool HandleShifting(float wheelRPM, float wheelSlip)
 	{
 		if (_isShifting)
@@ -106,6 +165,10 @@ public class TransmissionController : MonoBehaviour
 		return false;
 	}
 
+	/// <summary>
+	/// Gets the current engine RPM normalized between idle and redline.
+	/// </summary>
+	/// <returns>Normalized RPM value, usually in the range 0 to 1.</returns>
 	public float GetNormalizedRPM()
 	{
 		return Mathf.InverseLerp(idleRPM, redlineRPM, EngineRPM);
@@ -115,15 +178,23 @@ public class TransmissionController : MonoBehaviour
 
 	#region Private Helpers
 
-	/// <summary>Returns the ratio of the current forward gear.</summary>
+	/// <summary>
+	/// Gets the ratio of the current forward gear.
+	/// </summary>
+	/// <returns>Current gear ratio.</returns>
 	private float CurrentGearRatio()
 	{
 		return forwardGears[CurrentGear];
 	}
 
 	/// <summary>
-	/// Computes engine RPM from wheel RPM via current gear and final drive, then clamps to [idleRPM, redlineRPM].
+	/// Calculates engine RPM from wheel RPM.
 	/// </summary>
+	/// <param name="wheelRPM">Average driven-wheel RPM.</param>
+	/// <returns>Engine RPM clamped between <see cref="idleRPM"/> and <see cref="redlineRPM"/>.</returns>
+	/// <remarks>
+	/// Engine RPM is estimated as wheel RPM multiplied by the current gear ratio and final drive ratio.
+	/// </remarks>
 	private float CalculateRPM(float wheelRPM)
 	{
 		// engine rpm = wheel rpm * (gear * final drive)
@@ -142,9 +213,13 @@ public class TransmissionController : MonoBehaviour
 	#region Coroutines: Shifting
 
 	/// <summary>
-	/// Starts an upshift: invokes OnShift callbacks, eases EngineRPM toward idle during shiftDuration,
-	/// then increments CurrentGear and clears shifting flag.
+	/// Performs an automatic upshift.
 	/// </summary>
+	/// <returns>Coroutine enumerator.</returns>
+	/// <remarks>
+	/// Shift callbacks are invoked when the shift starts. During the shift duration,
+	/// <see cref="EngineRPM"/> is eased toward idle RPM before the current gear is incremented.
+	/// </remarks>
 	private IEnumerator ShiftUp()
 	{
 		if (_isShifting || CurrentGear >= forwardGears.Length - 1)
@@ -174,9 +249,13 @@ public class TransmissionController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Starts a downshift: invokes OnShift callbacks, eases EngineRPM toward redline during shiftDuration,
-	/// then decrements CurrentGear and clears shifting flag.
+	/// Performs an automatic downshift.
 	/// </summary>
+	/// <returns>Coroutine enumerator.</returns>
+	/// <remarks>
+	/// Shift callbacks are invoked when the shift starts. During the shift duration,
+	/// <see cref="EngineRPM"/> is eased toward redline RPM before the current gear is decremented.
+	/// </remarks>
 	private IEnumerator ShiftDown()
 	{
 		if (_isShifting || CurrentGear <= 0)

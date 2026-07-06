@@ -1,0 +1,7 @@
+<map id="GameDataManager.ReplaceLevel" name="GameDataManager.ReplaceLevel">
+<area shape="rect" id="Node000001" title="Replaces a stored level with an edited version." alt="" coords="5,5,223,32"/>
+<area shape="rect" id="Node000002" href="$class_level_map.html#a0cc6441f610383baba061b75d97635f5" title="Creates a copy of this level map." alt="" coords="271,5,383,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,16,258,19,252,19,223,21"/>
+<area shape="rect" id="Node000003" href="$class_level_map.html#a74b08718ac1b9ec60de0ae9b5c935372" title="Creates a default empty level map." alt="" coords="431,5,568,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,16,418,19,413,19,383,21"/>
+</map>

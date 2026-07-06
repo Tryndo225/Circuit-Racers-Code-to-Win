@@ -1,0 +1,19 @@
+<map id="Generic.SceneSingleton&lt; T &gt;" name="Generic.SceneSingleton&lt; T &gt;">
+<area shape="rect" id="Node000001" title="Scene&#45;local singleton base for Unity components." alt="" coords="454,325,635,395"/>
+<area shape="rect" id="Node000004" href="$class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene." alt="" coords="5,475,235,736"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="437,375,393,386,343,401,295,420,250,445,212,477,208,473,247,440,293,415,342,396,391,381,441,372"/>
+<area shape="rect" id="Node000005" href="$class_race_overlay.html" title="HUD controller for race status, countdown, timing, checkpoint splits, counters, and final results." alt="" coords="260,560,362,651"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="438,398,407,419,377,444,357,471,341,501,321,562,317,559,336,499,352,468,373,441,404,415,442,395"/>
+<area shape="rect" id="Node000006" href="$class_race_time_manager.html" title="Manages race timing, lap timing, checkpoint splits, and race completion." alt="" coords="386,443,548,768"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="531,407,521,444,516,441,527,411"/>
+<area shape="rect" id="Node000007" href="$class_replay_manager.html" title="Records replay snapshots during a race." alt="" coords="572,560,674,651"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="561,407,611,561,606,559,558,411"/>
+<area shape="rect" id="Node000008" href="$class_replay_previewer.html" title="Plays back recorded race replays by moving a replay car through recorded snapshots." alt="" coords="698,453,876,757"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="631,399,662,418,689,441,701,455,696,454,685,445,659,423,631,404"/>
+<area shape="rect" id="Node000009" href="$class_track_manager.html" title="Manages race flow for a track with sequential checkpoints." alt="" coords="900,507,1066,704"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="650,363,709,371,771,385,832,408,889,441,920,470,945,508,940,506,916,474,885,445,830,413,769,390,708,376,651,368"/>
+<area shape="rect" id="Node000002" href="$class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components." alt="" coords="472,123,617,277"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="546,290,547,327,542,324,543,295"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="494,5,595,75"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="545,87,547,124,542,122,543,92"/>
+</map>

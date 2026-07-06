@@ -1,0 +1,9 @@
+<map id="RaceOverlaySource" name="RaceOverlaySource">
+<area shape="rect" id="Node000001" title="Abstract source of race overlay state for RaceOverlay." alt="" coords="120,123,248,192"/>
+<area shape="rect" id="Node000003" href="$class_replay_race_overlay_source.html" title="Race overlay state source that feeds replay playback data into RaceOverlay." alt="" coords="5,240,174,309"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,202,119,242,115,238,145,205"/>
+<area shape="rect" id="Node000004" href="$class_track_race_overlay_source.html" title="Race overlay state source that feeds live track/race data into RaceOverlay." alt="" coords="199,240,359,309"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="222,201,254,241,249,240,220,206"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="134,5,235,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,87,187,124,182,122,183,92"/>
+</map>

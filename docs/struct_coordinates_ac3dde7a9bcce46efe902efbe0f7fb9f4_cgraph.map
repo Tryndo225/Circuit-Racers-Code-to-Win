@@ -1,8 +1,8 @@
 <map id="Coordinates.operator==" name="Coordinates.operator==">
-<area shape="rect" id="Node000001" title="Equality operator." alt="" coords="5,5,164,32"/>
-<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates (x, y)." alt="" coords="395,5,560,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,16,379,16,379,21,164,21"/>
-<area shape="rect" id="Node000003" href="$struct_coordinates.html#a14c4d704f188413912fc6d1c120517d2" title="Value equality on X and Y." alt="" coords="212,31,347,57"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,26,197,31,196,36,164,32"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="347,33,379,29,380,34,348,38"/>
+<area shape="rect" id="Node000001" title="Checks whether two coordinates are equal." alt="" coords="5,5,164,32"/>
+<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates from integer components." alt="" coords="395,5,560,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,16,380,16,378,21,164,21"/>
+<area shape="rect" id="Node000003" href="$struct_coordinates.html#a14c4d704f188413912fc6d1c120517d2" title="Checks whether this coordinate has the same component values as another coordinate." alt="" coords="212,31,347,57"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,26,199,33,194,33,164,32"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="347,33,377,31,382,31,348,38"/>
 </map>

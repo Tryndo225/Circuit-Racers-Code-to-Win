@@ -1,0 +1,7 @@
+<map id="ReplayManager" name="ReplayManager">
+<area shape="rect" id="Node000001" title="Records replay snapshots during a race." alt="" coords="45,325,148,416"/>
+<area shape="rect" id="Node000002" href="$class_generic_1_1_scene_singleton-1-g.html" title="Scene&#45;local singleton base for Unity components." alt="" coords="5,208,187,277"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,290,99,326,94,325,95,294"/>
+<area shape="rect" id="Node000003" href="$class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components." alt="" coords="24,5,168,160"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,172,99,209,94,208,96,178"/>
+</map>

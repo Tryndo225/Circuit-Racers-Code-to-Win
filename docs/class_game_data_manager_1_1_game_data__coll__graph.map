@@ -1,5 +1,10 @@
 <map id="GameDataManager.GameData" name="GameDataManager.GameData">
-<area shape="rect" id="Node000001" title="Serializable container for all saved progression data." alt="" coords="5,123,196,277"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="60,5,142,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,90,103,123,98,123,98,90"/>
+<area shape="rect" id="Node000001" title="Serializable container for all saved progression data." alt="" coords="76,415,277,783"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,87,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="42,87,42,206,46,274,58,342,82,415,76,415,53,343,41,275,36,206,42,92"/>
+<area shape="rect" id="Node000004" href="$class_game_data_manager_1_1_assists_settings.html" title="Serializable assist&#45;settings record." alt="" coords="67,167,287,300"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="77,85,135,166,130,168,78,90"/>
+<area shape="rect" id="Node000003" href="$class_replay.html" title="Serializable race replay containing an ordered list of recorded ReplaySnapshot values." alt="" coords="311,124,421,343"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="316,340,293,392,287,402,283,399,288,389,313,345"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="178,297,179,398,174,397,176,302"/>
 </map>

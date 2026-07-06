@@ -1,0 +1,5 @@
+<map id="LevelMap.Copy" name="LevelMap.Copy">
+<area shape="rect" id="Node000001" title="Creates a copy of this level map." alt="" coords="5,5,118,32"/>
+<area shape="rect" id="Node000002" href="$class_level_map.html#a74b08718ac1b9ec60de0ae9b5c935372" title="Creates a default empty level map." alt="" coords="166,5,303,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,16,153,18,148,19,118,21"/>
+</map>

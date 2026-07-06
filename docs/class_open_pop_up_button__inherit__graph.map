@@ -1,0 +1,7 @@
+<map id="OpenPopUpButton" name="OpenPopUpButton">
+<area shape="rect" id="Node000001" title="Button strategy that opens a configured popup GameObject." alt="" coords="23,123,164,213"/>
+<area shape="rect" id="Node000003" href="$class_import_level_from_clipboard_button.html" title="Button strategy that attempts to import a level directly from the system clipboard." alt="" coords="5,261,182,384"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="95,226,96,262,91,261,93,231"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract base class for serialized UI button actions." alt="" coords="56,5,132,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,87,96,123,91,123,93,92"/>
+</map>

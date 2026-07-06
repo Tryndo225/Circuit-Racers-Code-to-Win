@@ -1,0 +1,11 @@
+<map id="ImportExportManager.TryDecodeLevel" name="ImportExportManager.TryDecodeLevel">
+<area shape="rect" id="Node000001" title="Attempts to decode a shareable level string into a LevelMap." alt="" coords="482,39,696,81"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#af3dc16446e865c4f2d1b668750a9e20d" title="Attempts to decode a level map from the system clipboard." alt="" coords="228,5,434,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="464,44,434,43,434,37,469,44"/>
+<area shape="rect" id="Node000004" href="$class_import_export_manager.html#a319cd853c8b35b89b8f127c596513084" title="Attempts to decode a level string and add the resulting level to game data." alt="" coords="228,72,434,115"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="469,76,435,83,434,77,464,76"/>
+<area shape="rect" id="Node000003" href="$class_import_level_from_clipboard_button.html#a38ee37684ccfbe2ac32c86a8f58d51f2" title=" " alt="" coords="5,5,180,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="209,27,181,29,180,24,215,26"/>
+<area shape="rect" id="Node000005" href="$class_import_level_button.html#a12edd167aecea03afee928aa3dc72fd6" title=" " alt="" coords="8,80,177,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="209,94,177,96,177,91,215,93"/>
+</map>

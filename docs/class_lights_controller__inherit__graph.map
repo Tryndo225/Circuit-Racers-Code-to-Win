@@ -1,5 +1,5 @@
 <map id="LightsController" name="LightsController">
-<area shape="rect" id="Node000001" title="Controls vehicle lights (front, day, rear, reverse, brake) with optional fading, color/intensity pres..." alt="" coords="5,123,146,533"/>
+<area shape="rect" id="Node000001" title="Controls vehicle light groups and state&#45;dependent light effects." alt="" coords="5,123,146,533"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="26,5,126,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,90,78,123,73,123,73,90"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,87,78,123,73,123,76,93"/>
 </map>

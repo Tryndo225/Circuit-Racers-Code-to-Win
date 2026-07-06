@@ -1,15 +1,31 @@
 <map id="ButtonType" name="ButtonType">
-<area shape="rect" id="Node000001" title="Abstract strategy for a button action." alt="" coords="470,5,546,75"/>
-<area shape="rect" id="Node000002" href="$class_change_scene_button.html" title="Strategy: change to a specific scene via SceneManagement." alt="" coords="5,144,157,235"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="455,50,395,59,323,74,245,96,171,125,134,147,132,142,168,120,244,91,321,69,394,54,454,45"/>
-<area shape="rect" id="Node000003" href="$class_clear_levels_button.html" title="Strategy: clear all levels from GameDataManager." alt="" coords="181,144,320,235"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="457,64,396,91,333,125,303,146,300,142,331,120,394,86,455,59"/>
-<area shape="rect" id="Node000004" href="$class_generate_level_button.html" title="Strategy: procedurally generate a level (optionally circuit), add checkpoints, and display it in a po..." alt="" coords="344,123,498,256"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="483,89,462,124,457,122,478,86"/>
-<area shape="rect" id="Node000005" href="$class_go_to_selected_level.html" title="Strategy: request a scene change to the gameplay level currently selected in GameDataManager." alt="" coords="522,144,667,235"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="537,86,571,143,567,146,533,89"/>
-<area shape="rect" id="Node000006" href="$class_remove_level_button.html" title="Strategy: remove a level from GameDataManager." alt="" coords="692,144,842,235"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="561,61,619,87,680,120,712,142,710,146,677,125,617,92,559,65"/>
-<area shape="rect" id="Node000007" href="$class_select_level_button.html" title="Strategy: set the currently selected LevelMap in GameDataManager." alt="" coords="866,133,1004,245"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="561,44,623,53,698,67,778,89,854,120,873,131,871,136,852,125,776,95,697,73,622,58,561,49"/>
+<area shape="rect" id="Node000001" title="Abstract base class for serialized UI button actions." alt="" coords="780,5,857,75"/>
+<area shape="rect" id="Node000002" href="$class_change_scene_button.html" title="Button strategy that changes to a configured scene through SceneManagement." alt="" coords="17,133,169,224"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="763,41,656,46,509,57,428,67,344,81,262,101,182,125,159,135,155,131,180,120,260,95,343,76,427,62,509,51,656,40,768,40"/>
+<area shape="rect" id="Node000005" href="$class_clear_levels_button.html" title="Button strategy that clears all saved levels from GameDataManager." alt="" coords="193,133,332,224"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="763,44,683,52,576,66,459,89,401,105,345,125,323,136,320,131,343,120,399,100,458,84,575,60,682,47,768,42"/>
+<area shape="rect" id="Node000006" href="$class_close_pop_up_button.html" title="Button strategy that closes a configured popup GameObject." alt="" coords="356,133,500,224"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="763,51,648,79,579,100,513,125,492,136,490,131,511,120,578,95,646,74,768,49"/>
+<area shape="rect" id="Node000008" href="$class_generate_level_button.html" title="Button strategy that procedurally generates a level, creates checkpoints, and displays the result in ..." alt="" coords="524,123,678,235"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="770,72,679,132,676,127,765,74"/>
+<area shape="rect" id="Node000009" href="$class_go_play_button.html" title="Button strategy that starts gameplay by selecting either the day or night scene for the current level..." alt="" coords="702,144,794,213"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="796,87,767,146,763,142,792,90"/>
+<area shape="rect" id="Node000010" href="$class_go_to_selected_level.html" title="Button strategy that starts gameplay using the level currently selected in GameDataManager." alt="" coords="818,133,963,224"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="844,85,870,134,865,133,842,90"/>
+<area shape="rect" id="Node000011" href="$class_notification_button.html" title="Button strategy that displays a configured notification message." alt="" coords="986,144,1101,213"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="871,63,923,89,976,120,1007,145,1002,144,973,125,920,94,870,68"/>
+<area shape="rect" id="Node000012" href="$class_open_pop_up_button.html" title="Button strategy that opens a configured popup GameObject." alt="" coords="1125,133,1266,224"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="871,48,985,75,1051,95,1114,120,1136,134,1131,133,1112,125,1049,100,984,80,871,53"/>
+<area shape="rect" id="Node000014" href="$class_remove_level_button.html" title="Button strategy that removes a specific LevelMap from GameDataManager." alt="" coords="1290,133,1440,224"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="872,41,953,49,1056,63,1169,86,1279,120,1304,134,1299,133,1278,125,1167,91,1055,68,953,54,872,47"/>
+<area shape="rect" id="Node000015" href="$class_select_level_button.html" title="Button strategy that stores a specific LevelMap as the currently selected level." alt="" coords="1464,123,1602,235"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="872,42,1172,70,1335,92,1402,106,1453,120,1467,128,1462,128,1451,125,1401,111,1335,98,1171,75,872,48"/>
+<area shape="rect" id="Node000003" href="$class_edit_button.html" title="Button strategy that opens the editor scene only when a level is currently selected." alt="" coords="5,309,77,379"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="76,236,54,311,49,309,73,240"/>
+<area shape="rect" id="Node000004" href="$class_replay_button.html" title="Button strategy that opens the replay scene only when the selected level has a saved best replay." alt="" coords="102,309,191,379"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="114,236,138,310,133,310,111,240"/>
+<area shape="rect" id="Node000007" href="$class_import_level_button.html" title="Button strategy that imports a level from text entered into a TMP input field." alt="" coords="359,299,497,389"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="430,236,430,300,426,298,426,240"/>
+<area shape="rect" id="Node000013" href="$class_import_level_from_clipboard_button.html" title="Button strategy that attempts to import a level directly from the system clipboard." alt="" coords="1107,283,1284,405"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="1198,237,1198,285,1194,281,1194,241"/>
 </map>

@@ -4,21 +4,24 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 /// <summary>
-/// Centralized audio service for background music and pooled SFX playback.
-/// Supports looping music, pooled one-shot SFX, mapped looping SFX, and short
-/// continuation windows for sounds that should keep playing while repeatedly requested.
+/// Centralized audio service for background music and pooled sound-effect playback.
 /// </summary>
 /// <remarks>
 /// @ingroup audio_mgr
-/// @thread Unity main thread.
-/// @invariant Exactly one active instance exists through <see cref="Singleton{T}"/>.
-/// @invariant Non-looping SFX are not mapped by clip, so repeated one-shots can overlap.
-/// @invariant Looping SFX are mapped by clip, so only one looping helper exists per clip.
-/// @req <see cref="SoundManagerHelper"/> exposes:
-///      <c>IsUsed</c>, <c>IsPlaying</c>, <c>Target</c>, <c>Clip</c>, <c>Volume</c>,
-///      <c>Pitch</c>, <c>SpatialBlend</c>, <c>Loop</c>, <c>OutputMixerGroup</c>,
-///      and methods <c>PlaySound()</c>, <c>PauseSound()</c>, <c>ResetSound()</c>,
-///      <c>StopSound()</c>.
+/// @brief Manages looping music, pooled one-shot SFX, looping SFX, and short continuation windows for repeated sounds.
+///
+/// The manager owns one music <see cref="AudioSource"/> and a pool of <see cref="SoundManagerHelper"/>
+/// objects used for sound effects.
+///
+/// Behaviour:
+/// - Background music is played through a dedicated looping audio source.
+/// - Non-looping SFX are not mapped by clip, so repeated one-shots can overlap.
+/// - Looping SFX are mapped by clip, so one looping helper is reused per clip.
+/// - Continued SFX are kept alive for a short duration and stopped unless continued again.
+/// - The manager follows the main camera so manager-position SFX play near the listener.
+///
+/// Threading:
+/// - Unity main thread only.
 /// </remarks>
 public class SoundManager : Singleton<SoundManager>
 {
@@ -26,64 +29,85 @@ public class SoundManager : Singleton<SoundManager>
 
 	[Header("Audio Settings")]
 	/// <summary>
-	/// Volume scalar for background music in [0,1]. Applied to the internal music source.
+	/// Volume scalar for background music.
 	/// </summary>
-	[Tooltip("Volume for background music (0.0 to 1.0)")]
+	[Tooltip("Volume for background music.")]
 	[SerializeField, Range(0f, 1f)] private float musicVolume = 0.5f;
 
 	/// <summary>
-	/// Global SFX volume scalar in [0,1]. Multiplies per-call SFX volume.
+	/// Global SFX volume scalar.
 	/// </summary>
-	[Tooltip("Volume for sound effects (0.0 to 1.0)")]
+	/// <remarks>
+	/// This value multiplies the per-call SFX volume.
+	/// </remarks>
+	[Tooltip("Global volume multiplier for sound effects.")]
 	[SerializeField, Range(0f, 1f)] private float sfxVolume = 0.5f;
 
 	/// <summary>
-	/// Output mixer group for the music AudioSource (optional).
+	/// Optional output mixer group for background music.
 	/// </summary>
-	[Tooltip("Audio Mixer Group for background music")]
+	[Tooltip("Audio Mixer Group for background music.")]
 	[SerializeField] private AudioMixerGroup musicMixerGroup;
 
 	/// <summary>
-	/// Output mixer group for pooled SFX AudioSources (optional).
+	/// Optional output mixer group for sound effects.
 	/// </summary>
-	[Tooltip("Audio Mixer Group for sound effects")]
+	[Tooltip("Audio Mixer Group for sound effects.")]
 	[SerializeField] private AudioMixerGroup sfxMixerGroup;
 
 	/// <summary>
-	/// When a clip is “continued”, it will keep playing for this duration (seconds)
-	/// before being automatically stopped (unless continued again).
+	/// Duration in seconds for which a continued SFX clip remains active without another continue request.
 	/// </summary>
+	[Tooltip("How long a continued SFX keeps playing before it is stopped unless continued again.")]
 	[SerializeField] private float continueThreshold = 0.1f;
 
 	#endregion
 
 	#region State & Components
 
-	/// <summary>Looping music AudioSource managed by this component.</summary>
+	/// <summary>
+	/// Looping music audio source managed by this component.
+	/// </summary>
 	private AudioSource _musicSource;
 
-	/// <summary>Optional low-pass filter applied to music output.</summary>
+	/// <summary>
+	/// Low-pass filter applied to music output.
+	/// </summary>
 	private AudioLowPassFilter _musicLowPass;
 
-	/// <summary>Countdown (seconds) for clips scheduled to stop after a continue.</summary>
+	/// <summary>
+	/// Countdown values for clips scheduled to stop after a continuation window.
+	/// </summary>
 	private readonly Dictionary<AudioClip, float> _toBeContinued = new Dictionary<AudioClip, float>();
 
-	/// <summary>Staging list of continued clips to remove when countdown elapses.</summary>
+	/// <summary>
+	/// Temporary list of continued clips to remove after their countdown elapses.
+	/// </summary>
 	private readonly List<AudioClip> _toBeRemoved = new List<AudioClip>();
 
-	/// <summary>Scratch list for enumerating keys without allocation while mutating the dictionary.</summary>
+	/// <summary>
+	/// Scratch list used for enumerating dictionary keys while the dictionary may be mutated.
+	/// </summary>
 	private List<AudioClip> _keys;
 
-	/// <summary>Pool of helper components used to play/track active SFX.</summary>
+	/// <summary>
+	/// Pool of helper components used to play and track active sound effects.
+	/// </summary>
 	private readonly List<SoundManagerHelper> _sfxSources = new List<SoundManagerHelper>();
 
-	/// <summary>Maps an AudioClip to a helper currently responsible for playing it.</summary>
+	/// <summary>
+	/// Maps looping or continued clips to the helper currently responsible for playing them.
+	/// </summary>
 	private readonly Dictionary<AudioClip, SoundManagerHelper> _sfxMapping = new Dictionary<AudioClip, SoundManagerHelper>();
 
-	/// <summary>Cached main camera (used to co-locate the manager with the listener).</summary>
+	/// <summary>
+	/// Cached main camera used to keep this manager near the listener.
+	/// </summary>
 	private Camera _camera;
 
-	/// <summary>Exposes the music low-pass filter for external tweaks (cutoff/Q).</summary>
+	/// <summary>
+	/// Gets the music low-pass filter for external audio effects.
+	/// </summary>
 	public AudioLowPassFilter MusicLowPass => _musicLowPass;
 
 	#endregion
@@ -91,7 +115,7 @@ public class SoundManager : Singleton<SoundManager>
 	#region Unity methods
 
 	/// <summary>
-	/// Initializes the singleton, creates a looping music source, and a default low-pass filter.
+	/// Initializes the singleton, creates the music source, and adds a default low-pass filter.
 	/// </summary>
 	protected override void Awake()
 	{
@@ -108,15 +132,13 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Keeps this object at the listener position and services SFX pooling/continuations.
+	/// Keeps this object at the listener position and updates SFX continuation countdowns.
 	/// </summary>
 	private void Update()
 	{
-		// Follow the main camera so “global” SFX use the listener position.
 		if (_camera == null) _camera = Camera.main;
 		if (_camera != null) transform.position = _camera.transform.position;
 
-		// Manage “continue” countdowns.
 		_toBeRemoved.Clear();
 		_keys = _keys ?? new List<AudioClip>(4);
 		_keys.Clear();
@@ -151,10 +173,14 @@ public class SoundManager : Singleton<SoundManager>
 	#region Music API
 
 	/// <summary>
-	/// Starts playing the given music clip. If a new clip is provided, the source is swapped
-	/// and playback begins; if the same clip is already set but not playing, it resumes.
+	/// Starts or resumes background music.
 	/// </summary>
-	/// <param name="clip">Music clip to play (ignored if null).</param>
+	/// <param name="clip">Music clip to play.</param>
+	/// <remarks>
+	/// Null clips are ignored. If the requested clip differs from the current music clip,
+	/// the source is swapped and playback begins. If the same clip is already assigned but paused,
+	/// playback resumes.
+	/// </remarks>
 	public void PlayMusic(AudioClip clip)
 	{
 
@@ -172,7 +198,9 @@ public class SoundManager : Singleton<SoundManager>
 		}
 	}
 
-	/// <summary>Stops the current music if it is playing.</summary>
+	/// <summary>
+	/// Stops the current background music if it is playing.
+	/// </summary>
 	public void StopMusic()
 	{
 		if (_musicSource.isPlaying)
@@ -180,9 +208,9 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Sets music volume and applies it immediately.
+	/// Sets the background music volume.
 	/// </summary>
-	/// <param name="volume">Target volume in [0,1].</param>
+	/// <param name="volume">Target volume in the range 0 to 1.</param>
 	public void SetMusicVolume(float volume)
 	{
 		musicVolume = Mathf.Clamp01(volume);
@@ -194,21 +222,22 @@ public class SoundManager : Singleton<SoundManager>
 	#region SFX API
 
 	/// <summary>
-	/// Plays (or reuses) a pooled SFX helper for the given clip at a target target, with
-	/// optional volume/pitch/loop and spatial blend control.
+	/// Plays a sound effect through the pooled helper system.
 	/// </summary>
-	/// <param name="clip">Clip to play (ignored if null).</param>
-	/// <param name="target">World target whose position is tracked by the helper.</param>
-	/// <param name="volume">Per-call volume scalar (multiplied by global <see cref="sfxVolume"/>).</param>
+	/// <param name="clip">Clip to play.</param>
+	/// <param name="target">Target transform followed by the helper during playback.</param>
+	/// <param name="volume">Per-call volume multiplier.</param>
 	/// <param name="pitch">Per-call pitch multiplier.</param>
-	/// <param name="loop">Whether the SFX should loop.</param>
-	/// <param name="spatialBlend">
-	/// Spatial blend for the helper [0..1]. 0 = 2D, 1 = fully 3D.
-	/// </param>
+	/// <param name="loop">Whether the sound effect should loop.</param>
+	/// <param name="spatialBlend">Spatial blend in the range 0 to 1. A value of 0 is 2D; a value of 1 is fully 3D.</param>
 	/// <param name="reset">
-	/// If true and the clip is already playing, the helper is reset and restarted. If false,
-	/// an already-playing clip continues uninterrupted.
+	/// Whether an already-playing mapped clip should be reset and restarted.
+	/// If false, an already-playing mapped clip continues uninterrupted.
 	/// </param>
+	/// <remarks>
+	/// Non-looping sounds always use a free helper and are allowed to overlap. Looping sounds are mapped by clip
+	/// so repeated calls reuse the same helper.
+	/// </remarks>
 	public void PlaySFXClip(AudioClip clip, Transform target, float volume = 1f, float pitch = 1f, bool loop = false, float spatialBlend = 0.0f, bool reset = true)
 	{
 		if (clip == null)
@@ -257,10 +286,13 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// “Continues” a looping SFX for <see cref="continueThreshold"/> seconds and then stops it,
-	/// unless continued again in the meantime.
+	/// Keeps a looping SFX clip playing for the configured continuation window.
 	/// </summary>
-	/// <param name="clip">Clip to continue (ignored if null).</param>
+	/// <param name="clip">Clip to continue.</param>
+	/// <remarks>
+	/// The clip is played as a looping SFX and then scheduled to stop after <see cref="continueThreshold"/>
+	/// seconds unless this method is called again before the countdown expires.
+	/// </remarks>
 	public void ContinueSFXClip(AudioClip clip)
 	{
 		PlaySFXClip(clip, transform, 1f, 1f, true, 0.0f, false);
@@ -268,10 +300,10 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Same as <see cref="ContinueSFXClip(AudioClip)"/> but with an explicit start volume.
+	/// Keeps a looping SFX clip playing for the configured continuation window with a custom volume.
 	/// </summary>
 	/// <param name="clip">Clip to continue.</param>
-	/// <param name="volume">Per-call volume scalar.</param>
+	/// <param name="volume">Per-call volume multiplier.</param>
 	public void ContinueSFXClip(AudioClip clip, float volume)
 	{
 		PlaySFXClip(clip, transform, volume, 1f, true, 0.0f, false);
@@ -279,27 +311,27 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Convenience overload: plays a non-looping SFX at the manager’s position with a volume scalar.
+	/// Plays a non-looping sound effect at the manager position with a custom volume.
 	/// </summary>
 	/// <param name="clip">Clip to play.</param>
-	/// <param name="volume">Per-call volume scalar.</param>
+	/// <param name="volume">Per-call volume multiplier.</param>
 	public void PlaySFXClip(AudioClip clip, float volume)
 	{
 		PlaySFXClip(clip, transform, volume);
 	}
 
 	/// <summary>
-	/// Convenience overload: plays a non-looping SFX at the given target with default volume/pitch.
+	/// Plays a non-looping sound effect at the given target with default volume and pitch.
 	/// </summary>
 	/// <param name="clip">Clip to play.</param>
-	/// <param name="target">World target.</param>
+	/// <param name="target">Target transform followed by the helper during playback.</param>
 	public void PlaySFXClip(AudioClip clip, Transform target)
 	{
 		PlaySFXClip(clip, target, 1f, 1f, false, 0.0f, true);
 	}
 
 	/// <summary>
-	/// Convenience overload: plays a non-looping SFX at the manager’s position with default volume/pitch.
+	/// Plays a non-looping sound effect at the manager position with default volume and pitch.
 	/// </summary>
 	/// <param name="clip">Clip to play.</param>
 	public void PlaySFXClip(AudioClip clip)
@@ -308,7 +340,7 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Pauses a playing SFX associated with the given clip (if found).
+	/// Pauses a mapped sound effect associated with the given clip.
 	/// </summary>
 	/// <param name="clip">Clip whose helper should be paused.</param>
 	public void PauseSFXClip(AudioClip clip)
@@ -319,9 +351,9 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Resets a playing SFX (seek to start) for the given clip (if found).
+	/// Resets a mapped sound effect associated with the given clip.
 	/// </summary>
-	/// <param name="clip">Clip whose helper should be reset.</param>
+	/// <param name="clip">Clip whose helper should be reset to the start.</param>
 	public void ResetSFXClip(AudioClip clip)
 	{
 		if (clip == null) return;
@@ -330,7 +362,7 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Stops and unmaps the helper for the given clip (if found).
+	/// Stops and unmaps a sound effect associated with the given clip.
 	/// </summary>
 	/// <param name="clip">Clip whose playback should stop.</param>
 	public void StopSFXClip(AudioClip clip)
@@ -350,9 +382,12 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Sets the global SFX volume scalar for subsequent plays (existing one-shots are unaffected).
+	/// Sets the global SFX volume scalar for future sound effects.
 	/// </summary>
-	/// <param name="volume">Target volume in [0,1].</param>
+	/// <param name="volume">Target volume in the range 0 to 1.</param>
+	/// <remarks>
+	/// Existing one-shot sounds are not retroactively updated.
+	/// </remarks>
 	public void SetSFXVolume(float volume)
 	{
 		sfxVolume = Mathf.Clamp01(volume);
@@ -363,15 +398,15 @@ public class SoundManager : Singleton<SoundManager>
 	#region Internals
 
 	/// <summary>
-	/// Initializes a pooled helper with the desired clip, target, and playback parameters.
+	/// Initializes a pooled helper with clip, target, and playback parameters.
 	/// </summary>
 	/// <param name="helper">Helper instance to configure.</param>
 	/// <param name="clip">Clip to play.</param>
-	/// <param name="transform">World target to track.</param>
-	/// <param name="volume">Computed volume (already multiplied by <see cref="sfxVolume"/>).</param>
+	/// <param name="target">Target transform followed by the helper during playback.</param>
+	/// <param name="volume">Computed volume after applying the global SFX volume.</param>
 	/// <param name="pitch">Pitch multiplier.</param>
-	/// <param name="loop">Loop flag.</param>
-	/// <param name="spatialBlend">Spatial blend [0..1].</param>
+	/// <param name="loop">Whether playback should loop.</param>
+	/// <param name="spatialBlend">Spatial blend in the range 0 to 1.</param>
 	private void SetUpHelper(SoundManagerHelper helper, AudioClip clip, Transform target, float volume, float pitch, bool loop, float spatialBlend)
 	{
 		helper.IsUsed = true;
@@ -385,9 +420,12 @@ public class SoundManager : Singleton<SoundManager>
 	}
 
 	/// <summary>
-	/// Returns an unused helper from the pool, or creates a new helper if none are free.
-	/// Any stale clip mappings pointing to the reused helper are removed before reuse.
+	/// Gets an unused helper from the pool, or creates a new helper when none are free.
 	/// </summary>
+	/// <returns>Free helper ready for setup.</returns>
+	/// <remarks>
+	/// Any stale clip mappings pointing to a reused helper are removed before reuse.
+	/// </remarks>
 	private SoundManagerHelper GetFreeHelper()
 	{
 		for (int i = 0; i < _sfxSources.Count; i++)
@@ -408,9 +446,11 @@ public class SoundManager : Singleton<SoundManager>
 
 	/// <summary>
 	/// Removes all clip mappings that point to the given helper.
-	/// This prevents stale mappings when a pooled helper is reused for another sound.
 	/// </summary>
 	/// <param name="helper">Helper whose previous mappings should be removed.</param>
+	/// <remarks>
+	/// This prevents stale mappings when a pooled helper is reused for another sound.
+	/// </remarks>
 	private void RemoveMappingsForHelper(SoundManagerHelper helper)
 	{
 		if (helper == null)

@@ -1,0 +1,5 @@
+<map id="TrackManager.StartRace" name="TrackManager.StartRace">
+<area shape="rect" id="Node000001" title="Starts race setup from a provided level map or from existing scene checkpoint data." alt="" coords="5,5,173,32"/>
+<area shape="rect" id="Node000002" href="$class_track_manager.html#a148e1831d0184528f4f0835c074e813a" title="Handles the currently active checkpoint being claimed." alt="" coords="221,5,432,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,16,208,19,202,19,173,21"/>
+</map>

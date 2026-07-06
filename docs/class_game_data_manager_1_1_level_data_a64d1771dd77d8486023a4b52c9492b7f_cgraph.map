@@ -1,5 +1,5 @@
 <map id="GameDataManager.LevelData.operator!=" name="GameDataManager.LevelData.operator!=">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,266,40"/>
-<area shape="rect" id="Node000002" href="$class_game_data_manager_1_1_level_data.html#a3e100065efa7fc76a0d47d489a91b9d4" title="Creates a record with an unknown best time." alt="" coords="314,5,515,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="266,24,298,24,298,29,266,29"/>
+<area shape="rect" id="Node000001" title="Checks whether two level&#45;data records differ." alt="" coords="5,13,266,40"/>
+<area shape="rect" id="Node000002" href="$class_game_data_manager_1_1_level_data.html#a08fbd5daba156a8e83ae9deece00d5a5" title="Parameterless constructor for Unity serialization." alt="" coords="314,5,515,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="266,24,301,27,295,27,266,29"/>
 </map>

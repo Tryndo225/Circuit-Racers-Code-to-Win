@@ -1,0 +1,7 @@
+<map id="LevelMap.GetFlatTiles" name="LevelMap.GetFlatTiles">
+<area shape="rect" id="Node000001" title="Creates a flattened copy of the current Tiles grid." alt="" coords="484,13,636,40"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#adc3ded0f143550dfbed23d9e1bf63b6e" title="Encodes a LevelMap into a compact shareable string." alt="" coords="242,5,436,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="466,27,436,29,436,24,471,27"/>
+<area shape="rect" id="Node000003" href="$class_import_export_manager.html#ad9421a683f04ca3046b3a9921e10511b" title="Encodes a level map and copies the encoded string to the system clipboard." alt="" coords="5,5,194,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="224,27,194,29,194,24,229,26"/>
+</map>

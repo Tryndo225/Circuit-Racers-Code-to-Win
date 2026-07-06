@@ -264,14 +264,14 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 560e7a41e67ce0f42918a62ad8a7ef85, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonScript
   properties:
-    rid: 9136633811565019217
+    rid: 9136633907189907539
   references:
     version: 2
     RefIds:
-    - rid: 9136633811565019217
-      type: {class: GoPlayButtom, ns: , asm: Assembly-CSharp}
+    - rid: 9136633907189907539
+      type: {class: GoPlayButton, ns: , asm: Assembly-CSharp}
       data:
         _sceneToLoadDay:
           sceneName: Level - Day
@@ -607,7 +607,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0009503845}
+  m_AnchoredPosition: {x: 0, y: 0.000944084}
   m_SizeDelta: {x: 0, y: 1200}
   m_Pivot: {x: 0, y: 1}
 --- !u!1001 &272531929
@@ -2239,7 +2239,7 @@ MonoBehaviour:
         size: 50
         stepCount: 20
         stepSize: 0
-        maxAttemps: 1000
+        maxAttempts: 100
 --- !u!1 &787695314
 GameObject:
   m_ObjectHideFlags: 0

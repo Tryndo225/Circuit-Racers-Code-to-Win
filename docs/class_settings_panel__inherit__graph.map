@@ -1,0 +1,5 @@
+<map id="SettingsPanel" name="SettingsPanel">
+<area shape="rect" id="Node000001" title="UI controller for the driving assist settings panel." alt="" coords="10,123,102,213"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,106,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,87,58,124,53,123,55,92"/>
+</map>

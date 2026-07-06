@@ -1,5 +1,6 @@
 var class_transmission_controller =
 [
+    [ "GetNormalizedRPM", "class_transmission_controller.html#aee222daf955a09e3b3cee6ef1dfcc8d9", null ],
     [ "HandleShifting", "class_transmission_controller.html#abda2347948d263cb836db7f4b475d795", null ],
     [ "finalDrive", "class_transmission_controller.html#a99cc70e20b905d2627e24a4350374df5", null ],
     [ "forwardGears", "class_transmission_controller.html#ae7c7b44734702999ce847defadf3d483", null ],

@@ -1,3 +1,3 @@
 <map id="TrackPiece" name="TrackPiece">
-<area shape="rect" id="Node000001" title="Describes a single placeable track piece: which prefab to spawn and the world&#45;space pose (position an..." alt="" coords="5,5,103,117"/>
+<area shape="rect" id="Node000001" title="Describes a single placeable track piece: prefab, world&#45;space pose, and pattern size." alt="" coords="5,5,103,139"/>
 </map>

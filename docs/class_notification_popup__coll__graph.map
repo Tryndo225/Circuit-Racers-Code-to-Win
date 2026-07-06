@@ -1,0 +1,7 @@
+<map id="NotificationPopup" name="NotificationPopup">
+<area shape="rect" id="Node000001" title="Click&#45;dismissable UI popup used to display a notification message." alt="" coords="65,123,185,256"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,106,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,86,97,123,92,123,77,91"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="130,5,261,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,86,159,125,154,122,171,90"/>
+</map>

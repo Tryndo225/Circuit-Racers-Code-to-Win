@@ -1,5 +1,5 @@
 <map id="Coordinates.Equals" name="Coordinates.Equals">
-<area shape="rect" id="Node000001" title="Value equality on X and Y." alt="" coords="5,5,141,32"/>
-<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates (x, y)." alt="" coords="189,5,354,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,16,173,16,173,21,141,21"/>
+<area shape="rect" id="Node000001" title="Checks whether this coordinate has the same component values as another coordinate." alt="" coords="5,5,141,32"/>
+<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates from integer components." alt="" coords="189,5,354,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,16,176,18,170,19,141,21"/>
 </map>

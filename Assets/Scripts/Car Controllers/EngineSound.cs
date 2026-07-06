@@ -2,14 +2,23 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 /// <summary>
-/// Procedural engine audio using four RPM bands (idle/low/mid/high) with on/off-throttle layers.
-/// Smooths RPM and throttle, crossfades bands, applies pitch vs. RPM, shift flares, and a soft limiter.
+/// Procedural engine audio controller using four RPM bands.
 /// </summary>
 /// <remarks>
 /// @ingroup car_ctrl
-/// @invariant Exactly 4 bands are used internally (idle, low, mid, high).
-/// @invariant minRPM <= RPM <= maxRPM during Update (values are clamped).
-/// @thread Unity main thread (Update).
+/// @brief Blends idle, low, mid, and high RPM engine clips with on-throttle and off-throttle layers.
+///
+/// The component smooths RPM and throttle input, crossfades between four RPM bands, maps RPM to pitch,
+/// applies a short shift flare, and uses a soft limiter near redline.
+///
+/// Audio layout:
+/// - Four on-throttle layers: idle, low, mid, high.
+/// - Four off-throttle layers: idle, low, mid, high.
+/// - Each layer is played by its own looping <see cref="AudioSource"/>.
+///
+/// Threading:
+/// - Unity main thread only.
+/// - Updated from <see cref="Update"/>.
 /// </remarks>
 [DisallowMultipleComponent]
 public class EngineSound : MonoBehaviour
@@ -17,12 +26,20 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: Inputs
 
 	[Header("Inputs")]
-	/// <summary>Current engine speed in RPM (will be clamped to [minRPM, maxRPM]).</summary>
+	/// <summary>
+	/// Current engine speed in RPM.
+	/// </summary>
+	/// <remarks>
+	/// This value is clamped between <see cref="minRPM"/> and <see cref="maxRPM"/> during updates.
+	/// </remarks>
 	[Tooltip("Current engine speed in RPM.")]
 	public float RPM;
 
-	/// <summary>Driver demand/load in [0,1].</summary>
-	[Range(0f, 1f), Tooltip("Driver demand/load")]
+	/// <summary>
+	/// Current driver demand or engine load.
+	/// </summary>
+	[Range(0f, 1f)]
+	[Tooltip("Driver demand or engine load.")]
 	public float throttle;
 
 	#endregion
@@ -30,10 +47,16 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: RPM Range
 
 	[Header("RPM Range")]
-	/// <summary>Minimum RPM for normalization.</summary>
+	/// <summary>
+	/// Minimum RPM used for normalization.
+	/// </summary>
+	[Tooltip("Minimum RPM used for normalization.")]
 	public float minRPM;
 
-	/// <summary>Maximum RPM for normalization.</summary>
+	/// <summary>
+	/// Maximum RPM used for normalization.
+	/// </summary>
+	[Tooltip("Maximum RPM used for normalization.")]
 	public float maxRPM;
 
 	#endregion
@@ -41,16 +64,31 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: Main Output
 
 	[Header("Main Output")]
-	/// <summary>Audio mixer group for all engine sources.</summary>
+	/// <summary>
+	/// Audio mixer group used by all engine audio sources.
+	/// </summary>
+	[Tooltip("Audio mixer group used by all engine audio sources.")]
 	public AudioMixerGroup outputGroup;
 
-	/// <summary>Master volume applied after band mixing.</summary>
+	/// <summary>
+	/// Master volume applied after band mixing.
+	/// </summary>
+	[Tooltip("Master volume applied after band mixing.")]
 	[Range(0f, 1f)] public float masterVolume;
 
-	/// <summary>0 = 2D, 1 = fully 3D spatialized.</summary>
+	/// <summary>
+	/// Spatial blend applied to engine audio sources.
+	/// </summary>
+	/// <remarks>
+	/// A value of 0 means fully 2D audio. A value of 1 means fully 3D audio.
+	/// </remarks>
+	[Tooltip("0 = 2D, 1 = fully 3D spatialized.")]
 	[Range(0f, 1f)] public float spatialBlend;
 
-	/// <summary>Doppler effect intensity (0..5).</summary>
+	/// <summary>
+	/// Doppler effect intensity.
+	/// </summary>
+	[Tooltip("Doppler effect intensity.")]
 	[Range(0f, 5f)] public float dopplerLevel;
 
 	#endregion
@@ -58,23 +96,53 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: Clips (On/Off Throttle)
 
 	[Header("Clips (On-Throttle)")]
-	/// <summary>On-throttle idle clip.</summary>
+	/// <summary>
+	/// On-throttle idle RPM band clip.
+	/// </summary>
+	[Tooltip("On-throttle idle RPM band clip.")]
 	public AudioClip on_Idle;
-	/// <summary>On-throttle low band clip.</summary>
+
+	/// <summary>
+	/// On-throttle low RPM band clip.
+	/// </summary>
+	[Tooltip("On-throttle low RPM band clip.")]
 	public AudioClip on_Low;
-	/// <summary>On-throttle mid band clip.</summary>
+
+	/// <summary>
+	/// On-throttle mid RPM band clip.
+	/// </summary>
+	[Tooltip("On-throttle mid RPM band clip.")]
 	public AudioClip on_Mid;
-	/// <summary>On-throttle high band clip.</summary>
+
+	/// <summary>
+	/// On-throttle high RPM band clip.
+	/// </summary>
+	[Tooltip("On-throttle high RPM band clip.")]
 	public AudioClip on_High;
 
 	[Header("Clips (Off-Throttle)")]
-	/// <summary>Off-throttle idle clip.</summary>
+	/// <summary>
+	/// Off-throttle idle RPM band clip.
+	/// </summary>
+	[Tooltip("Off-throttle idle RPM band clip.")]
 	public AudioClip off_Idle;
-	/// <summary>Off-throttle low band clip.</summary>
+
+	/// <summary>
+	/// Off-throttle low RPM band clip.
+	/// </summary>
+	[Tooltip("Off-throttle low RPM band clip.")]
 	public AudioClip off_Low;
-	/// <summary>Off-throttle mid band clip.</summary>
+
+	/// <summary>
+	/// Off-throttle mid RPM band clip.
+	/// </summary>
+	[Tooltip("Off-throttle mid RPM band clip.")]
 	public AudioClip off_Mid;
-	/// <summary>Off-throttle high band clip.</summary>
+
+	/// <summary>
+	/// Off-throttle high RPM band clip.
+	/// </summary>
+	[Tooltip("Off-throttle high RPM band clip.")]
 	public AudioClip off_High;
 
 	#endregion
@@ -82,11 +150,19 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: Smoothing
 
 	[Header("Smoothing")]
-	/// <summary>RPM smoothing speed constant (higher = faster response).</summary>
-	[Tooltip("Higher = Faster response")]
+	/// <summary>
+	/// RPM smoothing speed constant.
+	/// </summary>
+	/// <remarks>
+	/// Higher values make RPM audio respond faster.
+	/// </remarks>
+	[Tooltip("RPM smoothing speed. Higher values make RPM audio respond faster.")]
 	public float rpmLerpSpeed;
 
-	/// <summary>Throttle smoothing speed constant.</summary>
+	/// <summary>
+	/// Throttle smoothing speed constant.
+	/// </summary>
+	[Tooltip("Throttle smoothing speed. Higher values make throttle audio respond faster.")]
 	public float throttleLerpSpeed;
 
 	#endregion
@@ -94,8 +170,10 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: Pitch Mapping
 
 	[Header("Pitch Mapping")]
-	/// <summary>Maps normalized RPM [0..1] to pitch multiplier.</summary>
-	[Tooltip("AnimationCurve maps normalized RPM [0..1] to pitch multiplier.")]
+	/// <summary>
+	/// Maps normalized RPM to pitch multiplier.
+	/// </summary>
+	[Tooltip("AnimationCurve maps normalized RPM from 0 to 1 to pitch multiplier.")]
 	public AnimationCurve pitchVsRpm;
 
 	#endregion
@@ -103,12 +181,22 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: Band Crossfade
 
 	[Header("Band Crossfade")]
-	/// <summary>Center points of the four bands over normalized RPM.</summary>
-	[Tooltip("Center points of the four bands over normalized RPM")]
+	/// <summary>
+	/// Center points of the four RPM bands over normalized RPM.
+	/// </summary>
+	/// <remarks>
+	/// Values correspond to idle, low, mid, and high bands.
+	/// </remarks>
+	[Tooltip("Center points of the idle, low, mid, and high RPM bands over normalized RPM.")]
 	public Vector4 bandCenters;
 
-	/// <summary>Crossfade sharpness between bands (bigger = narrower band).</summary>
-	[Tooltip("How sharp the crossfade between bands is (bigger = narrower band).")]
+	/// <summary>
+	/// Crossfade sharpness between RPM bands.
+	/// </summary>
+	/// <remarks>
+	/// Larger values create narrower band ranges.
+	/// </remarks>
+	[Tooltip("Crossfade sharpness between bands. Higher values create narrower bands.")]
 	public float bandSharpness;
 
 	#endregion
@@ -116,12 +204,19 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: On/Off Balance
 
 	[Header("On/Off Balance")]
-	/// <summary>Exponent shaping for throttle to on-throttle weight (1=linear, >1 favors off around mid throttle).</summary>
-	[Tooltip("Exponent shaping for throttle : On-throttle weight (1=linear, > 1 favors off at mid throttle).")]
+	/// <summary>
+	/// Exponent shaping from throttle value to on-throttle weight.
+	/// </summary>
+	/// <remarks>
+	/// A value of 1 is linear. Values greater than 1 keep more off-throttle character around mid throttle.
+	/// </remarks>
+	[Tooltip("Exponent shaping for throttle to on-throttle weight. 1 = linear.")]
 	public float throttleShape;
 
-	/// <summary>Additional gain for on-throttle layer relative to off-throttle.</summary>
-	[Tooltip("Extra volume on-throttle compared to off-throttle.")]
+	/// <summary>
+	/// Additional gain for the on-throttle layer.
+	/// </summary>
+	[Tooltip("Extra volume for on-throttle audio compared to off-throttle audio.")]
 	public float onThrottleBoost;
 
 	#endregion
@@ -129,39 +224,76 @@ public class EngineSound : MonoBehaviour
 	#region Inspector: Shift & Limiter
 
 	[Header("Shift & Limiter")]
-	/// <summary>Pitch flare amplitude during gear shifts.</summary>
+	/// <summary>
+	/// Pitch flare amplitude during gear shifts.
+	/// </summary>
+	[Tooltip("Pitch flare amplitude during gear shifts.")]
 	public float shiftFlareAmount;
 
-	/// <summary>Duration of shift flare in seconds.</summary>
+	/// <summary>
+	/// Duration of shift flare in seconds.
+	/// </summary>
+	[Tooltip("Duration of shift flare in seconds.")]
 	public float shiftFlareTime;
 
-	/// <summary>Limiter activation threshold in normalized RPM [0..1].</summary>
+	/// <summary>
+	/// Limiter activation threshold in normalized RPM.
+	/// </summary>
+	[Tooltip("Limiter activation threshold in normalized RPM.")]
 	public float limiterStart;
 
-	/// <summary>Limiter depth (how much level is reduced near redline).</summary>
+	/// <summary>
+	/// Limiter depth near redline.
+	/// </summary>
+	[Tooltip("Limiter depth, controlling how much volume is reduced near redline.")]
 	public float limiterDepth;
 
 	#endregion
 
 	#region State
 
-	// Internal state
+	/// <summary>
+	/// Smoothed RPM value used for audio blending.
+	/// </summary>
 	private float _rpmSmoothed;
+
+	/// <summary>
+	/// Smoothed throttle value used for on/off-throttle blending.
+	/// </summary>
 	private float _thrSmoothed;
+
+	/// <summary>
+	/// Remaining shift flare time.
+	/// </summary>
 	private float _shiftFlareT;
 
+	/// <summary>
+	/// Number of RPM bands used internally.
+	/// </summary>
 	private const int _bands = 4;
 
+	/// <summary>
+	/// Audio sources for on-throttle RPM bands.
+	/// </summary>
 	private AudioSource[] _onSrc = new AudioSource[_bands];
+
+	/// <summary>
+	/// Audio sources for off-throttle RPM bands.
+	/// </summary>
 	private AudioSource[] _offSrc = new AudioSource[_bands];
 
+	/// <summary>
+	/// Current normalized weights for the four RPM bands.
+	/// </summary>
 	private float[] _bandWeights = new float[_bands];
 
 	#endregion
 
 	#region Unity Methods
 
-	/// <summary>Initializes audio sources and seeds smoothed inputs.</summary>
+	/// <summary>
+	/// Initializes audio sources and seeds smoothed input values.
+	/// </summary>
 	private void Awake()
 	{
 		CreateOrReuseSources();
@@ -170,8 +302,7 @@ public class EngineSound : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Updates smoothed RPM and throttle, computes band weights and limiter, and applies volume/pitch
-	/// to each on/off source.
+	/// Updates smoothed RPM/throttle, computes band weights, applies limiter, and updates all engine sources.
 	/// </summary>
 	private void Update()
 	{
@@ -235,7 +366,12 @@ public class EngineSound : MonoBehaviour
 
 	#region Public API
 
-	/// <summary>Triggers a short pitch flare (e.g., on gear shift).</summary>
+	/// <summary>
+	/// Triggers a short pitch flare.
+	/// </summary>
+	/// <remarks>
+	/// Intended to be called on gear shifts.
+	/// </remarks>
 	public void OnShift()
 	{
 		_shiftFlareT = shiftFlareTime;
@@ -243,8 +379,10 @@ public class EngineSound : MonoBehaviour
 
 	/// <summary>
 	/// Clamps user-facing audio properties and applies them to created sources.
-	/// Call after Awake if you modify inspector values at runtime.
 	/// </summary>
+	/// <remarks>
+	/// Call after <see cref="Awake"/> if inspector values are modified at runtime.
+	/// </remarks>
 	public void SetUp()
 	{
 		spatialBlend = Mathf.Clamp01(spatialBlend);
@@ -265,11 +403,13 @@ public class EngineSound : MonoBehaviour
 	#region Helpers
 
 	/// <summary>
-	/// Computes normalized Gaussian-like weights for the four RPM bands around bandCenters,
-	/// then normalizes weights to sum to 1.
+	/// Computes normalized weights for the four RPM bands.
 	/// </summary>
-	/// <param name="n">Normalized RPM in [0,1].</param>
-	/// <param name="bandWeights">Output array of length 4.</param>
+	/// <param name="n">Normalized RPM in the range 0 to 1.</param>
+	/// <param name="bandWeights">Output array containing four band weights.</param>
+	/// <remarks>
+	/// Weights are calculated around <see cref="bandCenters"/> and then normalized so the total is 1.
+	/// </remarks>
 	private void BandWeights(float n, ref float[] bandWeights)
 	{
 		float s = Mathf.Max(1e-3f, bandSharpness);
@@ -289,7 +429,7 @@ public class EngineSound : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Creates or reuses eight audio sources (4 on-throttle + 4 off-throttle) and starts playback.
+	/// Creates or reuses audio sources for all on-throttle and off-throttle RPM bands.
 	/// </summary>
 	private void CreateOrReuseSources()
 	{
@@ -307,11 +447,11 @@ public class EngineSound : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Creates a band source if the clip exists and stores it in the on/off arrays.
+	/// Creates a band source if a clip exists and stores it in the on/off source arrays.
 	/// </summary>
-	/// <param name="band">Band index [0..3].</param>
+	/// <param name="band">Band index from 0 to 3.</param>
 	/// <param name="clip">Audio clip for this band.</param>
-	/// <param name="onThrottle">True for on-throttle layer, false for off-throttle.</param>
+	/// <param name="onThrottle">Whether the source belongs to the on-throttle layer.</param>
 	private void SetupBandSource(int band, AudioClip clip, bool onThrottle)
 	{
 		if (!clip)
@@ -326,13 +466,13 @@ public class EngineSound : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Instantiates an AudioSource child with standard engine settings and starts playback.
+	/// Instantiates an engine audio source child and starts playback.
 	/// </summary>
 	/// <param name="name">Child object name suffix.</param>
-	/// <param name="clip">Audio clip.</param>
-	/// <param name="vol">Initial volume.</param>
-	/// <param name="loop">Whether to loop playback.</param>
-	/// <returns>The created AudioSource.</returns>
+	/// <param name="clip">Audio clip assigned to the source.</param>
+	/// <param name="vol">Initial source volume.</param>
+	/// <param name="loop">Whether the source loops playback.</param>
+	/// <returns>The created audio source.</returns>
 	private AudioSource MakeSrc(string name, AudioClip clip, float vol, bool loop)
 	{
 		var go = new GameObject("Audio_" + name);

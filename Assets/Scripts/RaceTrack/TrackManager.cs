@@ -1,45 +1,64 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Manages race flow for a track with sequential checkpoints: spawns the player car,
-/// tracks laps and times, handles respawn/restart inputs, and advances checkpoint state.
+/// Manages race flow for a track with sequential checkpoints.
 /// </summary>
 /// <remarks>
-/// @ingroup track_mgr
-/// @invariant CheckPoints are ordered as the race path; index 0 is the start/finish for circuits.
-/// @invariant If carPrefab is assigned, the spawned instance must include a Rigidbody.
-/// @invariant When circuit mode is enabled (isCircuit), laps >= 1.
-/// @thread Unity main thread (lifecycle, physics callbacks, coroutines).
+/// @ingroup track_mng
+/// @brief Spawns the player car, tracks lap/checkpoint progression, handles respawn/restart input, and controls checkpoint activation.
+///
+/// This manager coordinates the runtime race flow:
+/// - Spawns and restarts the player car.
+/// - Activates only the next required checkpoint.
+/// - Advances checkpoint and lap progress.
+/// - Handles point-to-point and circuit race completion.
+/// - Respawns the car at the last claimed checkpoint.
+/// - Connects race progression to <see cref="RaceTimeManager"/>.
+///
+/// Threading:
+/// - Unity main thread only.
+/// - Uses Unity lifecycle methods, input callbacks, physics state, and coroutines.
 /// </remarks>
 public class TrackManager : Generic.SceneSingleton<TrackManager>
 {
-
-
 	/// <summary>
-	/// Optional explicit spawn transform for the car; if null, this object's transform is used.
+	/// Optional explicit spawn transform for the car.
 	/// </summary>
+	/// <remarks>
+	/// If this is not assigned, the manager object's own transform is used as the spawn point.
+	/// </remarks>
+	[Tooltip("Optional explicit spawn transform for the player car. If empty, this object's transform is used.")]
 	public Transform CarSpawn = null;
 
 	#region Inspector: Input Settings
 
 	[Header("Input Settings")]
 	/// <summary>
-	/// Input action to respawn at the last checkpoint (or restart if none).
-	/// Default bindings can be auto-created in OnValidate.
+	/// Input action used to respawn at the last claimed checkpoint.
 	/// </summary>
+	/// <remarks>
+	/// Default bindings can be created automatically in <see cref="OnValidate"/> when
+	/// <see cref="defaultBindings"/> is enabled.
+	/// </remarks>
+	[Tooltip("Input action used to respawn at the last claimed checkpoint.")]
 	[SerializeField] private InputActionProperty respawnLastCheckPoint;
 
 	/// <summary>
-	/// Input action to restart the race. Default bindings can be auto-created.
+	/// Input action used to restart the race.
 	/// </summary>
+	/// <remarks>
+	/// Default bindings can be created automatically in <see cref="OnValidate"/> when
+	/// <see cref="defaultBindings"/> is enabled.
+	/// </remarks>
+	[Tooltip("Input action used to restart the race.")]
 	[SerializeField] private InputActionProperty restartRace;
 
 	/// <summary>
-	/// When true, OnValidate replaces actions with generated defaults.
+	/// Whether default input bindings should be generated in editor validation.
 	/// </summary>
+	[Tooltip("If enabled, default respawn and restart input bindings are generated during validation.")]
 	[SerializeField] private bool defaultBindings = true;
 
 	#endregion
@@ -48,18 +67,24 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 
 	[Header("Car Prefab Reference")]
 	/// <summary>
-	/// Player car prefab to spawn at race start/restart.
+	/// Player car prefab spawned when the race starts or restarts.
 	/// </summary>
+	[Tooltip("Player car prefab spawned when the race starts or restarts.")]
 	[SerializeField] private GameObject carPrefab;
 
 	/// <summary>
-	/// Vertical offset applied on spawn relative to the spawn transform (meters).
+	/// Vertical spawn offset applied relative to the spawn transform.
 	/// </summary>
+	[Tooltip("Vertical offset applied when spawning the car.")]
 	[SerializeField] private float carSpawnVerticalOffset = 0.5f;
 
 	/// <summary>
-	/// Forward/backward offset applied on spawn in local forward (meters). Negative spawns behind the point.
+	/// Forward/backward spawn offset applied in the spawn transform's local forward direction.
 	/// </summary>
+	/// <remarks>
+	/// Negative values place the car behind the spawn point.
+	/// </remarks>
+	[Tooltip("Forward/backward offset applied when spawning the car. Negative values spawn behind the point.")]
 	[SerializeField] private float carSpawnHorizontalOffset = -5f;
 
 	#endregion
@@ -67,15 +92,22 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	#region Inspector: Track Settings
 
 	[Header("Track Settings")]
-	[SerializeField, ReadOnly] private LevelMap levelMap;
 	/// <summary>
-	/// True for lap-based circuit; false for point-to-point (finish at last checkpoint).
+	/// Level map currently used by this track manager.
 	/// </summary>
+	[Tooltip("Level map currently used by this track manager.")]
+	[SerializeField, ReadOnly] private LevelMap levelMap;
+
+	/// <summary>
+	/// Whether the race is a lap-based circuit instead of a point-to-point track.
+	/// </summary>
+	[Tooltip("If enabled, the race is treated as a lap-based circuit. If disabled, it is point-to-point.")]
 	[SerializeField] private bool isCircuit = false;
 
 	/// <summary>
-	/// Number of laps to complete (circuit mode only).
+	/// Number of laps required to finish a circuit race.
 	/// </summary>
+	[Tooltip("Number of laps required to finish a circuit race.")]
 	[SerializeField, ShowIf(nameof(isCircuit))] private int laps = 3;
 
 
@@ -85,54 +117,85 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 
 	[Header("Respawn Delay")]
 	/// <summary>
-	/// Unscaled delay (seconds) shown while pausing during respawn.
+	/// Unscaled delay in seconds used during respawn and restart countdowns.
 	/// </summary>
+	[Tooltip("Unscaled delay in seconds used during respawn.")]
 	[SerializeField, Range(0f, 5f)] private float respawnDelay = 3f;
 
 	#endregion
 
 	#region Private Fields
 
-	/// <summary>Runtime instance of the spawned car.</summary>
+	/// <summary>
+	/// Runtime instance of the spawned player car.
+	/// </summary>
 	private GameObject _carInstance;
 
-	/// <summary>Current lap index (1-based during race; 0 before the first pass).</summary>
+	/// <summary>
+	/// Current lap index.
+	/// </summary>
+	/// <remarks>
+	/// The value is one-based once a race has started and zero before the first start/finish pass.
+	/// </remarks>
 	private int _currentLap = 0;
 
-	/// <summary>Index of the next required checkpoint.</summary>
+	/// <summary>
+	/// Index of the next checkpoint that must be claimed.
+	/// </summary>
 	private int _currentCheckPointIndex = 0;
 
-	/// <summary>True once the race has finished.</summary>
+	/// <summary>
+	/// Whether the race has finished.
+	/// </summary>
 	private bool _isRaceFinished = false;
 
-	/// <summary>True when a respawn has been requested and is pending the coroutine.</summary>
+	/// <summary>
+	/// Whether a respawn has been requested and is waiting to run.
+	/// </summary>
 	private bool _pendingRespawn = false;
 
-	/// <summary>Checkpoint index to respawn at.</summary>
+	/// <summary>
+	/// Checkpoint index used as the next respawn target.
+	/// </summary>
 	private int _respawnCheckPoint = 0;
 
-	/// <summary>Countdown (unscaled seconds) shown during restart/respawn.</summary>
+	/// <summary>
+	/// Countdown value shown during restart or respawn.
+	/// </summary>
 	private float _respawnTimer = 0f;
 
+	/// <summary>
+	/// Currently running restart coroutine, if any.
+	/// </summary>
 	private Coroutine _restartCoroutine;
 
 	#endregion Private Fields
 
 	#region Public Properties
 
-	/// <summary>Current lap number (1-based once started).</summary>
+	/// <summary>
+	/// Gets the current lap number.
+	/// </summary>
 	public int CurrentLap => _currentLap;
 
-	/// <summary>Total laps configured for circuit races.</summary>
+	/// <summary>
+	/// Gets the total number of laps configured for circuit races.
+	/// </summary>
 	public int TotalLaps => laps;
 
-	/// <summary>Index of the next required checkpoint.</summary>
+	/// <summary>
+	/// Gets the index of the next required checkpoint.
+	/// </summary>
 	public int CurrentCheckPointIndex => _currentCheckPointIndex;
 
-	/// <summary>True after the race has finished.</summary>
+	/// <summary>
+	/// Gets whether the race has finished.
+	/// </summary>
 	public bool IsRaceFinished => _isRaceFinished;
 
-	/// <summary>Current visible countdown (unscaled seconds) used by respawn/restart flows.</summary>
+	/// <summary>
+	/// Gets the current visible respawn/restart countdown value.
+	/// </summary>
 	public float RespawnTimer => _respawnTimer;
 
 	#endregion Public Properties
@@ -140,7 +203,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	#region Unity Methods
 
 	/// <summary>
-	/// Editor-time validation: optionally assigns default input bindings for respawn and restart.
+	/// Unity editor validation hook that optionally assigns default input bindings.
 	/// </summary>
 	private void OnValidate()
 	{
@@ -152,7 +215,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Enables input actions and subscribes to performed callbacks for respawn and restart.
+	/// Enables input actions and subscribes to respawn/restart callbacks.
 	/// </summary>
 	private void OnEnable()
 	{
@@ -164,7 +227,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Unsubscribes input callbacks and disables actions to avoid leaks when disabled.
+	/// Unsubscribes input callbacks and disables input actions.
 	/// </summary>
 	private void OnDisable()
 	{
@@ -175,18 +238,26 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		restartRace.action.Disable();
 	}
 
+	/// <summary>
+	/// Handles the respawn input action.
+	/// </summary>
+	/// <param name="context">Input callback context.</param>
 	private void OnRespawnPerformed(InputAction.CallbackContext context)
 	{
 		Respawn();
 	}
 
+	/// <summary>
+	/// Handles the restart input action.
+	/// </summary>
+	/// <param name="context">Input callback context.</param>
 	private void OnRestartPerformed(InputAction.CallbackContext context)
 	{
 		StartRestartCountdown();
 	}
 
 	/// <summary>
-	/// Starts the race automatically if at least one checkpoint is assigned.
+	/// Initializes scene checkpoints and starts a race when no runtime track placer is present.
 	/// </summary>
 	private void Start()
 	{
@@ -202,7 +273,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Physics loop: triggers the respawn coroutine when a respawn is pending.
+	/// Starts the respawn coroutine when a respawn request is pending.
 	/// </summary>
 	private void FixedUpdate()
 	{
@@ -217,8 +288,9 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	#region Default Input Bindings
 
 	/// <summary>
-	/// Creates a default respawn action with keyboard and gamepad bindings.
+	/// Creates the default respawn input action.
 	/// </summary>
+	/// <returns>Input action with keyboard and gamepad respawn bindings.</returns>
 	private InputAction CreateDefaultRespawnBind()
 	{
 		var respawn = new InputAction("Respawn", InputActionType.Button, expectedControlType: "Button");
@@ -229,8 +301,9 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Creates a default restart action with keyboard and gamepad bindings.
+	/// Creates the default restart input action.
 	/// </summary>
+	/// <returns>Input action with keyboard and gamepad restart bindings.</returns>
 	private InputAction CreateDefaultRestartBind()
 	{
 		var restart = new InputAction("Restart", InputActionType.Button, expectedControlType: "Button");
@@ -245,8 +318,12 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	#region Coroutines
 
 	/// <summary>
-	/// Restarts the race with a short unscaled countdown, pausing gameplay during the delay.
+	/// Restarts the race with a short unscaled countdown.
 	/// </summary>
+	/// <returns>Coroutine enumerator.</returns>
+	/// <remarks>
+	/// Gameplay time is paused while the restart countdown is active.
+	/// </remarks>
 	private IEnumerator RestartCoroutine()
 	{
 		Restart();
@@ -265,9 +342,14 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Respawns the car at the chosen checkpoint after an unscaled delay, pausing during the countdown.
+	/// Respawns the car after an unscaled countdown.
 	/// </summary>
-	/// <param name="delay">Unscaled seconds to wait.</param>
+	/// <param name="delay">Unscaled delay in seconds.</param>
+	/// <returns>Coroutine enumerator.</returns>
+	/// <remarks>
+	/// Gameplay time is paused while the respawn countdown is active. The car is first moved to the
+	/// saved checkpoint pose and then gameplay resumes after the delay.
+	/// </remarks>
 	private IEnumerator RespawnDelayCoroutine(float delay)
 	{
 		if (_carInstance == null)
@@ -315,6 +397,9 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		Time.timeScale = 1f;
 	}
 
+	/// <summary>
+	/// Starts or restarts the restart countdown coroutine.
+	/// </summary>
 	private void StartRestartCountdown()
 	{
 		if (_restartCoroutine != null)
@@ -330,8 +415,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	#region Restart and Respawn Methods
 
 	/// <summary>
-	/// Destroys any existing car, spawns a new one at the spawn transform (or manager transform),
-	/// resets race timing and checkpoint activation.
+	/// Restarts the race state by replacing the car, resetting progress, starting timing, and resetting checkpoints.
 	/// </summary>
 	private void Restart()
 	{
@@ -372,9 +456,12 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Requests a respawn at the previous checkpoint (or restart if before the first checkpoint),
-	/// or restarts immediately if the race is finished.
+	/// Requests a respawn at the previous checkpoint or starts a full restart when no checkpoint can be used.
 	/// </summary>
+	/// <remarks>
+	/// Finished races restart instead of respawning. In circuit mode, when the current checkpoint index wraps to zero,
+	/// the previous checkpoint is the final checkpoint of the lap.
+	/// </remarks>
 	private void Respawn()
 	{
 		if (_isRaceFinished)
@@ -402,7 +489,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Warps the car to a checkpoint's saved pose and velocities, adjusts timers to exclude time since last checkpoint.
+	/// Warps the car to the saved pose and velocities captured by a checkpoint.
 	/// </summary>
 	/// <param name="index">Checkpoint index to respawn at.</param>
 	private void RespawnCar(int index)
@@ -423,8 +510,14 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	#endregion Restart and Respawn Methods
 
 	/// <summary>
-	/// Initializes the race: subscribes to checkpoint events and starts the restart countdown.
+	/// Starts race setup from a provided level map or from existing scene checkpoint data.
 	/// </summary>
+	/// <param name="lvlMap">Optional level map used to configure laps and circuit mode.</param>
+	/// <remarks>
+	/// If a level map is provided, its lap count and circuit flag are copied into this manager.
+	/// The method requires at least one checkpoint in <see cref="CheckPointManager"/> and registers
+	/// <see cref="CheckPointTaken"/> as a checkpoint listener before starting the restart countdown.
+	/// </remarks>
 	public void StartRace(LevelMap lvlMap)
 	{
 		if (lvlMap != null)
@@ -444,12 +537,11 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 
 		CheckPointManager.Instance.AddListenerToCheckpoints(CheckPointTaken);
 
-		var checkpointParent = CheckPointManager.Instance.CheckPoints[0].GetComponentInParent<Transform>();
 		StartRestartCountdown();
 	}
 
 	/// <summary>
-	/// Deactivates all checkpoints and activates the first one (start).
+	/// Deactivates all checkpoints and activates the first checkpoint.
 	/// </summary>
 	private void ResetCheckPoints()
 	{
@@ -458,9 +550,12 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	}
 
 	/// <summary>
-	/// Callback when the current checkpoint is taken: advances the checkpoint index,
-	/// updates lap or finish logic, and records times.
+	/// Handles the currently active checkpoint being claimed.
 	/// </summary>
+	/// <remarks>
+	/// The method advances checkpoint progression, handles lap transitions in circuit mode,
+	/// finishes the race when the required final condition is met, and activates the next required checkpoint.
+	/// </remarks>
 	public void CheckPointTaken()
 	{
 		Debug.Log($"[TrackManager] CheckPoint {_currentCheckPointIndex} taken at {RaceTimeManager.Instance.GetCurrentRaceTime()} seconds.");
@@ -491,6 +586,10 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		CheckPointManager.Instance.ActivateCheckpoint(_currentCheckPointIndex);
 	}
 
+	/// <summary>
+	/// Gets the follow camera component from the main camera.
+	/// </summary>
+	/// <returns>The <see cref="FollowCamera"/> on the main camera, or <c>null</c> if unavailable.</returns>
 	private FollowCamera GetFollowCamera()
 	{
 		Camera mainCamera = Camera.main;

@@ -1,5 +1,5 @@
 <map id="DriveTrainController" name="DriveTrainController">
-<area shape="rect" id="Node000001" title="Handles steering, throttle, braking, anti&#45;roll, and wheel friction setup for a 4&#45;wheel vehicle." alt="" coords="5,123,156,491"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="30,5,131,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,89,84,123,78,123,78,89"/>
+<area shape="rect" id="Node000001" title="Handles drivetrain, steering, braking, grip modifiers, and wheel visuals for a four&#45;wheel vehicle." alt="" coords="5,123,191,656"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="48,5,149,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,87,101,123,96,122,98,92"/>
 </map>

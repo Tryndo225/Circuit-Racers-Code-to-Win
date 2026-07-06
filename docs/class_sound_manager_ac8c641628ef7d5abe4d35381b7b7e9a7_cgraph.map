@@ -1,5 +1,7 @@
 <map id="SoundManager.ContinueSFXClip" name="SoundManager.ContinueSFXClip">
-<area shape="rect" id="Node000001" title="Same as ContinueSFXClip(AudioClip) but with an explicit start volume." alt="" coords="5,5,219,32"/>
-<area shape="rect" id="Node000002" href="$class_sound_manager.html#a96abf86ace810cdec1cdca44da9aca80" title="Plays (or reuses) a pooled SFX helper for the given clip at a target transform, with optional volume/..." alt="" coords="267,5,454,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,16,251,16,251,21,219,21"/>
+<area shape="rect" id="Node000001" title="Keeps a looping SFX clip playing for the configured continuation window with a custom volume." alt="" coords="5,5,219,32"/>
+<area shape="rect" id="Node000002" href="$class_sound_manager.html#acee4fcd517a94525dbf79b559fda0313" title="Plays a sound effect through the pooled helper system." alt="" coords="267,5,454,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,16,254,19,248,19,219,21"/>
+<area shape="rect" id="Node000003" href="$class_sound_manager_helper.html#a4bc5f25adc563f859c055405031c3e4e" title="Starts playback using the currently assigned clip and playback parameters." alt="" coords="502,5,715,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="455,16,489,19,484,19,455,21"/>
 </map>

@@ -1,5 +1,9 @@
 <map id="ChangeSceneButton" name="ChangeSceneButton">
-<area shape="rect" id="Node000001" title="Strategy: change to a specific scene via SceneManagement." alt="" coords="5,123,157,213"/>
-<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract strategy for a button action." alt="" coords="43,5,120,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,89,84,123,79,123,79,89"/>
+<area shape="rect" id="Node000001" title="Button strategy that changes to a configured scene through SceneManagement." alt="" coords="17,123,169,213"/>
+<area shape="rect" id="Node000003" href="$class_edit_button.html" title="Button strategy that opens the editor scene only when a level is currently selected." alt="" coords="5,261,77,331"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="71,225,57,263,52,261,68,230"/>
+<area shape="rect" id="Node000004" href="$class_replay_button.html" title="Button strategy that opens the replay scene only when the selected level has a saved best replay." alt="" coords="102,261,191,331"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="119,225,135,262,130,261,116,229"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract base class for serialized UI button actions." alt="" coords="55,5,132,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,87,96,124,91,123,93,92"/>
 </map>

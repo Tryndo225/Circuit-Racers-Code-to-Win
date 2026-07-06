@@ -1,0 +1,5 @@
+<map id="LevelEditorManager.ReplaceEditedLevel" name="LevelEditorManager.ReplaceEditedLevel">
+<area shape="rect" id="Node000001" title="Validates the edited level and replaces the currently selected level with it." alt="" coords="5,5,194,48"/>
+<area shape="rect" id="Node000002" href="$class_level_map_validator.html#a5aecd8063cf0f048615a4bfd79782451" title="Validates a level map." alt="" coords="242,13,419,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,24,229,26,223,27,194,29"/>
+</map>

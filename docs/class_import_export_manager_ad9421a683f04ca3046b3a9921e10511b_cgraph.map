@@ -1,0 +1,11 @@
+<map id="ImportExportManager.ExportLevelToClipboard" name="ImportExportManager.ExportLevelToClipboard">
+<area shape="rect" id="Node000001" title="Encodes a level map and copies the encoded string to the system clipboard." alt="" coords="5,72,194,115"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#adc3ded0f143550dfbed23d9e1bf63b6e" title="Encodes a LevelMap into a compact shareable string." alt="" coords="242,72,436,115"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,91,229,93,224,94,194,96"/>
+<area shape="rect" id="Node000003" href="$class_import_export_manager.html#a683514cc3e3999d7652afbc5100a2312" title="Converts an integer array to a signed byte array." alt="" coords="484,5,680,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="419,69,485,53,490,52,420,74"/>
+<area shape="rect" id="Node000004" href="$class_import_export_manager.html#a09d133e74aacc3a38681fdf8d4a7fa38" title="Encodes a flat tile array with run&#45;length encoding." alt="" coords="485,72,679,115"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="436,91,472,93,467,94,437,96"/>
+<area shape="rect" id="Node000005" href="$class_level_map.html#aacd0caba553f8e8be9148694261a74b2" title="Creates a flattened copy of the current Tiles grid." alt="" coords="506,139,658,165"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="430,113,511,134,506,134,430,118"/>
+</map>

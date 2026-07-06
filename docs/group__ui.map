@@ -1,4 +1,9 @@
-<map id="UI" name="UI">
-<area shape="rect" id="Node000002" href="$group__level__gen.html" title="Procedural creation of grid&#45;based tracks, with serializable maps, BFS carve/backtrack,..." alt="" coords="214,8,333,35"/>
-<area shape="rect" id="Node000001" title="Runtime UI widgets, menus, overlays, previews, and utilities for level browsing and play." alt="" coords="5,8,44,35"/>
+<map id="User Interface" name="User Interface">
+<area shape="rect" id="Node000005" href="$group__game__data.html" title="Persistent progression data, selected level state, best times, checkpoint splits, replays,..." alt="" coords="523,194,611,221"/>
+<area shape="rect" id="Node000006" href="$group__level__gen.html" title="Procedural creation, representation, validation, and placement support for grid&#45;based race tracks." alt="" coords="507,257,627,284"/>
+<area shape="rect" id="Node000007" href="$group__replay__system.html" title="Race replay recording, replay data storage, replay playback, replay camera support,..." alt="" coords="511,320,623,346"/>
+<area shape="rect" id="Node000004" href="$group__scene__mgmt.html" title="Centralized scene loading with editor&#45;friendly scene references and scene&#45;to&#45;music pairing." alt="" coords="498,446,636,473"/>
+<area shape="rect" id="Node000002" href="$group__systems.html" title="Runtime subsystems used by the racing game." alt="" coords="5,320,79,346"/>
+<area shape="rect" id="Node000001" title="Runtime UI widgets, menus, overlays, popups, settings, notifications, previews, and button actions." alt="" coords="128,320,232,346"/>
+<area shape="rect" id="Node000003" href="$group__ui__levels.html" title="Saved&#45;level browser, level&#45;entry cards, and level&#45;list layout UI." alt="" coords="532,497,602,524"/>
 </map>

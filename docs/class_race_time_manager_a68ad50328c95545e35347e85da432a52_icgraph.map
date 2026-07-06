@@ -1,0 +1,7 @@
+<map id="RaceTimeManager.GetCurrentRaceTime" name="RaceTimeManager.GetCurrentRaceTime">
+<area shape="rect" id="Node000001" title="Gets the current race time." alt="" coords="497,5,696,48"/>
+<area shape="rect" id="Node000002" href="$class_race_time_manager.html#a921d3588823479c6468b2c6d2fb2e7c0" title="Records a checkpoint split for the current race." alt="" coords="248,5,449,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="479,27,450,29,449,24,484,27"/>
+<area shape="rect" id="Node000003" href="$class_race_time_manager.html#a6e82eb4400597fab81c75e82b260af46" title="Starts a new race timer and prepares race&#45;related timing state." alt="" coords="5,13,200,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="229,27,200,29,200,24,234,26"/>
+</map>

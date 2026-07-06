@@ -1,0 +1,8 @@
+<map id="LevelGenerator.GenerateLevel" name="LevelGenerator.GenerateLevel">
+<area shape="rect" id="Node000001" title="Generates a level using an explicit integer seed." alt="" coords="251,31,448,57"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="390,16,378,12,349,9,323,11,309,16,306,21,313,31,308,29,301,22,306,12,322,6,349,4,379,7,396,16"/>
+<area shape="rect" id="Node000002" href="$class_generate_level_button.html#a1748a95d62b017914a650960b8edd7b2" title="Generates a level, generates its checkpoints, and opens the preview popup." alt="" coords="12,5,196,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,33,197,31,196,26,238,32"/>
+<area shape="rect" id="Node000003" href="$class_level_generator.html#a326a48767ad027968c11e9facaf67151" title="Generates a level using a provided Random source." alt="" coords="5,56,203,83"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="233,56,203,62,203,56,238,55"/>
+</map>

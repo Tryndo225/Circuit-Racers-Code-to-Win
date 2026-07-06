@@ -1,0 +1,5 @@
+<map id="FloatCamera.SetTarget" name="FloatCamera.SetTarget">
+<area shape="rect" id="Node000001" title="Assigns a new target and immediately synchronizes the camera to it." alt="" coords="5,5,162,32"/>
+<area shape="rect" id="Node000002" href="$class_float_camera.html#a56c8f4bb71a738a2e99034cda4f7fa8a" title="Instantly places and rotates the camera to match the target." alt="" coords="210,5,386,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,16,197,19,191,19,162,21"/>
+</map>

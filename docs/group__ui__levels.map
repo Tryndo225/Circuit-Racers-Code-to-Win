@@ -1,0 +1,5 @@
+<map id="Level UI" name="Level UI">
+<area shape="rect" id="Node000003" href="$group__game__data.html" title="Persistent progression data, selected level state, best times, checkpoint splits, replays,..." alt="" coords="339,8,428,35"/>
+<area shape="rect" id="Node000002" href="$group__ui.html" title="Runtime UI widgets, menus, overlays, popups, settings, notifications, previews, and button actions." alt="" coords="5,8,110,35"/>
+<area shape="rect" id="Node000001" title="Saved&#45;level browser, level&#45;entry cards, and level&#45;list layout UI." alt="" coords="159,8,229,35"/>
+</map>

@@ -1,45 +1,58 @@
 /// <summary>
-/// Utility that scans a generated <see cref="LevelMap"/> road (tile value 1) and stamps
-/// checkpoint tiles (-2) along sufficiently long straight segments.
+/// Utility that scans a generated <see cref="LevelMap"/> road and places checkpoint tiles on long straight segments.
 /// </summary>
 /// <remarks>
 /// @ingroup level_gen
-/// Traversal starts at <see cref="LevelMap.StartPoint"/> and follows the road until no
-/// forward step is possible. A checkpoint is placed once per straight segment whose
-/// length meets <paramref name="minstraightLengthForCheckPoint"/>; the checkpoint is
-/// positioned roughly at the middle of that straight. Start/finish tiles are never
-/// converted to checkpoints.
-/// @thread Unity main thread (mutates <see cref="LevelMap.Tiles"/>).
+/// @brief Converts viable road tiles into checkpoint tiles based on straight-segment length.
+///
+/// Traversal starts at <see cref="LevelMap.StartPoint"/> and follows connected road tiles until no
+/// forward step is possible. A checkpoint is placed once per sufficiently long straight segment, roughly
+/// at the middle of that straight. Start and finish tiles are never converted to checkpoints.
+///
+/// Tile values used by this utility come from <see cref="LevelMap.LevelTileTypes"/>:
+/// - <see cref="LevelMap.LevelTileTypes.Track"/>: road tile.
+/// - <see cref="LevelMap.LevelTileTypes.CP"/>: generated checkpoint tile.
+///
+/// Threading:
+/// - This mutates <see cref="LevelMap.Tiles"/> directly and should be called from code that owns the level data.
 /// </remarks>
 public static class LevelCheckPointMaker
 {
 	/// <summary>
-	/// Sentinel coordinate used to indicate an invalid direction/position.
+	/// Integer tile value used for road/track cells.
+	/// </summary>
+	private const int TrackTile = (int)LevelMap.LevelTileTypes.Track;
+
+	/// <summary>
+	/// Integer tile value used for checkpoint cells.
+	/// </summary>
+	private const int CheckpointTile = (int)LevelMap.LevelTileTypes.CP;
+
+	/// <summary>
+	/// Sentinel coordinate used to indicate an invalid direction or position.
 	/// </summary>
 	private static readonly Coordinates Invalid = new Coordinates(-1, -1);
 
 	/// <summary>
-	/// Walks the road network in <paramref name="levelMap"/> and converts the midpoint of each
-	/// sufficiently long straight segment into a checkpoint tile (-2).
+	/// Walks the road network in <paramref name="levelMap"/> and converts midpoint tiles of sufficiently long
+	/// straight segments into checkpoint tiles.
 	/// </summary>
 	/// <param name="levelMap">Target level definition containing the road grid.</param>
 	/// <param name="minStraightLengthForCheckPoint">
-	/// Minimum number of consecutive road tiles (including the first) required
-	/// before a checkpoint is placed on that straight segment. (Typo preserved.)
+	/// Minimum number of consecutive road tiles required before a checkpoint is placed on a straight segment.
 	/// </param>
 	/// <remarks>
 	/// @ingroup level_gen
+	///
 	/// Preconditions:
-	/// <list type="bullet">
-	/// <item><description><paramref name="levelMap"/> is non-null.</description></item>
-	/// <item><description><c>levelMap.Tiles</c> is a valid 2D grid with road cells marked as 1.</description></item>
-	/// </list>
-	/// Postconditions:
-	/// <list type="bullet">
-	/// <item><description>Some road cells (value 1) may be converted to checkpoints (value -2).</description></item>
-	/// <item><description>Start/finish cells are not modified.</description></item>
-	/// </list>
-	/// Complexity: O(N) over visited road tiles (single pass with 4-neighborhood checks).
+	/// - <paramref name="levelMap"/> is non-null.
+	/// - <c>levelMap.Tiles</c> is a valid 2D grid.
+	/// - Road cells are marked with <see cref="LevelMap.LevelTileTypes.Track"/>.
+	///
+	/// Effects:
+	/// - Some road cells may be converted to checkpoint cells with <see cref="LevelMap.LevelTileTypes.CP"/>.
+	/// - <see cref="LevelMap.CheckpointCountPerLap"/> is incremented for each generated checkpoint.
+	/// - Start and finish cells are not modified.
 	/// </remarks>
 	public static void GenerateCheckPoints(LevelMap levelMap, int minStraightLengthForCheckPoint = 4)
 	{
@@ -76,6 +89,18 @@ public static class LevelCheckPointMaker
 		}
 	}
 
+	/// <summary>
+	/// Places a checkpoint on a straight segment when the segment is long enough and the target tile is valid.
+	/// </summary>
+	/// <param name="levelMap">Level map whose tile grid should be modified.</param>
+	/// <param name="straightStart">First coordinate of the straight segment.</param>
+	/// <param name="direction">Direction of the straight segment.</param>
+	/// <param name="straightLength">Length of the straight segment in tiles.</param>
+	/// <param name="minStraightLengthForCheckPoint">Minimum straight length required to place a checkpoint.</param>
+	/// <remarks>
+	/// The checkpoint is placed at the middle of the straight segment. The method skips invalid starts,
+	/// out-of-bounds coordinates, and coordinates equal to the level start or finish point.
+	/// </remarks>
 	private static void PlaceCheckpointIfPossible(LevelMap levelMap, Coordinates straightStart, Coordinates direction, int straightLength, int minStraightLengthForCheckPoint)
 	{
 		if (straightLength >= minStraightLengthForCheckPoint && straightStart != Invalid)
@@ -86,23 +111,26 @@ public static class LevelCheckPointMaker
 
 			if (checkpoint != levelMap.StartPoint && checkpoint != levelMap.FinishPoint && levelMap.Tiles.InBounds(checkpoint.X, checkpoint.Y))
 			{
-				levelMap.Tiles.At(checkpoint) = -2;
+				levelMap.Tiles.At(checkpoint) = CheckpointTile;
 				++levelMap.CheckpointCountPerLap;
 			}
 		}
 	}
 
 	/// <summary>
-	/// Advances one step along the road from <paramref name="position"/> to an adjacent
-	/// road tile (value 1), avoiding immediate backtracking and skipping the finish tile.
+	/// Advances one step along the road from <paramref name="position"/> to a valid adjacent road tile.
 	/// </summary>
 	/// <param name="levelMap">Level map containing the road grid.</param>
-	/// <param name="position">Current traversal position; updated on success.</param>
-	/// <param name="lastVisited">Previous position used to prevent backtracking; updated on success.</param>
+	/// <param name="position">Current traversal position; updated when a valid step is found.</param>
+	/// <param name="lastVisited">Previous traversal position used to avoid immediate backtracking; updated on success.</param>
 	/// <returns>
-	/// The offset (direction) used for the step if a move was made; otherwise
-	/// <see cref="Invalid"/> when no forward step is possible.
+	/// Direction offset used for the step if a move was made; otherwise <see cref="Invalid"/> when no forward step is possible.
 	/// </returns>
+	/// <remarks>
+	/// The method checks the cardinal directions from <see cref="LevelMap.CardinalDirections"/>.
+	/// It only steps onto tiles marked with <see cref="LevelMap.LevelTileTypes.Track"/>, avoids the immediately previous tile,
+	/// and does not step onto <see cref="LevelMap.FinishPoint"/>.
+	/// </remarks>
 	private static Coordinates Step(LevelMap levelMap, ref Coordinates position, ref Coordinates lastVisited)
 	{
 		foreach (var offset in LevelMap.CardinalDirections)
@@ -112,7 +140,7 @@ public static class LevelCheckPointMaker
 			if (!levelMap.Tiles.InBounds(next.X, next.Y))
 				continue;
 
-			if (levelMap.Tiles[next.X, next.Y] == 1 && next != lastVisited && next != levelMap.FinishPoint)
+			if (levelMap.Tiles[next.X, next.Y] == TrackTile && next != lastVisited && next != levelMap.FinishPoint)
 			{
 				lastVisited = position;
 				position = next;

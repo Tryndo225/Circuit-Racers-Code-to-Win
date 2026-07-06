@@ -1,0 +1,9 @@
+<map id="ImportExportManager.EncodeLevel" name="ImportExportManager.EncodeLevel">
+<area shape="rect" id="Node000001" title="Encodes a LevelMap into a compact shareable string." alt="" coords="5,72,200,115"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#a683514cc3e3999d7652afbc5100a2312" title="Converts an integer array to a signed byte array." alt="" coords="248,5,444,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,69,253,51,248,54,184,74"/>
+<area shape="rect" id="Node000003" href="$class_import_export_manager.html#a09d133e74aacc3a38681fdf8d4a7fa38" title="Encodes a flat tile array with run&#45;length encoding." alt="" coords="249,72,443,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,91,236,93,231,94,200,96"/>
+<area shape="rect" id="Node000004" href="$class_level_map.html#aacd0caba553f8e8be9148694261a74b2" title="Creates a flattened copy of the current Tiles grid." alt="" coords="270,139,422,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="194,113,275,134,270,135,194,118"/>
+</map>

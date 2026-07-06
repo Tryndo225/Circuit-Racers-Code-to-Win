@@ -1,0 +1,6 @@
+<map id="LevelGenerator.GenerateLevel" name="LevelGenerator.GenerateLevel">
+<area shape="rect" id="Node000001" title="Generates a level using a provided Random source." alt="" coords="5,29,203,56"/>
+<area shape="rect" id="Node000002" href="$class_level_generator.html#af36f7dc329dcf47670ffdd4a97b416ca" title="Generates a level using an explicit integer seed." alt="" coords="251,29,448,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,40,238,43,232,43,203,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="308,28,301,21,306,11,322,5,349,3,379,5,396,15,391,14,378,10,349,8,323,10,309,15,306,20,313,30"/>
+</map>

@@ -3,19 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Trigger-based checkpoint sensor that captures the player's pose and velocities on entry
-/// and notifies registered listeners. Intended for lap/track progression and respawn points.
+/// Trigger-based checkpoint sensor that records the player's pose and velocities when entered.
 /// </summary>
 /// <remarks>
 /// @ingroup track_mng
-/// @invariant A <see cref="Collider"/> (set to trigger) and a <see cref="Renderer"/> exist on the same GameObject
-///            (enforced by attributes; validated in <see cref="GetReferences"/>).
-/// @thread Unity main thread only (standard MonoBehaviour lifecycle).
-/// @usage
-/// - Call <see cref="SetActive(bool)"/> to enable/disable the checkpoint (toggles collider &amp; renderer).
-/// - Register callbacks with <see cref="AddListener(Action)"/> to react when the player enters the trigger.
-/// - After a claim, read the captured respawn data via <see cref="CPClaimedPosition"/>, <see cref="CPClaimedRotation"/>,
-///   <see cref="CPClaimedRbLinearVelocity"/>, and <see cref="CPClaimedRbAngularVelocity"/>.
+/// @brief Detects when the player crosses this checkpoint and notifies registered listeners.
+///
+/// This component represents one checkpoint trigger in the race track. When active, it waits for a
+/// collider attached to a rigidbody tagged <c>Player</c>. On entry, it stores the player's position,
+/// rotation, linear velocity, and angular velocity, then invokes all registered listeners.
+///
+/// Requirements:
+/// - A <see cref="Collider"/> must be present on the same GameObject.
+/// - The collider should be configured as a trigger.
+/// - A <see cref="Renderer"/> must be present on the same GameObject.
+/// - The player rigidbody must be tagged <c>Player</c>.
+///
+/// Usage:
+/// - Call <see cref="SetActive(bool)"/> to enable or disable this checkpoint.
+/// - Register callbacks with <see cref="AddListener(Action)"/>.
+/// - Read the captured values from <see cref="CPClaimedPosition"/>, <see cref="CPClaimedRotation"/>,
+///   <see cref="CPClaimedRbLinearVelocity"/>, and <see cref="CPClaimedRbAngularVelocity"/> after the checkpoint is claimed.
+///
+/// Threading:
+/// - Unity main thread only.
 /// </remarks>
 [Serializable]
 [DisallowMultipleComponent]
@@ -24,49 +35,71 @@ using UnityEngine;
 public class CheckPointListener : MonoBehaviour
 {
 	[Header("Checkpoint Settings")]
+	/// <summary>
+	/// Order of this checkpoint within the track progression.
+	/// </summary>
+	[field: Tooltip("Order of this checkpoint within the track progression.")]
 	[field: SerializeField] public int CheckpointOrder { get; set; }
 
-	[Header("Check Point Reference")]
+	[Header("Checkpoint Reference")]
 	/// <summary>
 	/// Trigger collider used to detect the player crossing the checkpoint.
-	/// Auto-cached in <see cref="GetReferences"/>.
 	/// </summary>
+	/// <remarks>
+	/// This reference is cached by <see cref="GetReferences"/>.
+	/// </remarks>
+	[Tooltip("Trigger collider used to detect the player crossing this checkpoint.")]
 	[SerializeField, ReadOnly] private Collider checkPointCollider;
 
 	/// <summary>
-	/// Visual marker for the checkpoint. Toggled alongside the collider in <see cref="SetActive(bool)"/>.
-	/// Auto-cached in <see cref="GetReferences"/>.
+	/// Renderer used as the visual marker for this checkpoint.
 	/// </summary>
+	/// <remarks>
+	/// This reference is cached by <see cref="GetReferences"/> and toggled together with
+	/// <see cref="checkPointCollider"/> in <see cref="SetActive(bool)"/>.
+	/// </remarks>
+	[Tooltip("Renderer used as the visible checkpoint marker.")]
 	[SerializeField, ReadOnly] private Renderer checkPointRenderer;
 
 	/// <summary>
-	/// True while the checkpoint is accepting triggers and visible (see <see cref="SetActive(bool)"/>).
+	/// Whether this checkpoint currently accepts trigger events and displays its renderer.
 	/// </summary>
 	private bool _isActive = false;
 
 	/// <summary>
-	/// Observer list invoked when the player claims this checkpoint.
+	/// Registered callbacks invoked when this checkpoint is claimed by the player.
 	/// </summary>
 	private HashSet<Action> _listeners = new HashSet<Action>();
 
-	/// <summary>Captured player position at the moment of trigger entry.</summary>
+	/// <summary>
+	/// Captured player position at the moment of trigger entry.
+	/// </summary>
 	public Vector3 CPClaimedPosition { get; private set; }
-	/// <summary>Captured player rotation at the moment of trigger entry.</summary>
+
+	/// <summary>
+	/// Captured player rotation at the moment of trigger entry.
+	/// </summary>
 	public Quaternion CPClaimedRotation { get; private set; }
-	/// <summary>Captured player rigidbody linear velocity at the moment of trigger entry.</summary>
+
+	/// <summary>
+	/// Captured player rigidbody linear velocity at the moment of trigger entry.
+	/// </summary>
 	public Vector3 CPClaimedRbLinearVelocity { get; private set; }
-	/// <summary>Captured player rigidbody angular velocity at the moment of trigger entry.</summary>
+
+	/// <summary>
+	/// Captured player rigidbody angular velocity at the moment of trigger entry.
+	/// </summary>
 	public Vector3 CPClaimedRbAngularVelocity { get; private set; }
 
 	/// <summary>
-	/// Scratch array used to safely invoke listeners even if the listener set changes during callbacks.
+	/// Temporary listener array used to invoke callbacks safely even if the listener set changes during invocation.
 	/// </summary>
 	private Action[] _listenerBuffer;
 
 	#region Unity Methods
 
 	/// <summary>
-	/// Editor validation hook: caches required references and warns on misconfiguration.
+	/// Unity editor validation hook that caches required references and warns about missing or misconfigured components.
 	/// </summary>
 	private void OnValidate()
 	{
@@ -74,7 +107,7 @@ public class CheckPointListener : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Unity Awake: caches component references.
+	/// Unity initialization hook that caches required component references.
 	/// </summary>
 	private void Awake()
 	{
@@ -82,7 +115,7 @@ public class CheckPointListener : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Unity Start: ensures references are cached.
+	/// Unity start hook that ensures required component references are cached.
 	/// </summary>
 	private void Start()
 	{
@@ -92,9 +125,12 @@ public class CheckPointListener : MonoBehaviour
 
 	#region Setup Methods
 	/// <summary>
-	/// Caches the <see cref="Collider"/> and <see cref="Renderer"/> components and validates
-	/// that the collider is set as a trigger.
+	/// Caches the <see cref="Collider"/> and <see cref="Renderer"/> components and validates trigger setup.
 	/// </summary>
+	/// <remarks>
+	/// Missing required components are reported as errors. A non-trigger collider is reported as a warning
+	/// because checkpoint detection depends on trigger entry events.
+	/// </remarks>
 	private void GetReferences()
 	{
 		checkPointCollider = GetComponent<Collider>();
@@ -117,10 +153,13 @@ public class CheckPointListener : MonoBehaviour
 	#endregion Setup Methods
 
 	/// <summary>
-	/// Physics callback: when active and a collider tagged <c>Player</c> enters,
-	/// captures position, rotation, and velocities, then notifies listeners.
+	/// Handles trigger entry and claims the checkpoint when the entering rigidbody is tagged as the player.
 	/// </summary>
-	/// <param name="other">Incoming collider.</param>
+	/// <param name="other">Incoming collider that entered this checkpoint trigger.</param>
+	/// <remarks>
+	/// When the checkpoint is inactive, the trigger is ignored. When the checkpoint is active and the entering
+	/// rigidbody is tagged <c>Player</c>, the player's pose and velocities are captured and listeners are notified.
+	/// </remarks>
 	private void OnTriggerEnter(Collider other)
 	{
 		if (!_isActive)
@@ -146,10 +185,12 @@ public class CheckPointListener : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Invokes all registered listeners safely.
-	/// A snapshot is used so callbacks may add or remove listeners without modifying
-	/// the collection being enumerated.
+	/// Invokes all registered checkpoint listeners.
 	/// </summary>
+	/// <remarks>
+	/// A copied listener buffer is used so callbacks may add or remove listeners without modifying the
+	/// collection while it is being enumerated.
+	/// </remarks>
 	private void NotifyListeners()
 	{
 		if (_listeners == null || _listeners.Count == 0)
@@ -174,10 +215,12 @@ public class CheckPointListener : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Enables/disables the checkpoint. When disabled, the collider is turned off and the
-	/// renderer is hidden; the checkpoint will not claim or notify.
+	/// Enables or disables this checkpoint.
 	/// </summary>
-	/// <param name="isActive">True to enable; false to disable.</param>
+	/// <param name="isActive">Whether the checkpoint should accept trigger events and be visible.</param>
+	/// <remarks>
+	/// The checkpoint collider and renderer are toggled together. Disabled checkpoints do not claim the player.
+	/// </remarks>
 	public void SetActive(bool isActive)
 	{
 		if (checkPointCollider == null || checkPointRenderer == null)
@@ -192,19 +235,19 @@ public class CheckPointListener : MonoBehaviour
 
 	#region Observer Pattern Methods
 	/// <summary>
-	/// Registers a callback to be invoked when this checkpoint is claimed by the player.
+	/// Registers a callback to invoke when this checkpoint is claimed by the player.
 	/// </summary>
-	/// <param name="listener">Action to invoke on claim.</param>
+	/// <param name="listener">Callback invoked on checkpoint claim.</param>
 	public void AddListener(Action listener)
 	{
 		_listeners.Add(listener);
 	}
 
 	/// <summary>
-	/// Unregisters a previously added listener.
+	/// Unregisters a previously added checkpoint callback.
 	/// </summary>
-	/// <param name="listener">Action to remove.</param>
-	/// <returns>True if the listener was removed; otherwise false.</returns>
+	/// <param name="listener">Callback to remove.</param>
+	/// <returns><c>true</c> if the callback was removed; otherwise <c>false</c>.</returns>
 	public bool RemoveListener(Action listener)
 	{
 		return _listeners.Remove(listener);

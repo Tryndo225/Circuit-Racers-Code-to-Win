@@ -1,5 +1,5 @@
 <map id="RaceTrackPlacer" name="RaceTrackPlacer">
-<area shape="rect" id="Node000001" title="Procedural track placer: scans a LevelMap grid, matches local patterns around each path cell to a leg..." alt="" coords="5,123,117,192"/>
+<area shape="rect" id="Node000001" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track&#45;pi..." alt="" coords="5,123,117,192"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="11,5,112,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,90,64,123,58,123,58,90"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="62,87,64,123,59,122,60,92"/>
 </map>

@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['this_5btkey_20key_5d_0',['this[TKey key]',['../class_serializable_dictionary-2-g.html#ae439a2e72e69cdbfe74ee0ef326022b7',1,'SerializableDictionary-2-g']]],
-  ['totalcheckpoints_1',['TotalCheckPoints',['../class_track_manager.html#a9cd95d5847cdb97d06bd95c2f1c930fc',1,'TrackManager']]],
-  ['totallaps_2',['TotalLaps',['../class_track_manager.html#a62081a6e44152936270740e41b8b1644',1,'TrackManager']]],
-  ['totaltracktime_3',['TotalTrackTime',['../class_track_manager.html#af0863d2e4e7c7b72a9d0c13d8ecb54f7',1,'TrackManager']]]
+  ['raceendtime_0',['RaceEndTime',['../class_race_time_manager.html#a74a376013f7f5f6d22179635aa50fbe7',1,'RaceTimeManager']]],
+  ['racestarttime_1',['RaceStartTime',['../class_race_time_manager.html#a50460bb8d9de34cbac0d30f47f460a53',1,'RaceTimeManager']]],
+  ['replayduration_2',['ReplayDuration',['../class_replay_previewer.html#a56f94c364f76b0d90ecad6e5f631afa4',1,'ReplayPreviewer']]],
+  ['respawntimer_3',['RespawnTimer',['../class_track_manager.html#a54e7e122a7e800816ddb22d7f9964500',1,'TrackManager']]],
+  ['reversing_4',['Reversing',['../class_drive_train_controller.html#a3e20be384e776a6ea09ee7acd675432e',1,'DriveTrainController']]]
 ];

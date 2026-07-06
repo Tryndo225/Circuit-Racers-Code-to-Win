@@ -1,4 +1,4 @@
 <map id="Vehicle Control" name="Vehicle Control">
-<area shape="rect" id="Node000001" title="Modular 4&#45;wheel car stack: input, drivetrain, transmission, audio, lights, VFX, and camera follow." alt="" coords="5,5,115,32"/>
-<area shape="rect" id="Node000002" href="$group__car__ctrl__deprecated.html" title="Legacy experimental wheel physics (kept for reference only)." alt="" coords="163,5,352,32"/>
+<area shape="rect" id="Node000001" title="Modular four&#45;wheel car stack: input, drivetrain, transmission, audio, lights, VFX,..." alt="" coords="127,5,236,32"/>
+<area shape="rect" id="Node000002" href="$group__systems.html" title="Runtime subsystems used by the racing game." alt="" coords="5,5,79,32"/>
 </map>

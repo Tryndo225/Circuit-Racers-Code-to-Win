@@ -1,0 +1,5 @@
+<map id="LevelEditorManager.AutomaticCPGeneration" name="LevelEditorManager.AutomaticCPGeneration">
+<area shape="rect" id="Node000001" title="Automatically regenerates checkpoints for the edited level and refreshes the preview." alt="" coords="5,5,205,48"/>
+<area shape="rect" id="Node000002" href="$group__level__gen.html#ga62e10e573f8e506a8faa4f94db07236f" title="Walks the road network in levelMap &#160;and converts midpoint tiles of sufficiently long straight segment..." alt="" coords="253,5,466,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,24,240,26,234,27,205,29"/>
+</map>

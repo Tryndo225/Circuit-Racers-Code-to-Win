@@ -5,14 +5,17 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Centralized scene loader and background-music router.
-/// Loads scenes by helper or name, unpauses time, and selects a music clip
-/// based on a configured list of scene-to-clip pairs.
 /// </summary>
 /// <remarks>
 /// @ingroup scene_mgmt
-/// @thread Unity main thread only.
-/// @invariant Scene music is matched by scene name first, then scene path as fallback.
-/// @invariant Each configured pair maps one scene to one AudioClip.
+/// @brief Loads scenes by helper or name, restores normal time scale, and selects scene-specific background music.
+///
+/// Scene music is matched from the configured <see cref="sceneAudioClipPairs"/> list.
+/// Matching prefers scene name and then falls back to scene path.
+///
+/// Threading:
+/// - Unity main thread only.
+/// - Uses Unity scene loading, coroutines, and audio manager access.
 /// </remarks>
 public class SceneManagement : Generic.Singleton<SceneManagement>
 {
@@ -20,9 +23,11 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 
 	[Header("Scene -> Music Mapping")]
 	/// <summary>
-	/// List of mappings from scene to music clip.
-	/// When a scene loads, the first pair with a matching scene name or path is played.
+	/// Scene-to-music mappings used when scenes are loaded.
 	/// </summary>
+	/// <remarks>
+	/// When a scene loads, the first pair with a matching scene name or scene path is used.
+	/// </remarks>
 	[Tooltip("List of scene and corresponding audio clip pairs. The audio clip will be played when the scene is loaded.")]
 	[SerializeField] private List<SceneAssetHelperAudioClipPair> sceneAudioClipPairs = new List<SceneAssetHelperAudioClipPair>();
 
@@ -31,8 +36,9 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 	#region Unity methods
 
 	/// <summary>
-	/// On startup, waits for SoundManager and plays music for the currently active scene.
+	/// Waits for the sound manager and plays music for the initially active scene.
 	/// </summary>
+	/// <returns>Coroutine enumerator.</returns>
 	private IEnumerator Start()
 	{
 		yield return WaitForSoundManager();
@@ -49,12 +55,12 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 	#region Public API
 
 	/// <summary>
-	/// Loads a scene by a SceneAssetHelper, unpauses time,
-	/// and plays the mapped music clip if configured.
+	/// Loads a scene from a <see cref="SceneAssetHelper"/>.
 	/// </summary>
-	/// <param name="scene">Helper carrying the scene name and path.</param>
+	/// <param name="scene">Scene helper containing the scene name and path.</param>
 	/// <remarks>
-	/// If the helper's name equals "Quit Game", the application will quit instead of loading.
+	/// The method restores <see cref="Time.timeScale"/> to normal after starting the scene load.
+	/// If the helper's name is <c>Quit Game</c>, the application quits instead of loading a scene.
 	/// </remarks>
 	public void ChangeScene(SceneAssetHelper scene)
 	{
@@ -88,9 +94,14 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 	}
 
 	/// <summary>
-	/// Loads a scene by string name, unpauses time, and plays the mapped music clip if configured.
+	/// Loads a scene by name.
 	/// </summary>
 	/// <param name="sceneName">Scene name as added in Build Settings.</param>
+	/// <remarks>
+	/// The method restores <see cref="Time.timeScale"/> to normal after starting the scene load.
+	/// The provided string is passed as both scene name and scene path for music matching, so it can
+	/// also work with path-like scene identifiers.
+	/// </remarks>
 	public void ChangeScene(string sceneName)
 	{
 		if (string.IsNullOrWhiteSpace(sceneName))
@@ -113,8 +124,9 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 	#region Internals
 
 	/// <summary>
-	/// Waits until SoundManager exists.
+	/// Waits until <see cref="SoundManager.Instance"/> is available.
 	/// </summary>
+	/// <returns>Coroutine enumerator.</returns>
 	private IEnumerator WaitForSoundManager()
 	{
 		while (SoundManager.Instance == null)
@@ -124,10 +136,11 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 	}
 
 	/// <summary>
-	/// Waits until SoundManager is ready, then plays music for the scene.
+	/// Waits for the sound manager and then matches music for a scene.
 	/// </summary>
-	/// <param name="sceneName">Scene name to match.</param>
+	/// <param name="sceneName">Scene name to match first.</param>
 	/// <param name="scenePath">Scene path to use as fallback.</param>
+	/// <returns>Coroutine enumerator.</returns>
 	private IEnumerator MatchMusicWhenReady(string sceneName, string scenePath)
 	{
 		yield return WaitForSoundManager();
@@ -136,11 +149,14 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 	}
 
 	/// <summary>
-	/// Attempts to find and play a music clip for the given scene name or path.
-	/// Matching prefers scene name and falls back to scene path.
+	/// Attempts to find and play a music clip for a scene.
 	/// </summary>
 	/// <param name="sceneName">Scene name to match first.</param>
 	/// <param name="scenePath">Scene path to match as fallback.</param>
+	/// <remarks>
+	/// Matching is performed against the configured <see cref="sceneAudioClipPairs"/> list.
+	/// Name matching is preferred, with path matching as a fallback.
+	/// </remarks>
 	private void MatchMusicClip(string sceneName, string scenePath)
 	{
 		if (SoundManager.Instance == null)
@@ -178,12 +194,12 @@ public class SceneManagement : Generic.Singleton<SceneManagement>
 	}
 
 	/// <summary>
-	/// Returns true if the pair matches the supplied scene name or scene path.
-	/// Name matching is preferred; path matching is used as a fallback.
+	/// Checks whether a configured scene/audio pair matches a runtime scene name or path.
 	/// </summary>
 	/// <param name="pair">Configured scene/audio pair.</param>
 	/// <param name="sceneName">Runtime scene name.</param>
 	/// <param name="scenePath">Runtime scene path.</param>
+	/// <returns><c>true</c> if the pair matches the scene name or path; otherwise <c>false</c>.</returns>
 	private bool SceneMatches(SceneAssetHelperAudioClipPair pair, string sceneName, string scenePath)
 	{
 		if (!string.IsNullOrEmpty(sceneName) && pair.Name == sceneName)

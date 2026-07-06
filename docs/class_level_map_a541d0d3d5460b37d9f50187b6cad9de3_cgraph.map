@@ -1,0 +1,8 @@
+<map id="LevelMap.operator==" name="LevelMap.operator==">
+<area shape="rect" id="Node000001" title="Checks whether two level maps are equal." alt="" coords="5,5,150,32"/>
+<area shape="rect" id="Node000002" href="$class_level_map.html#a74b08718ac1b9ec60de0ae9b5c935372" title="Creates a default empty level map." alt="" coords="367,5,504,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,16,352,16,351,21,150,21"/>
+<area shape="rect" id="Node000003" href="$class_level_map.html#a98077ba8ec34f6fa10476cf3e49c6648" title="Checks whether this level map has the same data as another object." alt="" coords="198,31,319,57"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,26,185,33,180,34,150,31"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="319,33,349,31,354,30,320,38"/>
+</map>

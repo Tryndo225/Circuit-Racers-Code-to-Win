@@ -1,5 +1,5 @@
 <map id="SliderScript" name="SliderScript">
-<area shape="rect" id="Node000001" title="Simple UI slider label updater: formats the incoming float value as a zero&#45;padded two&#45;digit integer a..." alt="" coords="9,123,103,192"/>
+<area shape="rect" id="Node000001" title="Updates a TMP label from a slider value." alt="" coords="9,123,103,192"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,5,106,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,90,58,123,53,123,53,90"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,87,58,123,53,122,54,92"/>
 </map>

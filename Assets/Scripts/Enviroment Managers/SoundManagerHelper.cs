@@ -3,33 +3,41 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 /// <summary>
-/// Lightweight pooled SFX helper owned by <c>SoundManager</c>.
-/// Holds a runtime-created <see cref="AudioSource"/> and optionally follows a target
-/// <see cref="Transform"/> for positional sound playback.
+/// Lightweight pooled SFX helper owned by <see cref="SoundManager"/>.
 /// </summary>
 /// <remarks>
 /// @ingroup audio_mgr
-/// @thread Unity main thread.
-/// @invariant If <see cref="Loop"/> is false, the helper automatically returns itself
-///            to the pool after playback finishes.
-/// @invariant While <see cref="Target"/> is assigned, this helper follows the target position.
-/// @invariant Runtime-adjustable playback values such as <see cref="Volume"/>,
-///            <see cref="Pitch"/>, and <see cref="SpatialBlend"/> are synchronized every frame.
+/// @brief Wraps a runtime <see cref="AudioSource"/> for pooled sound-effect playback.
+///
+/// This helper stores playback settings for one sound instance and applies them to an internal
+/// <see cref="AudioSource"/>. It can optionally follow a target <see cref="Transform"/> for positional
+/// 3D audio playback.
+///
+/// Behaviour:
+/// - If <see cref="Loop"/> is false, the helper automatically releases itself after playback finishes.
+/// - While <see cref="Target"/> is assigned, the helper follows the target position.
+/// - Runtime-adjustable values such as <see cref="Volume"/>, <see cref="Pitch"/>, and
+///   <see cref="SpatialBlend"/> are synchronized every frame.
+///
+/// Threading:
+/// - Unity main thread only.
 /// </remarks>
 public class SoundManagerHelper : MonoBehaviour
 {
 	#region Inspector Fields
 
 	/// <summary>
-	/// True while this helper is reserved by the sound pool.
+	/// Whether this helper is currently reserved by the sound pool.
 	/// </summary>
 	[Tooltip("Set by SoundManager when this helper is in use.")]
 	public bool IsUsed = false;
 
 	/// <summary>
 	/// Optional target transform followed by this helper.
-	/// Useful for 3D sounds attached to moving objects.
 	/// </summary>
+	/// <remarks>
+	/// Useful for 3D sounds attached to moving objects.
+	/// </remarks>
 	[Tooltip("Optional Transform to follow for 3D playback.")]
 	public Transform Target;
 
@@ -40,30 +48,36 @@ public class SoundManagerHelper : MonoBehaviour
 	public AudioClip Clip;
 
 	/// <summary>
-	/// Playback volume in the range [0, 1].
+	/// Playback volume.
 	/// </summary>
-	[Tooltip("Playback volume (0..1).")]
+	[Tooltip("Playback volume.")]
 	[Range(0f, 1f)]
 	public float Volume = 1.0f;
 
 	/// <summary>
 	/// Playback pitch multiplier.
-	/// Values above 1 increase pitch and playback speed; values below 1 decrease them.
 	/// </summary>
+	/// <remarks>
+	/// Values above 1 increase pitch and playback speed. Values below 1 decrease them.
+	/// </remarks>
 	[Tooltip("Playback pitch multiplier.")]
 	public float Pitch = 1.0f;
 
 	/// <summary>
-	/// If true, the assigned clip loops until explicitly stopped.
-	/// If false, the helper is automatically released after playback ends.
+	/// Whether the assigned clip should loop until explicitly stopped.
 	/// </summary>
+	/// <remarks>
+	/// Non-looping sounds return this helper to the pool automatically after playback finishes.
+	/// </remarks>
 	[Tooltip("Loop the clip.")]
 	public bool Loop = false;
 
 	/// <summary>
-	/// Spatial blend of the internal AudioSource.
-	/// 0 means fully 2D, 1 means fully 3D.
+	/// Spatial blend of the internal <see cref="AudioSource"/>.
 	/// </summary>
+	/// <remarks>
+	/// A value of 0 means fully 2D audio. A value of 1 means fully 3D audio.
+	/// </remarks>
 	[Tooltip("0 = 2D, 1 = 3D.")]
 	[Range(0f, 1f)]
 	public float SpatialBlend = 0.0f;
@@ -79,7 +93,7 @@ public class SoundManagerHelper : MonoBehaviour
 	#region Properties
 
 	/// <summary>
-	/// True if the internal AudioSource exists and is currently playing.
+	/// Gets whether the internal <see cref="AudioSource"/> exists and is currently playing.
 	/// </summary>
 	public bool IsPlaying
 	{
@@ -91,14 +105,16 @@ public class SoundManagerHelper : MonoBehaviour
 	#region Private State
 
 	/// <summary>
-	/// Runtime AudioSource used for actual playback.
+	/// Runtime audio source used for playback.
 	/// </summary>
 	private AudioSource _audioSource;
 
 	/// <summary>
 	/// Coroutine used to release this helper after a non-looping sound finishes.
-	/// Stored so it can be stopped without cancelling unrelated coroutines.
 	/// </summary>
+	/// <remarks>
+	/// Stored so it can be stopped without cancelling unrelated coroutines.
+	/// </remarks>
 	private Coroutine _finishCoroutine;
 
 	#endregion
@@ -106,9 +122,12 @@ public class SoundManagerHelper : MonoBehaviour
 	#region Unity Methods
 
 	/// <summary>
-	/// Creates or reuses an AudioSource on this GameObject and prevents the helper
-	/// from being destroyed when scenes change.
+	/// Creates or reuses an <see cref="AudioSource"/> on this object.
 	/// </summary>
+	/// <remarks>
+	/// The helper is marked with <see cref="Object.DontDestroyOnLoad(Object)"/> so pooled helpers
+	/// can survive scene changes.
+	/// </remarks>
 	private void Awake()
 	{
 		if (!TryGetComponent(out _audioSource))
@@ -122,8 +141,7 @@ public class SoundManagerHelper : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Follows the assigned target, if any, and synchronizes values that may change
-	/// during playback.
+	/// Follows the assigned target and synchronizes mutable playback settings.
 	/// </summary>
 	private void Update()
 	{
@@ -146,11 +164,10 @@ public class SoundManagerHelper : MonoBehaviour
 
 	/// <summary>
 	/// Starts playback using the currently assigned clip and playback parameters.
-	/// If the sound is not looping, a coroutine is started to return the helper
-	/// to the pool after playback finishes.
 	/// </summary>
 	/// <remarks>
-	/// This method resets playback to the beginning of the clip before playing.
+	/// Playback is reset to the beginning of the clip before playing. If the sound is not looping,
+	/// a coroutine releases the helper back to the pool after playback finishes.
 	/// </remarks>
 	public void PlaySound()
 	{
@@ -182,9 +199,11 @@ public class SoundManagerHelper : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Pauses playback if the AudioSource is currently playing.
-	/// The helper remains reserved until it is resumed, stopped, or reset by the owner.
+	/// Pauses playback if the audio source is currently playing.
 	/// </summary>
+	/// <remarks>
+	/// The helper remains reserved until it is resumed, stopped, or reset by the owner.
+	/// </remarks>
 	public void PauseSound()
 	{
 		if (_audioSource != null && _audioSource.isPlaying)
@@ -195,9 +214,11 @@ public class SoundManagerHelper : MonoBehaviour
 
 	/// <summary>
 	/// Stops playback and immediately returns this helper to the pool.
-	/// Runtime state such as target, clip, loop flag, mixer group, and playback values
-	/// is cleared to safe defaults.
 	/// </summary>
+	/// <remarks>
+	/// Runtime state such as target, clip, loop flag, mixer group, and playback values is cleared
+	/// to safe defaults.
+	/// </remarks>
 	public void StopSound()
 	{
 		StopFinishCoroutine();
@@ -212,10 +233,12 @@ public class SoundManagerHelper : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Stops playback and rewinds the AudioSource to the beginning.
-	/// The helper remains reserved, allowing the owner to immediately call
-	/// <see cref="PlaySound"/> again with the same or updated settings.
+	/// Stops playback and rewinds the audio source to the beginning.
 	/// </summary>
+	/// <remarks>
+	/// The helper remains reserved, allowing the owner to call <see cref="PlaySound"/> again
+	/// with the same or updated settings.
+	/// </remarks>
 	public void ResetSound()
 	{
 		StopFinishCoroutine();
@@ -228,10 +251,12 @@ public class SoundManagerHelper : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Destroys this helper GameObject.
-	/// Prefer returning helpers to the pool with <see cref="StopSound"/> unless the
-	/// whole pool is being shut down.
+	/// Destroys this helper object.
 	/// </summary>
+	/// <remarks>
+	/// Prefer returning helpers to the pool with <see cref="StopSound"/> unless the whole pool
+	/// is being shut down.
+	/// </remarks>
 	public void DestroyHelper()
 	{
 		StopFinishCoroutine();
@@ -255,7 +280,7 @@ public class SoundManagerHelper : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Clears all runtime state so the helper can be safely reused by the pool.
+	/// Clears runtime state so the helper can be safely reused by the pool.
 	/// </summary>
 	private void ClearState()
 	{
@@ -274,9 +299,9 @@ public class SoundManagerHelper : MonoBehaviour
 	#region Coroutines
 
 	/// <summary>
-	/// Waits until a non-looping sound finishes, then releases this helper back
-	/// to the pool.
+	/// Waits until a non-looping sound finishes, then releases this helper back to the pool.
 	/// </summary>
+	/// <returns>Coroutine enumerator.</returns>
 	private IEnumerator SetUnusedWhenFinished()
 	{
 		while (_audioSource != null && _audioSource.isPlaying)

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,22 +7,35 @@ using UnityEngine;
 
 /// <summary>
 /// Custom property drawer for polymorphic <see cref="ButtonType"/> managed references.
-/// Renders a type-selection popup (for concrete subclasses) and the chosen instance's fields inline.
 /// </summary>
 /// <remarks>
 /// @ingroup editor_util
-/// @thread Unity Editor thread only. Editor-only code; excluded from player builds.
-/// @usage Add a field like <c>[SerializeReference] private ButtonType _action;</c> on a component,
-/// then this drawer will allow choosing among non-abstract <see cref="ButtonType"/> subclasses
-/// and editing their serialized fields.
+/// @brief Renders a type-selection popup for concrete <see cref="ButtonType"/> subclasses and draws the selected instance inline.
+///
+/// This drawer is editor-only and should either be placed inside an Editor folder or wrapped in a
+/// <c>UNITY_EDITOR</c> guard.
+///
+/// Usage:
+/// Add a managed-reference field such as:
+/// <code>
+/// [SerializeReference] private ButtonType _action;
+/// </code>
+/// The drawer then allows choosing among non-abstract <see cref="ButtonType"/> subclasses and editing
+/// their serialized fields.
+///
+/// Threading:
+/// - Unity Editor thread only.
 /// </remarks>
 [CustomPropertyDrawer(typeof(ButtonType), true)]
 public class ButtonTypeDrawer : PropertyDrawer
 {
 	/// <summary>
 	/// Cache of discovered, non-abstract, non-generic subclasses of <see cref="ButtonType"/>,
-	/// sorted by name. Populated on first draw via <see cref="EnsureTypeList"/>.
+	/// sorted by name.
 	/// </summary>
+	/// <remarks>
+	/// Populated on first draw through <see cref="EnsureTypeList"/>.
+	/// </remarks>
 	private List<Type> _types;
 
 	/// <summary>
@@ -30,8 +44,7 @@ public class ButtonTypeDrawer : PropertyDrawer
 	private string[] _typeNames;
 
 	/// <summary>
-	/// Ensures <see cref="_types"/> and <see cref="_typeNames"/> are populated with
-	/// concrete subclasses of <see cref="ButtonType"/> using <see cref="TypeCache"/>.
+	/// Ensures the type cache is populated with concrete <see cref="ButtonType"/> subclasses.
 	/// </summary>
 	private void EnsureTypeList()
 	{
@@ -46,10 +59,10 @@ public class ButtonTypeDrawer : PropertyDrawer
 	}
 
 	/// <summary>
-	/// Calculates the required GUI height for the drawer: popup line + body height + padding.
+	/// Calculates the required GUI height for the drawer.
 	/// </summary>
-	/// <param name="property">The managed reference property.</param>
-	/// <param name="label">The label for the property.</param>
+	/// <param name="property">Managed-reference property being drawn.</param>
+	/// <param name="label">Inspector label.</param>
 	/// <returns>Total height in pixels.</returns>
 	public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 	{
@@ -59,11 +72,10 @@ public class ButtonTypeDrawer : PropertyDrawer
 	}
 
 	/// <summary>
-	/// Draws the type popup and, below it, the serialized fields of the selected
-	/// <see cref="ButtonType"/> instance.
+	/// Draws the type popup and the serialized fields of the selected <see cref="ButtonType"/> instance.
 	/// </summary>
-	/// <param name="position">Drawing rect.</param>
-	/// <param name="property">Managed reference property to draw.</param>
+	/// <param name="position">Drawing rectangle.</param>
+	/// <param name="property">Managed-reference property to draw.</param>
 	/// <param name="label">Inspector label.</param>
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
@@ -95,11 +107,14 @@ public class ButtonTypeDrawer : PropertyDrawer
 	}
 
 	/// <summary>
-	/// Converts Unity's managed reference typename (format: "AssemblyName TypeFullName")
-	/// to a <see cref="Type"/> by searching loaded assemblies.
+	/// Converts Unity's managed-reference type name into a runtime <see cref="Type"/>.
 	/// </summary>
-	/// <param name="fullTypename">Managed reference typename string.</param>
-	/// <returns>Resolved <see cref="Type"/> or <c>null</c> if not found.</returns>
+	/// <param name="fullTypename">Managed-reference type name string.</param>
+	/// <returns>Resolved type, or <c>null</c> if the type cannot be found.</returns>
+	/// <remarks>
+	/// Unity stores managed-reference type names in the format:
+	/// <c>AssemblyName TypeFullName</c>.
+	/// </remarks>
 	private static Type GetTypeFromManagedReferenceFullTypename(string fullTypename)
 	{
 		if (string.IsNullOrEmpty(fullTypename)) return null;
@@ -119,12 +134,10 @@ public class ButtonTypeDrawer : PropertyDrawer
 	}
 
 	/// <summary>
-	/// Replaces the managed reference object with a new instance of <paramref name="newType"/>,
-	/// or clears it when <paramref name="newType"/> is <c>null</c>. Wraps the change in
-	/// SerializedObject Update/Apply.
+	/// Replaces the managed-reference object with a new instance of the selected type.
 	/// </summary>
-	/// <param name="property">Managed reference property being edited.</param>
-	/// <param name="newType">Concrete type to instantiate (or null to clear).</param>
+	/// <param name="property">Managed-reference property being edited.</param>
+	/// <param name="newType">Concrete type to instantiate, or <c>null</c> to clear the reference.</param>
 	private static void SetManagedReferenceToNewInstance(SerializedProperty property, Type newType)
 	{
 		property.serializedObject.Update();
@@ -142,3 +155,4 @@ public class ButtonTypeDrawer : PropertyDrawer
 		property.serializedObject.ApplyModifiedProperties();
 	}
 }
+#endif

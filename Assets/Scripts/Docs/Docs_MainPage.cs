@@ -1,158 +1,289 @@
 /*!
-\mainpage Circuit-Racers : Code-To-Win
+\mainpage Circuit Racers: Code-To-Win
 \tableofcontents
 
 # Welcome
 
-Fast, pick-up-and-play top-down racing. Generate tracks, run laps, hit checkpoints, and chase a clean final time.  
-This page explains **how to play**, **controls**, and what you’ll see on screen. For developer docs, see:
+Circuit Racers: Code-To-Win is a fast, pick-up-and-play racing game about generating tracks,
+running clean laps, hitting checkpoints, and improving your final time.
+
+This page explains how to play, what the controls do, and what the race HUD means.
+
+For developer documentation, see:
+- \ref systems "Systems"
+- \ref car_ctrl "Vehicle Control"
 - \ref track_mng "Track Management"
 - \ref level_gen "Level Generation"
+- \ref game_data "Game Data"
+- \ref replay_system "Replay System"
+- \ref audio_mgr "Audio Manager"
+- \ref scene_mgmt "Scene Management"
 - \ref ui "User Interface"
+- \ref ui_levels "Level UI"
+- \ref tools "Tools"
+- \ref editor_attrs "Editor Attributes"
 - \ref editor_util "Editor Utilities"
-- \ref wheel_deprecated "Deprecated Wheel Prototype"
+- \ref core_utils "Core Utilities"
 
 ---
 
 # Quick Start
-1. **Start**
-   - From the main menu, click **Play** or **Test Track**.
 
-1. **Start / Load a Track**
-   - Use the level browser to pick a saved map, or generate a new one.
-   - When generating confirm the popup preview to add it to your list or throw it away and generate another one.
+1. **Start from the main menu**
+   - Choose **Play**, **Test Track**, or another available scene/action button.
 
-2. **Grid / Start**
-   - A short countdown appears. When it clears, you’re live.
+2. **Choose or create a track**
+   - Pick a saved level from the level browser.
+   - Or generate a new track and inspect its preview.
+   - Keep the generated track to add it to your saved level list, or discard it and generate another one.
 
-3. **Race**
-   - Follow the **road** to the checkpoints.
-   - Cross **checkpoints** (light blue markers) in order.
-   - Complete the required **laps**. Your **final time** shows at the finish.
+3. **Wait for the countdown**
+   - A full-screen countdown/respawn overlay appears before the car becomes active.
+
+4. **Race**
+   - Follow the road.
+   - Pass checkpoints in order.
+   - Complete the required number of laps.
+   - The finish screen shows your final time.
 
 ---
 
 # Controls
 
-## Keyboard & Mouse
-- **Throttle / Brake:** `W` / `S`  *(Up/Down Arrow also work)*
-- **Steer Left / Right:** `A` / `D`  *(Left/Right Arrow also work)*
+## Keyboard
+
+- **Throttle:** `W` or `Up Arrow`
+- **Brake / Reverse:** `S` or `Down Arrow`
+- **Steer Left / Right:** `A` / `D` or `Left Arrow` / `Right Arrow`
 - **Handbrake:** `Space`
-- **Lights (toggle):** `L`
-- **Menus / UI:** Standard mouse navigation
+- **Lights Toggle:** `L`
+- **Menus / UI:** Mouse navigation
+- **Open unfinished result screen during race:** `Escape`
 
-## Gamepad (Xbox / DualShock / Generic)
-- **Throttle / Brake:** Triggers (Right/Left)
-- **Steer:** Left Stick (X)
-- **Handbrake:** South / Cross (`A` on Xbox, `X` on PS)
-- **Lights (toggle):** D-Pad Up
+## Gamepad
 
-> The game detects your last used device and adapts steering behavior accordingly.
+- **Throttle:** Right Trigger
+- **Brake / Reverse:** Left Trigger
+- **Steer:** Left Stick X axis
+- **Handbrake:** South Button / Cross
+- **Lights Toggle:** D-Pad Up
 
----
-
-# HUD & What It Means
-
-- **Start Filter & Timer**  
-  A large overlay with a countdown. When it’s gone, your car is live.
-
-- **Lap Time**  
-  Current lap’s running timer.
-
-- **Track Time**  
-  Total time since the first lap started (hidden until you begin your first lap).
-
-- **Lap Counter**  
-  `current / total`, e.g., `2/3`.
-
-- **Checkpoint Counter**  
-  `current / total`, showing progress through the lap.
-
-- **Finish Screen**  
-  Pops up when the race is complete, showing your **Final Time**.
+The vehicle controller detects the last used input device and uses that information to adjust steering behaviour.
 
 ---
 
-# Checkpoints & Respawn
+# HUD and What It Means
 
-- **Checkpoints**  
-  Automatically placed along straights. You must pass them **in order**.
-- **Respawn Timer**  
-  If you crash, reset, or the race starts, a short **respawn timer** overlay appears.
-- **Saved State**  
-  On checkpoint claim, your **position**, **rotation**, and **velocities** are captured and can be used for fair respawn behavior.
+## Countdown / Respawn Overlay
+
+A full-screen filter and timer appear before the race starts and during respawn.
+When the timer reaches zero, the car is live again.
+
+## Lap Time
+
+Shows the current lap's running time.
+
+## Track Time
+
+Shows the total elapsed track time.
+It is hidden until the first lap has started.
+
+## Lap Counter
+
+Shows race lap progress in the form:
+
+\code
+current / total
+\endcode
+
+Example:
+
+\code
+2/3
+\endcode
+
+## Checkpoint Counter
+
+Shows checkpoint progress through the current lap in the form:
+
+\code
+current / total
+\endcode
+
+Example:
+
+\code
+4/8
+\endcode
+
+## Checkpoint Split Popup
+
+When a checkpoint is passed, a temporary split popup may appear.
+It shows the current split time and the difference compared to the stored reference split.
+
+## Finish Screen
+
+When the race is complete, the finish screen shows the final race time.
+Pressing `Escape` during an unfinished race may open the result screen as unfinished.
 
 ---
 
-# Track Colors (Map Preview)
+# Checkpoints, Laps, and Respawn
 
-- **Grass / Off-track:** Green  
-- **Road / Drivable:** Gray  
-- **Start:** Light-Green Marker  
-- **Finish:** Red Marker (same as Start for circuit tracks)  
-- **Checkpoint:** Light-Blue Marker
+## Checkpoints
 
----
+Checkpoints must be passed in order.
+Generated intermediate checkpoints are placed along suitable straight sections of the track.
+The placed start and finish blocks also provide checkpoint behaviour in the playable scene.
 
-# Level Generation (Player-Facing)
+## Laps
 
-- **Circuit or Point-to-Point**  
-  Circuits return to the start; point-to-point ends elsewhere.
-- **Size**  
-  Width/Height of the grid. Bigger maps -> more complex tracks.
-- **Steps**  
-  Higher steps carve longer/more varied routes.
-- **Preview**  
-  A pixel-perfect preview texture is generated so you can verify before saving.
+Circuit tracks may require multiple laps.
+Point-to-point tracks end at a separate finish location.
 
-> Under the hood: the generator uses BFS “flooding” to carve a drivable road and ensures spacing so branches don’t crowd.
+## Respawn
+
+The race system stores checkpoint-related state so the player can be returned to a fair recent position
+after crashes, resets, or race restarts.
 
 ---
 
-# Menus & UI Bits
+# Track Preview Colors
 
-- **Level Browser**  
-  Grid of level cards. Resize responsively based on window size.
-- **Level Popup**  
-  Shows a large preview and action buttons (keep / discard).
-- **Dropdown Scene Button**  
-  A styled dropdown that changes a paired button’s action (e.g., “Play”, “Test Track”, “Quit” by scene).
+The level preview uses simple colors to make the generated layout easy to read:
+
+- **Grass / Off-track:** green
+- **Road / Drivable track:** gray
+- **Start:** light-green marker
+- **Finish:** red marker
+- **Checkpoint:** light-blue marker
+
+For circuit tracks, the start and finish are represented by the same tile.
 
 ---
 
-# Tips & Driving
+# Level Generation
 
-- **Feather the steering** don’t just hold it.
-- **Handbrake** helps pivot the car on tight hairpins—use sparingly.
-- **Watch the minimap / road** color in the preview to predict corners.
-- **Gamepad** offers smoother steering at speed thanks to analog input.
+The generator creates grid-based racing tracks.
+
+## Track Type
+
+- **Circuit:** the road closes back to the start.
+- **Point-to-point:** the road starts and finishes at different locations.
+
+## Size
+
+Width and height control the grid size.
+Larger maps can produce longer and more complex tracks.
+
+## Steps
+
+The step count controls how many times the generator attempts to extend the road.
+Higher values usually create longer or more varied tracks.
+
+## Preview
+
+A preview texture is generated before saving so the layout can be checked visually.
+
+Under the hood, generation uses flood-fill style path search, backtracking, spacer tiles, validation,
+and checkpoint post-processing to produce playable layouts.
+
+---
+
+# Menus and UI
+
+## Level Browser
+
+Shows saved levels as level cards.
+Use it to select, play, edit, delete, or inspect levels depending on the current menu.
+
+## Level Popup
+
+Shows a larger preview of a generated or selected level and provides action buttons such as keep,
+discard, play, or edit depending on context.
+
+## Settings
+
+Settings can control driving assists such as ABS and traction control when available.
+
+## Scene Buttons and Dropdowns
+
+Some menu buttons can change their target action through a dropdown, for example switching between
+play, test track, or quit actions.
+
+---
+
+# Tips for Driving
+
+- Do not hold steering fully through every corner; smoother input is usually faster.
+- Brake before the corner, then steer.
+- Use the handbrake only when you need a sharp rotation.
+- Gamepad steering gives smoother analog control.
+- Watch checkpoint order and avoid cutting across the track.
+- Replays and saved best times are useful for comparing your improved runs.
 
 ---
 
 # Troubleshooting
 
-- **No Input:**  
-  Check that your Input Actions are bound. If using defaults, the game will auto-create bindings. Tap any key/gamepad to re-detect the device.
+## No Input
 
-- **No Sound:**  
-  Ensure an AudioListener exists (usually on the main camera) and that volumes aren’t set to 0 in settings.
+- Check that input actions are assigned.
+- If using automatic defaults, make sure default binding creation is enabled.
+- Press any keyboard or gamepad control to let the vehicle detect the active device.
 
-- **Low FPS with Large Tracks:**  
-  Try smaller grid sizes or fewer steps when generating.
+## No Sound
 
-- **Missing Levels in Browser:**  
-  Ensure you saved/kept the level from the popup after preview.
+- Make sure an AudioListener exists, usually on the main camera.
+- Check music, SFX, and engine volumes.
+- Check AudioMixer routing.
+- Check that the relevant clips are assigned.
+
+## Car Does Not Move
+
+- Check that the car prefab has a Rigidbody.
+- Check that all four WheelCollider references are assigned.
+- Check that at least one wheel is marked as powered.
+- Check that the wheels are touching a collider.
+
+## Lights Do Not Toggle
+
+- Check the lights input binding.
+- Check that the light lists contain valid Light references.
+- Check that the vehicle has a LightsController.
+
+## Missing Levels in Browser
+
+- Make sure the generated level was kept/saved from the popup.
+- Imported levels should be valid before being added to the saved list.
+
+## Low FPS with Large Tracks
+
+- Use smaller grid sizes.
+- Use fewer generation steps.
+- Avoid excessive preview/debug generation during gameplay.
 
 ---
 
 # For Developers
 
-Jump into:
-- \ref level_gen — generation algorithm, tiles, checkpoints
-- \ref track_mng — race state machine, timers, checkpoint claims
-- \ref ui — parallax, HUD, previews, menus
-- \ref editor_util — custom property drawers & inspectors
-- \ref wheel_deprecated — legacy prototype (not used)
+Main runtime groups:
+- \ref systems "Systems"
+- \ref car_ctrl "Vehicle Control"
+- \ref track_mng "Track Management"
+- \ref level_gen "Level Generation"
+- \ref game_data "Game Data"
+- \ref replay_system "Replay System"
+- \ref audio_mgr "Audio Manager"
+- \ref scene_mgmt "Scene Management"
+- \ref ui "User Interface"
+- \ref ui_levels "Level UI"
+- \ref core_utils "Core Utilities"
+
+Tooling groups:
+- \ref tools "Tools"
+- \ref editor_attrs "Editor Attributes"
+- \ref editor_util "Editor Utilities"
 
 Happy racing!
 */

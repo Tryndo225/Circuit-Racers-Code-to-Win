@@ -1,0 +1,5 @@
+<map id="LevelEditorManager.SaveEditedLevelAsNew" name="LevelEditorManager.SaveEditedLevelAsNew">
+<area shape="rect" id="Node000001" title="Validates the edited level and saves it as a new level entry." alt="" coords="5,5,213,48"/>
+<area shape="rect" id="Node000002" href="$class_level_map_validator.html#a5aecd8063cf0f048615a4bfd79782451" title="Validates a level map." alt="" coords="261,13,438,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,24,248,27,242,27,213,29"/>
+</map>

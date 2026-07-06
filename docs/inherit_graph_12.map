@@ -1,3 +1,19 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_heatmap_preview.html" title=" " alt="" coords="5,5,188,48"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,195,118,221"/>
+<area shape="rect" id="Node000001" href="$class_button_type_drawer.html" title="Custom property drawer for polymorphic ButtonType managed references." alt="" coords="230,5,359,32"/>
+<area shape="poly" id="edge120_Node000000_Node000001" title=" " alt="" coords="70,179,84,147,104,109,130,73,164,42,195,27,231,19,227,23,197,32,167,46,134,76,108,112,88,149,75,181"/>
+<area shape="rect" id="Node000002" href="$class_read_only_drawer.html" title="Inspector drawer that renders fields marked with ReadOnlyAttribute as disabled." alt="" coords="234,56,355,83"/>
+<area shape="poly" id="edge121_Node000000_Node000002" title=" " alt="" coords="77,180,113,134,137,111,164,92,198,78,235,72,231,75,200,83,167,97,141,115,117,138,82,183"/>
+<area shape="rect" id="Node000003" href="$class_show_if_drawer.html" title="Inspector drawer for ShowIfAttribute." alt="" coords="242,107,346,133"/>
+<area shape="poly" id="edge122_Node000000_Node000003" title=" " alt="" coords="92,184,126,162,165,143,203,131,244,124,240,128,204,136,167,148,129,166,96,187"/>
+<area shape="rect" id="Node000004" href="$class_string_track_piece_dictionary_drawer.html" title="Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable,..." alt="" coords="204,157,384,200"/>
+<area shape="poly" id="edge123_Node000000_Node000004" title=" " alt="" coords="132,197,206,188,202,192,134,201"/>
+<area shape="rect" id="Node000005" href="$class_wheel_spec_drawer.html" title="Compact 1&#45;row drawer for WheelSpec showing collider, visual, powered, and steering columns." alt="" coords="229,224,360,251"/>
+<area shape="poly" id="edge124_Node000000_Node000005" title=" " alt="" coords="132,214,231,227,226,231,134,220"/>
+<area shape="rect" id="Node000006" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_channel_picker_attribute_drawer.html" title=" " alt="" coords="166,275,423,333"/>
+<area shape="poly" id="edge125_Node000000_Node000006" title=" " alt="" coords="99,227,167,260,197,273,192,275,165,265,99,232"/>
+<area shape="rect" id="Node000007" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_resolution_dropdown_attribute_drawer.html" title=" " alt="" coords="172,357,416,416"/>
+<area shape="poly" id="edge126_Node000000_Node000007" title=" " alt="" coords="77,233,114,290,139,318,167,343,187,356,182,357,164,347,135,322,110,293,76,238"/>
+<area shape="rect" id="Node000008" href="$classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_slider_drawer.html" title=" " alt="" coords="195,440,394,483"/>
+<area shape="poly" id="edge127_Node000000_Node000008" title=" " alt="" coords="68,234,82,278,100,330,129,382,147,405,167,426,197,445,192,445,164,430,143,409,124,385,96,332,76,280,68,239"/>
 </map>

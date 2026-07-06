@@ -7,5 +7,6 @@ var dir_1880f8e4a19fbb5b9bd5efbd79ea8b21 =
     [ "LightsController.cs", "_lights_controller_8cs.html", null ],
     [ "TransmissionController.cs", "_transmission_controller_8cs.html", null ],
     [ "TyreEffects.cs", "_tyre_effects_8cs.html", null ],
-    [ "VehicleController.cs", "_vehicle_controller_8cs.html", null ]
+    [ "VehicleController.cs", "_vehicle_controller_8cs.html", null ],
+    [ "WheelSpec.cs", "_wheel_spec_8cs.html", null ]
 ];

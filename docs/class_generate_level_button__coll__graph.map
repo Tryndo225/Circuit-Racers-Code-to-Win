@@ -1,5 +1,5 @@
 <map id="GenerateLevelButton" name="GenerateLevelButton">
-<area shape="rect" id="Node000001" title="Strategy: procedurally generate a level (optionally circuit), add checkpoints, and display it in a po..." alt="" coords="5,123,159,256"/>
-<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract strategy for a button action." alt="" coords="44,5,121,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,90,85,123,80,123,80,90"/>
+<area shape="rect" id="Node000001" title="Button strategy that procedurally generates a level, creates checkpoints, and displays the result in ..." alt="" coords="5,123,159,235"/>
+<area shape="rect" id="Node000002" href="$class_button_type.html" title="Abstract base class for serialized UI button actions." alt="" coords="44,5,121,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,87,85,123,80,122,81,92"/>
 </map>

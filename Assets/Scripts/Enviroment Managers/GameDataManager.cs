@@ -1,49 +1,64 @@
-using IEnumerableExtention;       // For GetContentHash()
+using IEnumerableExtensions;       // For GetContentHash()
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
 
 /// <summary>
-/// Runtime manager for persistent game progression data (levels, best times, current selection).
+/// Runtime manager for persistent game progression data.
 /// </summary>
 /// <remarks>
-/// @defgroup game_data_mgr Game Data Manager
-/// @ingroup systems
-/// @brief Central orchestrator for saving/loading <see cref="GameData"/>, tracking the selected
+/// @ingroup game_data
+/// @brief Central manager for saving/loading <see cref="GameData"/>, tracking the selected
 /// <see cref="LevelMap"/>, and notifying listeners about changes.
-/// 
+///
 /// Responsibilities:
-/// - Load/save <see cref="GameData"/> to PlayerPrefs as JSON under key "GameData".
+/// - Load and save <see cref="GameData"/> to PlayerPrefs as JSON under the key <c>GameData</c>.
 /// - Maintain the currently selected <see cref="LevelMap"/> used by gameplay scene transitions.
-/// - Provide helper APIs for adding/removing/clearing levels and recording best times.
-/// - Compute and expose a content hash of the level list; notify observers when it changes.
-/// 
-/// @thread Unity main thread only.
-/// @invariant Exactly one instance exists (via <c>Generic.Singleton&lt;T&gt;</c>).
-/// @invariant <see cref="Hash"/> reflects <see cref="CurrentGameData"/>.Levels via <c>GetContentHash()</c>.
-/// @invariant Best time is monotonically improved (never worsened by <see cref="CompleteLevel"/>).
+/// - Provide helper APIs for adding, removing, clearing, editing, and replacing levels.
+/// - Record best times, checkpoint splits, and best replays.
+/// - Store assist settings.
+/// - Compute and expose a content hash of the level list.
+/// - Notify observers when the level-list hash changes.
+///
+/// Threading:
+/// - Unity main thread only.
 /// </remarks>
 public class GameDataManager : Generic.Singleton<GameDataManager>
 {
 	#region Data Records
 
 	/// <summary>
-	/// Serializable record containing a <see cref="LevelMap"/> reference and its best saved run data.
+	/// Serializable record containing a level map and its best saved run data.
 	/// </summary>
+	/// <remarks>
+	/// @ingroup game_data
+	/// @brief Stores the best time, checkpoint splits, and replay associated with one level.
+	/// </remarks>
 	[Serializable]
 	public class LevelData : ISerializable
 	{
-		/// <summary>Associated level map.</summary>
+		/// <summary>
+		/// Associated level map.
+		/// </summary>
 		public LevelMap LevelMap;
 
-		/// <summary>Best completion time in seconds. Use <see cref="float.MaxValue"/> for unknown.</summary>
+		/// <summary>
+		/// Best completion time in seconds.
+		/// </summary>
+		/// <remarks>
+		/// Uses <see cref="float.MaxValue"/> when no completion time is known.
+		/// </remarks>
 		public float Time = float.MaxValue;
 
-		/// <summary>Best checkpoint split times for this level.</summary>
+		/// <summary>
+		/// Best checkpoint split times for this level.
+		/// </summary>
 		public float[] CheckpointTimeSplits;
 
-		/// <summary>Replay associated with the stored best time.</summary>
+		/// <summary>
+		/// Replay associated with the stored best time.
+		/// </summary>
 		public Replay BestReplay;
 
 		/// <summary>
@@ -52,17 +67,17 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		public LevelData() { }
 
 		/// <summary>
-		/// Creates a record with an unknown best time.
+		/// Creates a level record with an unknown best time.
 		/// </summary>
 		/// <param name="levelMap">Target level map.</param>
 		public LevelData(LevelMap levelMap) : this(levelMap, float.MaxValue) { }
 
 		/// <summary>
-		/// Creates a record with a specified best time.
+		/// Creates a level record with a specified best time.
 		/// </summary>
 		/// <param name="levelMap">Target level map.</param>
 		/// <param name="time">Best time in seconds.</param>
-		/// <param name="checkpointTimeSplits">Optional array of checkpoint time splits; if null, initialized to default size.</param>
+		/// <param name="checkpointTimeSplits">Optional checkpoint split times.</param>
 		/// <param name="replay">Optional replay associated with this time.</param>
 		public LevelData(LevelMap levelMap, float time, float[] checkpointTimeSplits = null, Replay replay = null)
 		{
@@ -75,6 +90,8 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		/// <summary>
 		/// Deserialization constructor used by serializers that rely on <see cref="ISerializable"/>.
 		/// </summary>
+		/// <param name="info">Serialized level-data values.</param>
+		/// <param name="context">Serialization context.</param>
 		public LevelData(SerializationInfo info, StreamingContext context)
 		{
 			LevelMap = GetValueOrDefault<LevelMap>(info, "LevelMap", null);
@@ -85,7 +102,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			EnsureValid();
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Writes this level-data record into the serialization store.
+		/// </summary>
+		/// <param name="info">Serialization target.</param>
+		/// <param name="context">Serialization context.</param>
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("LevelMap", LevelMap, typeof(LevelMap));
@@ -95,7 +116,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 
 		/// <summary>
-		/// Ensures loaded data is usable even if it came from an older save.
+		/// Ensures loaded data is usable even if it came from an older save format.
 		/// </summary>
 		public void EnsureValid()
 		{
@@ -104,8 +125,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 
 		/// <summary>
-		/// Equality compares saved run data by value.
+		/// Checks whether two level-data records contain the same saved run data.
 		/// </summary>
+		/// <param name="a">First level-data record.</param>
+		/// <param name="b">Second level-data record.</param>
+		/// <returns><c>true</c> when both records are equal; otherwise <c>false</c>.</returns>
 		public static bool operator ==(LevelData a, LevelData b)
 		{
 			if (ReferenceEquals(a, b))
@@ -117,19 +141,31 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			return a.LevelMap == b.LevelMap && a.Time == b.Time && FloatArrayEquals(a.CheckpointTimeSplits, b.CheckpointTimeSplits) && EqualityComparer<Replay>.Default.Equals(a.BestReplay, b.BestReplay);
 		}
 
-		/// <inheritdoc cref="operator =="/>
+		/// <summary>
+		/// Checks whether two level-data records differ.
+		/// </summary>
+		/// <param name="a">First level-data record.</param>
+		/// <param name="b">Second level-data record.</param>
+		/// <returns><c>true</c> when the records differ; otherwise <c>false</c>.</returns>
 		public static bool operator !=(LevelData a, LevelData b)
 		{
 			return !(a == b);
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Checks whether this level-data record equals another object.
+		/// </summary>
+		/// <param name="obj">Object to compare with this record.</param>
+		/// <returns><c>true</c> when the object is an equal <see cref="LevelData"/>; otherwise <c>false</c>.</returns>
 		public override bool Equals(object obj)
 		{
 			return obj is LevelData other && this == other;
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Computes a hash code from the stored level map, time, splits, and replay.
+		/// </summary>
+		/// <returns>Hash code for this level-data record.</returns>
 		public override int GetHashCode()
 		{
 			int hash = HashCode.Combine(LevelMap, Time, BestReplay);
@@ -144,7 +180,8 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		/// <summary>
 		/// Creates a default checkpoint split array for a level.
 		/// </summary>
-		/// <param name="levelMap">Level map whose checkpoint/lap count should be used.</param>
+		/// <param name="levelMap">Level map whose checkpoint and lap count should be used.</param>
+		/// <returns>Default split array for the given level.</returns>
 		private static float[] CreateDefaultSplits(LevelMap levelMap)
 		{
 			if (levelMap == null)
@@ -159,6 +196,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		/// <summary>
 		/// Compares two float arrays by value.
 		/// </summary>
+		/// <param name="a">First array.</param>
+		/// <param name="b">Second array.</param>
+		/// <returns><c>true</c> when both arrays contain the same values; otherwise <c>false</c>.</returns>
 		private static bool FloatArrayEquals(float[] a, float[] b)
 		{
 			if (ReferenceEquals(a, b))
@@ -178,8 +218,16 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 
 		/// <summary>
-		/// Reads an optional serialized value. Used for backwards compatibility with older save data.
+		/// Reads an optional serialized value.
 		/// </summary>
+		/// <typeparam name="T">Expected value type.</typeparam>
+		/// <param name="info">Serialized data source.</param>
+		/// <param name="name">Serialized entry name.</param>
+		/// <param name="fallback">Fallback value used when the entry is missing.</param>
+		/// <returns>The stored value when present; otherwise <paramref name="fallback"/>.</returns>
+		/// <remarks>
+		/// This is used for backwards compatibility with older save data.
+		/// </remarks>
 		private static T GetValueOrDefault<T>(SerializationInfo info, string name, T fallback)
 		{
 			foreach (SerializationEntry entry in info)
@@ -190,24 +238,51 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 	}
 
+	/// <summary>
+	/// Serializable assist-settings record.
+	/// </summary>
+	/// <remarks>
+	/// @ingroup game_data
+	/// @brief Stores whether driving assists are enabled in saved game data.
+	/// </remarks>
 	[Serializable]
 	public class AssistsSettings : ISerializable
 	{
+		/// <summary>
+		/// Whether anti-lock braking assist is enabled.
+		/// </summary>
 		public bool ABS;
+
+		/// <summary>
+		/// Whether traction-control assist is enabled.
+		/// </summary>
 		public bool TC;
 
+		/// <summary>
+		/// Creates assist settings with assists disabled by default.
+		/// </summary>
 		public AssistsSettings()
 		{
 			ABS = false;
 			TC = false;
 		}
 
+		/// <summary>
+		/// Deserialization constructor for assist settings.
+		/// </summary>
+		/// <param name="info">Serialized assist settings.</param>
+		/// <param name="context">Serialization context.</param>
 		protected AssistsSettings(SerializationInfo info, StreamingContext context)
 		{
 			ABS = info.GetBoolean(nameof(ABS));
 			TC = info.GetBoolean(nameof(TC));
 		}
 
+		/// <summary>
+		/// Writes assist settings into the serialization store.
+		/// </summary>
+		/// <param name="info">Serialization target.</param>
+		/// <param name="context">Serialization context.</param>
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue(nameof(ABS), ABS);
@@ -218,24 +293,44 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	/// <summary>
 	/// Serializable container for all saved progression data.
 	/// </summary>
+	/// <remarks>
+	/// @ingroup game_data
+	/// @brief Stores custom levels, practice-map records, replays, and assist settings.
+	/// </remarks>
 	[Serializable]
 	public class GameData : ISerializable
 	{
-		/// <summary>List of known levels and their best times.</summary>
+		/// <summary>
+		/// List of known levels and their best times.
+		/// </summary>
 		public List<LevelData> Levels;
 
-		/// <summary>Best practice/test-map time. Uses <see cref="float.MaxValue"/> when unknown.</summary>
+		/// <summary>
+		/// Best practice/test-map time.
+		/// </summary>
+		/// <remarks>
+		/// Uses <see cref="float.MaxValue"/> when unknown.
+		/// </remarks>
 		public float PracticeMapTime = float.MaxValue;
 
-		/// <summary>Best practice/test-map checkpoint splits.</summary>
+		/// <summary>
+		/// Best practice/test-map checkpoint splits.
+		/// </summary>
 		public float[] PracticeMapSplits = new float[30];
 
-		/// <summary>Best practice/test-map replay.</summary>
+		/// <summary>
+		/// Best practice/test-map replay.
+		/// </summary>
 		public Replay PracticeMapReplay;
 
+		/// <summary>
+		/// Saved driving assist settings.
+		/// </summary>
 		public AssistsSettings AssistsSettings;
 
-		/// <summary>Creates an empty game data set.</summary>
+		/// <summary>
+		/// Creates an empty game data set.
+		/// </summary>
 		public GameData()
 		{
 			Levels = new List<LevelData>();
@@ -245,6 +340,8 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		/// <summary>
 		/// Deserialization constructor used by serializers that rely on <see cref="ISerializable"/>.
 		/// </summary>
+		/// <param name="info">Serialized game-data values.</param>
+		/// <param name="context">Serialization context.</param>
 		public GameData(SerializationInfo info, StreamingContext context)
 		{
 			Levels = GetValueOrDefault(info, "Levels", new List<LevelData>());
@@ -256,7 +353,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			EnsureValid();
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Writes saved game data into the serialization store.
+		/// </summary>
+		/// <param name="info">Serialization target.</param>
+		/// <param name="context">Serialization context.</param>
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("Levels", Levels, typeof(List<LevelData>));
@@ -267,7 +368,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 
 		/// <summary>
-		/// Ensures loaded data is usable even if it came from an older save.
+		/// Ensures loaded game data is usable even if it came from an older save format.
 		/// </summary>
 		public void EnsureValid()
 		{
@@ -286,12 +387,18 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			}
 
 			if (PracticeMapSplits == null)
-				PracticeMapSplits = new float[11];
+				PracticeMapSplits = new float[30];
 
 			if (AssistsSettings == null)
 				AssistsSettings = new AssistsSettings();
 		}
 
+		/// <summary>
+		/// Gets a saved checkpoint split for a custom level.
+		/// </summary>
+		/// <param name="map">Level map whose stored split should be read.</param>
+		/// <param name="index">Split index.</param>
+		/// <returns>Saved split time, or zero if the map or split is unavailable.</returns>
 		public float GetCheckpointSplit(LevelMap map, int index)
 		{
 			int levelIndex = Levels.FindIndex(ld => ld.LevelMap == map);
@@ -319,6 +426,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			return splits[index];
 		}
 
+		/// <summary>
+		/// Gets a saved checkpoint split for the practice/test map.
+		/// </summary>
+		/// <param name="index">Split index.</param>
+		/// <returns>Saved practice split time, or zero if the split is unavailable.</returns>
 		public float GetTestLevelCheckpointSplit(int index)
 		{
 			if (PracticeMapSplits == null)
@@ -337,12 +449,15 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 
 		/// <summary>
-		/// Adds or improves a level time; replaces only if <paramref name="time"/> is lower than the stored best.
+		/// Adds or improves a custom level time.
 		/// </summary>
 		/// <param name="map">Target level map.</param>
 		/// <param name="time">New completion time in seconds.</param>
 		/// <param name="splits">Checkpoint splits for the completed run.</param>
 		/// <param name="replay">Replay for the completed run.</param>
+		/// <remarks>
+		/// Existing records are replaced only when <paramref name="time"/> is lower than the stored best time.
+		/// </remarks>
 		public void UpdateLevelTime(LevelMap map, float time, float[] splits, Replay replay)
 		{
 			int index = Levels.FindIndex(ld => ld.LevelMap == map);
@@ -373,12 +488,17 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		{
 			if (time < PracticeMapTime)
 			{
-				PracticeMapSplits = splits ?? new float[11];
+				PracticeMapSplits = splits ?? new float[30];
 				PracticeMapTime = time;
 				PracticeMapReplay = replay;
 			}
 		}
 
+		/// <summary>
+		/// Gets the best saved time for a custom level.
+		/// </summary>
+		/// <param name="map">Level map to look up.</param>
+		/// <returns>Best saved time, or <see cref="float.MaxValue"/> if the level is not stored.</returns>
 		public float GetBestLevelTime(LevelMap map)
 		{
 			int index = Levels.FindIndex(ld => ld.LevelMap == map);
@@ -389,11 +509,20 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			return float.MaxValue;
 		}
 
+		/// <summary>
+		/// Gets the best saved practice/test-map time.
+		/// </summary>
+		/// <returns>Best saved practice/test-map time.</returns>
 		public float GetBestTestLevelTime()
 		{
 			return PracticeMapTime;
 		}
 
+		/// <summary>
+		/// Gets the best replay for a custom level.
+		/// </summary>
+		/// <param name="map">Level map to look up.</param>
+		/// <returns>Best replay if one exists and contains snapshots; otherwise <c>null</c>.</returns>
 		public Replay GetBestReplay(LevelMap map)
 		{
 			int index = Levels.FindIndex(ld => ld.LevelMap == map);
@@ -409,6 +538,10 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			return null;
 		}
 
+		/// <summary>
+		/// Gets the best replay for the practice/test map.
+		/// </summary>
+		/// <returns>Best practice replay if one exists and contains snapshots; otherwise <c>null</c>.</returns>
 		public Replay GetBestTestLevelReplay()
 		{
 			if (PracticeMapReplay != null && PracticeMapReplay.Duration > 0f && PracticeMapReplay.Snapshots != null && PracticeMapReplay.Snapshots.Count > 0)
@@ -418,14 +551,23 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 
 		/// <summary>
-		/// Returns true if the level exists in the data set.
+		/// Checks whether the level exists in the data set.
 		/// </summary>
 		/// <param name="map">Level map to check.</param>
+		/// <returns><c>true</c> if the level is stored; otherwise <c>false</c>.</returns>
 		public bool ContainsLevel(LevelMap map) => Levels.Exists(ld => ld.LevelMap == map);
 
 		/// <summary>
-		/// Reads an optional serialized value. Used for backwards compatibility with older save data.
+		/// Reads an optional serialized value.
 		/// </summary>
+		/// <typeparam name="T">Expected value type.</typeparam>
+		/// <param name="info">Serialized data source.</param>
+		/// <param name="name">Serialized entry name.</param>
+		/// <param name="fallback">Fallback value used when the entry is missing.</param>
+		/// <returns>The stored value when present; otherwise <paramref name="fallback"/>.</returns>
+		/// <remarks>
+		/// This is used for backwards compatibility with older save data.
+		/// </remarks>
 		private static T GetValueOrDefault<T>(SerializationInfo info, string name, T fallback)
 		{
 			foreach (SerializationEntry entry in info)
@@ -441,38 +583,58 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Public Properties
 
 	/// <summary>
-	/// The active data set (list of <see cref="LevelData"/> entries).
+	/// Active saved game-data set.
 	/// </summary>
 	public GameData CurrentGameData { get; private set; } = new GameData();
 
 	/// <summary>
-	/// The currently selected level to be played.
-	/// Null means the practice/test map is selected.
+	/// Currently selected level to be played.
 	/// </summary>
+	/// <remarks>
+	/// A <c>null</c> value means the practice/test map is selected.
+	/// </remarks>
 	public LevelMap CurrentLevelMap { get; private set; } = null;
 
 	/// <summary>
-	/// Best replay for the current map.
-	/// If no custom level is selected, this returns the practice/test-map replay.
+	/// Best replay for the currently selected map.
 	/// </summary>
+	/// <remarks>
+	/// If no custom level is selected, this returns the practice/test-map replay.
+	/// </remarks>
 	public Replay CurrentLevelReplay => GetCurrentMapReplay();
 
+	/// <summary>
+	/// Gets whether ABS assist is enabled in saved settings.
+	/// </summary>
+	/// <returns><c>true</c> if ABS is enabled; otherwise <c>false</c>.</returns>
 	public bool GetABS()
 	{
 		return CurrentGameData.AssistsSettings.ABS;
 	}
 
+	/// <summary>
+	/// Sets the saved ABS assist state and persists game data.
+	/// </summary>
+	/// <param name="enabled">Whether ABS should be enabled.</param>
 	public void SetABS(bool enabled)
 	{
 		CurrentGameData.AssistsSettings.ABS = enabled;
 		SaveGameData();
 	}
 
+	/// <summary>
+	/// Gets whether traction control assist is enabled in saved settings.
+	/// </summary>
+	/// <returns><c>true</c> if traction control is enabled; otherwise <c>false</c>.</returns>
 	public bool GetTC()
 	{
 		return CurrentGameData.AssistsSettings.TC;
 	}
 
+	/// <summary>
+	/// Sets the saved traction control assist state and persists game data.
+	/// </summary>
+	/// <param name="enabled">Whether traction control should be enabled.</param>
 	public void SetTC(bool enabled)
 	{
 		CurrentGameData.AssistsSettings.TC = enabled;
@@ -480,8 +642,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	}
 
 	/// <summary>
-	/// Hash of <see cref="CurrentGameData"/>.Levels content for change detection.
+	/// Hash of the current level-list content.
 	/// </summary>
+	/// <remarks>
+	/// Used for change detection by level-list UI and other listeners.
+	/// </remarks>
 	public int Hash { get; private set; }
 
 	#endregion
@@ -489,12 +654,12 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Observers
 
 	/// <summary>
-	/// Registered listeners notified whenever the game data content hash changes.
+	/// Registered listeners notified whenever the game-data content hash changes.
 	/// </summary>
 	private readonly List<Action> onGameDataChanged = new List<Action>();
 
 	/// <summary>
-	/// Subscribes a listener to hash-change notifications.
+	/// Subscribes a listener to game-data hash-change notifications.
 	/// </summary>
 	/// <param name="action">Callback invoked when game data changes.</param>
 	public void AddListener(Action action)
@@ -518,7 +683,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Unity Methods
 
 	/// <summary>
-	/// Unity method: loads saved game data from PlayerPrefs if present.
+	/// Loads saved game data from PlayerPrefs if present.
 	/// </summary>
 	protected override void Awake()
 	{
@@ -536,7 +701,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	}
 
 	/// <summary>
-	/// Unity method: saves game data to PlayerPrefs on application quit.
+	/// Saves game data to PlayerPrefs when the application quits.
 	/// </summary>
 	private void OnApplicationQuit()
 	{
@@ -548,8 +713,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Persistence
 
 	/// <summary>
-	/// Serializes <see cref="CurrentGameData"/> to JSON and writes it to PlayerPrefs ("GameData").
+	/// Serializes <see cref="CurrentGameData"/> to JSON and writes it to PlayerPrefs.
 	/// </summary>
+	/// <remarks>
+	/// Data is stored under the PlayerPrefs key <c>GameData</c>.
+	/// </remarks>
 	private void SaveGameData()
 	{
 		try
@@ -569,9 +737,12 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	}
 
 	/// <summary>
-	/// Loads JSON from PlayerPrefs ("GameData") and deserializes into <see cref="CurrentGameData"/>.
-	/// Recomputes <see cref="Hash"/> and prints debug info.
+	/// Loads game data JSON from PlayerPrefs.
 	/// </summary>
+	/// <remarks>
+	/// Data is loaded from the PlayerPrefs key <c>GameData</c>. The content hash is recomputed after loading.
+	/// If loading fails, a new empty <see cref="GameData"/> instance is created.
+	/// </remarks>
 	private void LoadGameData()
 	{
 		try
@@ -608,9 +779,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Selection & Flow
 
 	/// <summary>
-	/// Attempts to start gameplay by loading the "Level" scene.
-	/// Requires <see cref="CurrentLevelMap"/> to be set via <see cref="SelectingLevelMap"/>.
+	/// Attempts to start gameplay by loading the level scene.
 	/// </summary>
+	/// <remarks>
+	/// Requires <see cref="CurrentLevelMap"/> to be set by <see cref="SelectingLevelMap(LevelMap)"/>.
+	/// </remarks>
 	public void GoToSelectedLevel()
 	{
 		if (CurrentLevelMap == null)
@@ -622,6 +795,13 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		SceneManagement.Instance.ChangeScene("Level");
 	}
 
+	/// <summary>
+	/// Gets the saved checkpoint split for the currently selected map.
+	/// </summary>
+	/// <param name="splitIndex">Checkpoint split index.</param>
+	/// <returns>
+	/// Saved split time for the selected custom level, or the practice/test-map split if no custom level is selected.
+	/// </returns>
 	public float GetCurrentMapSplit(int splitIndex)
 	{
 		if (CurrentLevelMap == null)
@@ -633,6 +813,12 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		return CurrentGameData.GetCheckpointSplit(CurrentLevelMap, splitIndex);
 	}
 
+	/// <summary>
+	/// Gets the best replay for the currently selected map.
+	/// </summary>
+	/// <returns>
+	/// Best replay for the selected custom level, or the practice/test-map replay if no custom level is selected.
+	/// </returns>
 	public Replay GetCurrentMapReplay()
 	{
 		if (CurrentLevelMap == null)
@@ -667,12 +853,15 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Progression
 
 	/// <summary>
-	/// Records completion of the currently selected level and updates best time if improved.
-	/// Automatically saves the data set.
+	/// Records completion of the currently selected level and updates the best time if improved.
 	/// </summary>
 	/// <param name="time">Completion time in seconds.</param>
 	/// <param name="checkpointSplits">Checkpoint splits for the completed run.</param>
 	/// <param name="replay">Replay for the completed run.</param>
+	/// <remarks>
+	/// If no custom level is selected, the completion is stored as a practice/test-map result.
+	/// The data set is saved after the result is recorded.
+	/// </remarks>
 	public void CompleteLevel(float time, float[] checkpointSplits, Replay replay)
 	{
 		if (CurrentLevelMap == null)
@@ -689,9 +878,12 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	}
 
 	/// <summary>
-	/// Adds a level to the data set if it does not already exist; triggers change detection.
+	/// Adds a level to the data set if it does not already exist.
 	/// </summary>
 	/// <param name="map">Level to add.</param>
+	/// <remarks>
+	/// Triggers hash-change detection and saves game data when a level is added.
+	/// </remarks>
 	public void AddLevel(LevelMap map)
 	{
 		if (map == null)
@@ -713,9 +905,12 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	}
 
 	/// <summary>
-	/// Removes a level from the data set if present; triggers change detection.
+	/// Removes a level from the data set if present.
 	/// </summary>
 	/// <param name="levelMap">Level to remove.</param>
+	/// <remarks>
+	/// Triggers hash-change detection and saves game data when a level is removed.
+	/// </remarks>
 	public void RemoveLevel(LevelMap levelMap)
 	{
 		if (levelMap == null)
@@ -744,8 +939,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	}
 
 	/// <summary>
-	/// Clears all levels from the data set; triggers change detection.
+	/// Clears all custom levels from the data set.
 	/// </summary>
+	/// <remarks>
+	/// Also clears the current custom-level selection, triggers hash-change detection, and saves game data.
+	/// </remarks>
 	public void ClearLevels()
 	{
 		CurrentGameData.Levels.Clear();
@@ -759,6 +957,11 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 
 	#region Level Editing
 
+	/// <summary>
+	/// Creates an editable copy of a stored level map.
+	/// </summary>
+	/// <param name="sourceMap">Stored level map to copy for editing.</param>
+	/// <returns>Editable copy of the level map, or <c>null</c> if the source map is invalid or not stored.</returns>
 	public LevelMap CreateEditableCopy(LevelMap sourceMap)
 	{
 		if (sourceMap == null)
@@ -778,6 +981,16 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		return CurrentGameData.Levels[index].LevelMap.Copy();
 	}
 
+	/// <summary>
+	/// Replaces a stored level with an edited version.
+	/// </summary>
+	/// <param name="originalMap">Original stored level map to replace.</param>
+	/// <param name="editedMap">Edited level map to save in its place.</param>
+	/// <returns><c>true</c> if the stored level was replaced; otherwise <c>false</c>.</returns>
+	/// <remarks>
+	/// Replacing a level resets its associated best time, splits, and replay by creating a new
+	/// <see cref="LevelData"/> record for the edited map.
+	/// </remarks>
 	public bool ReplaceLevel(LevelMap originalMap, LevelMap editedMap)
 	{
 		if (originalMap == null)
@@ -818,8 +1031,7 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Internals
 
 	/// <summary>
-	/// Compares a new hash with the current <see cref="Hash"/> and, if different,
-	/// updates <see cref="Hash"/> and notifies all listeners.
+	/// Updates the stored hash and notifies listeners when the content hash changes.
 	/// </summary>
 	/// <param name="hash">Newly computed content hash.</param>
 	private void PotentialHashChange(int hash)
@@ -848,6 +1060,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 
 	#region Context Menu
 
+	/// <summary>
+	/// Copies the raw saved game-data JSON from PlayerPrefs to the system clipboard.
+	/// </summary>
 	[ContextMenu("Copy Saved GameData To Clipboard")]
 	public void CopySavedGameDataToClipboard()
 	{
@@ -863,6 +1078,9 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		Debug.Log("[GameDataManager] Saved GameData copied to clipboard.");
 	}
 
+	/// <summary>
+	/// Deletes the saved game-data JSON from PlayerPrefs.
+	/// </summary>
 	[ContextMenu("Delete Saved GameData")]
 	public void DeleteSavedGameData()
 	{

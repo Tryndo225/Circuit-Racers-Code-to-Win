@@ -1,0 +1,5 @@
+<map id="Tools" name="Tools">
+<area shape="rect" id="Node000002" href="$group__editor__attrs.html" title="Runtime&#45;safe Inspector attributes consumed by editor&#45;only custom property drawers." alt="" coords="106,5,220,32"/>
+<area shape="rect" id="Node000003" href="$group__editor__util.html" title="Custom property drawers and inspector helpers for compact, safer authoring workflows." alt="" coords="111,56,214,83"/>
+<area shape="rect" id="Node000001" title="Editor&#45;only and development&#45;support utilities." alt="" coords="5,31,58,57"/>
+</map>

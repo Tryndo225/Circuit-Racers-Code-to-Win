@@ -4,50 +4,78 @@ using UnityEngine;
 /// Serializable tuning container for one Unity <see cref="WheelFrictionCurve"/>.
 /// </summary>
 /// <remarks>
+/// @ingroup car_ctrl
+/// @brief Stores inspector-editable friction curve values used by wheel colliders.
+///
 /// The values are copied into a <see cref="WheelCollider"/> friction curve by
-/// <see cref="DriveTrainController.ApplyFrictionSettings"/>. Keeping them in a struct
-/// makes the inspector safer than using positional float arrays.
+/// <see cref="DriveTrainController"/>. Keeping them in a struct makes the inspector safer
+/// than using positional float arrays.
 /// </remarks>
 [System.Serializable]
 public struct WheelFrictionSettings
 {
 	/// <summary>
 	/// Global multiplier applied to the whole friction curve.
-	/// Higher values increase the total available grip.
 	/// </summary>
+	/// <remarks>
+	/// Higher values increase the total available grip.
+	/// </remarks>
+	[Tooltip("Global multiplier applied to the whole friction curve. Higher values increase total grip.")]
 	public float stiffness;
 
 	/// <summary>
 	/// Slip value at which the tire reaches peak grip.
 	/// </summary>
+	[Tooltip("Slip value at which the tire reaches peak grip.")]
 	public float extremumSlip;
 
 	/// <summary>
 	/// Peak grip value at <see cref="extremumSlip"/>.
 	/// </summary>
+	[Tooltip("Peak grip value at the extremum slip point.")]
 	public float extremumValue;
 
 	/// <summary>
 	/// Slip value at which the tire reaches its sliding-grip region.
-	/// This should usually be greater than <see cref="extremumSlip"/>.
 	/// </summary>
+	/// <remarks>
+	/// This should usually be greater than <see cref="extremumSlip"/>.
+	/// </remarks>
+	[Tooltip("Slip value at which the tire reaches its sliding-grip region.")]
 	public float asymptoteSlip;
 
 	/// <summary>
 	/// Grip value when the tire is already sliding heavily.
-	/// This should usually be lower than <see cref="extremumValue"/>.
 	/// </summary>
+	/// <remarks>
+	/// This should usually be lower than <see cref="extremumValue"/>.
+	/// </remarks>
+	[Tooltip("Grip value when the tire is already sliding heavily.")]
 	public float asymptoteValue;
 }
 
 /// <summary>
-/// Handles steering, throttle, braking, anti-roll, dynamic tire-friction modifiers,
-/// and wheel-mesh synchronization for a four-wheel vehicle.
+/// Handles drivetrain, steering, braking, grip modifiers, and wheel visuals for a four-wheel vehicle.
 /// </summary>
 /// <remarks>
-/// This component is configured by <c>VehicleController</c> and coordinates with
-/// <c>TransmissionController</c>. The class intentionally remains a single Unity component,
-/// but the logic is split into smaller private methods so the main control flow is easier to read.
+/// @ingroup car_ctrl
+/// @brief Applies player/replay wheel control to Unity WheelColliders and synchronizes the visible wheel meshes.
+///
+/// This component is configured by <see cref="VehicleController"/> and coordinates with
+/// <see cref="TransmissionController"/>. It applies:
+/// - Speed-limited steering.
+/// - Throttle and reverse behaviour.
+/// - Service braking and handbrake behaviour.
+/// - Traction control and ABS reductions.
+/// - Limited-slip differential approximation.
+/// - Anti-roll forces.
+/// - Dynamic tire-friction changes.
+/// - Simplified grip-circle coupling.
+/// - Wheel mesh synchronization.
+///
+/// Threading:
+/// - Unity main thread only.
+/// - Called from gameplay physics/update flow by the owning vehicle controller.
 /// </remarks>
 public class DriveTrainController : MonoBehaviour
 {
@@ -94,7 +122,7 @@ public class DriveTrainController : MonoBehaviour
 	#region Inspector: Stability
 
 	[Header("Stability")]
-	[Tooltip("Anti-roll force toggle")]
+	[Tooltip("Anti-roll force toggle.")]
 	public bool antiRollToggle;
 
 	[Tooltip("Anti-roll stiffness for the front axle.")]
@@ -223,46 +251,74 @@ public class DriveTrainController : MonoBehaviour
 
 	#region State & Dependencies
 
-	/// <summary>Vehicle rigidbody used for speed calculation and anti-roll forces.</summary>
+	/// <summary>
+	/// Vehicle rigidbody used for speed calculation and anti-roll forces.
+	/// </summary>
 	private Rigidbody _carRigidBody;
 
-	/// <summary>Transmission controller used for shifting and normalized RPM values.</summary>
+	/// <summary>
+	/// Transmission controller used for shifting and normalized RPM values.
+	/// </summary>
 	private TransmissionController _transmissionController;
 
-	/// <summary>Wheel colliders ordered as front-left, front-right, rear-left, rear-right.</summary>
+	/// <summary>
+	/// Wheel colliders ordered as front-left, front-right, rear-left, rear-right.
+	/// </summary>
 	private WheelCollider[] _wheelColliders;
 
-	/// <summary>Visual wheel meshes synchronized with the wheel colliders.</summary>
+	/// <summary>
+	/// Visual wheel meshes synchronized with the wheel colliders.
+	/// </summary>
 	private Transform[] _wheelMeshes;
 
-	/// <summary>Flags saying which wheels receive motor torque.</summary>
+	/// <summary>
+	/// Flags saying which wheels receive motor torque.
+	/// </summary>
 	private bool[] _driven;
 
-	/// <summary>Number of wheels marked as driven.</summary>
+	/// <summary>
+	/// Number of wheels marked as driven.
+	/// </summary>
 	private int _drivenWheelCount;
 
-	/// <summary>Flags saying which wheels receive steering angle.</summary>
+	/// <summary>
+	/// Flags saying which wheels receive steering angle.
+	/// </summary>
 	private bool[] _steering;
 
-	/// <summary>True when the car is currently using brake input as reverse throttle.</summary>
+	/// <summary>
+	/// True when the car is currently using brake input as reverse throttle.
+	/// </summary>
 	private bool _isReversing = false;
 
-	/// <summary>Current normalized brake input stored for external read-only state.</summary>
+	/// <summary>
+	/// Current normalized brake input stored for external read-only state.
+	/// </summary>
 	private float _braking = 0f;
 
-	/// <summary>Current steering angle in degrees after input shaping and smoothing.</summary>
+	/// <summary>
+	/// Current steering angle in degrees after input shaping and smoothing.
+	/// </summary>
 	private float steeringAngle = 0f;
 
-	/// <summary>Per-wheel target motor torque state, used by traction-control decay.</summary>
+	/// <summary>
+	/// Per-wheel target motor torque state, used by traction-control decay.
+	/// </summary>
 	private float[] _targetThrottlePower;
 
-	/// <summary>Per-wheel target brake torque state, used by ABS decay.</summary>
+	/// <summary>
+	/// Per-wheel target brake torque state, used by ABS decay.
+	/// </summary>
 	private float[] _targetBrakingPower;
 
-	/// <summary>True if the vehicle is currently in reverse mode.</summary>
+	/// <summary>
+	/// Gets whether the vehicle is currently in reverse mode.
+	/// </summary>
 	public bool Reversing => _isReversing;
 
-	/// <summary>True if the service brake input is currently active.</summary>
+	/// <summary>
+	/// Gets whether service brake input is currently active.
+	/// </summary>
 	public bool Braking => _braking > 0.1f;
 
 	#endregion
@@ -308,10 +364,10 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Applies all wheel-related controls for one physics tick.
 	/// </summary>
-	/// <param name="throttle">Throttle input, usually in range [0, 1].</param>
-	/// <param name="braking">Brake input, usually in range [0, 1].</param>
+	/// <param name="throttle">Throttle input, usually in range 0 to 1.</param>
+	/// <param name="braking">Brake input, usually in range 0 to 1.</param>
 	/// <param name="handbrake">Whether the handbrake is active.</param>
-	/// <param name="steering">Steering input, usually in range [-1, 1].</param>
+	/// <param name="steering">Steering input, usually in range -1 to 1.</param>
 	/// <param name="gamepadSteering">Whether the steering input comes from an analog gamepad source.</param>
 	public void ApplyWheelControls(float throttle, float braking, bool handbrake, float steering, bool gamepadSteering)
 	{
@@ -330,53 +386,67 @@ public class DriveTrainController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Returns current vehicle speed in km/h.
+	/// Gets the current vehicle speed in km/h.
 	/// </summary>
+	/// <returns>Vehicle speed in km/h.</returns>
 	public float GetSpeed()
 	{
 		return CalculateSpeed();
 	}
 
 	/// <summary>
-	/// Returns configured maximum forward speed in km/h.
+	/// Gets the configured maximum forward speed.
 	/// </summary>
+	/// <returns>Maximum forward speed in km/h.</returns>
 	public float GetMaxSpeed()
 	{
 		return maxSpeed;
 	}
 
 	/// <summary>
-	/// Returns configured maximum reverse speed in km/h.
+	/// Gets the configured maximum reverse speed.
 	/// </summary>
+	/// <returns>Maximum reverse speed in km/h.</returns>
 	public float GetMaxReverseSpeed()
 	{
 		return maxReverseSpeed;
 	}
 
 	/// <summary>
-	/// Returns current smoothed steering angle in degrees.
+	/// Gets the current smoothed steering angle.
 	/// </summary>
+	/// <returns>Current steering angle in degrees.</returns>
 	public float GetSteeringAngle()
 	{
 		return steeringAngle;
 	}
 
 	/// <summary>
-	/// Returns configured maximum low-speed steering angle in degrees.
+	/// Gets the configured maximum low-speed steering angle.
 	/// </summary>
+	/// <returns>Maximum low-speed steering angle in degrees.</returns>
 	public float GetMaxSteeringAngle()
 	{
 		return maxSteerAngle;
 	}
 
 	/// <summary>
-	/// Returns configured maximum top-speed steering angle in degrees.
+	/// Gets the configured maximum top-speed steering angle.
 	/// </summary>
+	/// <returns>Maximum top-speed steering angle in degrees.</returns>
 	public float GetMaxSteeringAngleAtTopSpeed()
 	{
 		return maxSteerAngleAtTopSpeed;
 	}
 
+	/// <summary>
+	/// Applies steering and wheel-mesh synchronization during replay playback.
+	/// </summary>
+	/// <param name="replaySteeringAngle">Steering angle recorded by the replay.</param>
+	/// <remarks>
+	/// This updates only the visual wheel steering state. It does not apply drivetrain torque,
+	/// braking, suspension, or live input logic.
+	/// </remarks>
 	public void ApplyReplayWheelVisuals(float replaySteeringAngle)
 	{
 		steeringAngle = replaySteeringAngle;
@@ -397,6 +467,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Counts how many wheel flags in <see cref="_driven"/> are enabled.
 	/// </summary>
+	/// <returns>Number of driven wheels.</returns>
 	private int CountDrivenWheels()
 	{
 		int count = 0;
@@ -411,7 +482,7 @@ public class DriveTrainController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Configures Unity's vehicle substeps for all wheel colliders.
+	/// Configures Unity vehicle substeps for all wheel colliders.
 	/// </summary>
 	private void ConfigureWheelColliderSubsteps()
 	{
@@ -463,7 +534,7 @@ public class DriveTrainController : MonoBehaviour
 	/// Updates and returns whether brake input should be interpreted as reverse.
 	/// </summary>
 	/// <param name="braking">Current brake input.</param>
-	/// <returns>True if the car is in reverse mode after this check.</returns>
+	/// <returns><c>true</c> if the car is in reverse mode after this check; otherwise <c>false</c>.</returns>
 	private bool ReverseCheck(float braking)
 	{
 		bool brakingCheck = braking > 0.1f;
@@ -490,7 +561,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Calculates the average absolute RPM of grounded driven wheels.
 	/// </summary>
-	/// <returns>Average absolute driven-wheel RPM, or 0 if no driven wheel is grounded.</returns>
+	/// <returns>Average absolute driven-wheel RPM, or zero if no driven wheel is grounded.</returns>
 	private float AverageGroundedDrivenWheelAbsRPM()
 	{
 		float sum = 0f;
@@ -514,7 +585,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Calculates the average combined slip of grounded driven wheels.
 	/// </summary>
-	/// <returns>Average combined slip, or 0 if no driven wheel is grounded.</returns>
+	/// <returns>Average combined slip, or zero if no driven wheel is grounded.</returns>
 	private float AverageDrivenWheelSlip()
 	{
 		float sum = 0f;
@@ -536,8 +607,9 @@ public class DriveTrainController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Calculates vehicle body speed in km/h.
+	/// Calculates vehicle body speed.
 	/// </summary>
+	/// <returns>Vehicle body speed in km/h.</returns>
 	private float CalculateSpeed()
 	{
 		return _carRigidBody.linearVelocity.magnitude * 3.6f;
@@ -556,6 +628,8 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Determines whether a wheel index belongs to the front axle.
 	/// </summary>
+	/// <param name="wheelIndex">Wheel index in FL, FR, RL, RR order.</param>
+	/// <returns><c>true</c> if the wheel belongs to the front axle; otherwise <c>false</c>.</returns>
 	private bool IsFrontWheel(int wheelIndex)
 	{
 		return wheelIndex < 2;
@@ -564,6 +638,8 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Determines whether a wheel index belongs to the rear axle.
 	/// </summary>
+	/// <param name="wheelIndex">Wheel index in FL, FR, RL, RR order.</param>
+	/// <returns><c>true</c> if the wheel belongs to the rear axle; otherwise <c>false</c>.</returns>
 	private bool IsRearWheel(int wheelIndex)
 	{
 		return wheelIndex >= 2;
@@ -576,7 +652,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Shapes steering input, limits steering angle by speed, and applies the resulting wheel angles.
 	/// </summary>
-	/// <param name="steerInput">Raw steering input in range [-1, 1].</param>
+	/// <param name="steerInput">Raw steering input in range -1 to 1.</param>
 	/// <param name="gamepadSteering">Whether analog gamepad shaping should be used.</param>
 	private void ControlSteering(float steerInput, bool gamepadSteering)
 	{
@@ -591,6 +667,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Calculates the maximum allowed steering angle for the current vehicle speed.
 	/// </summary>
+	/// <returns>Speed-limited steering angle in degrees.</returns>
 	private float CalculateSpeedLimitedSteeringAngle()
 	{
 		float kph = CalculateSpeed();
@@ -605,6 +682,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <param name="steerInput">Raw steering input.</param>
 	/// <param name="maxAngle">Maximum steering angle allowed at current speed.</param>
 	/// <param name="gamepadSteering">Whether to apply analog input shaping.</param>
+	/// <returns>Target steering angle in degrees.</returns>
 	private float CalculateTargetSteeringAngle(float steerInput, float maxAngle, bool gamepadSteering)
 	{
 		if (!gamepadSteering)
@@ -688,6 +766,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Determines whether drivetrain torque should be fully cut this physics tick.
 	/// </summary>
+	/// <returns><c>true</c> if drive torque should be cut; otherwise <c>false</c>.</returns>
 	private bool ShouldCutDriveTorque()
 	{
 		bool maxForewardsCheck = CalculateSpeed() > maxSpeed;
@@ -726,6 +805,7 @@ public class DriveTrainController : MonoBehaviour
 	/// </summary>
 	/// <param name="wheelIndex">Wheel index.</param>
 	/// <param name="handbrake">Whether the handbrake is active.</param>
+	/// <returns><c>true</c> if motor torque should be disabled; otherwise <c>false</c>.</returns>
 	private bool ShouldDisableDriveForWheel(int wheelIndex, bool handbrake)
 	{
 		return handbrake && IsRearWheel(wheelIndex);
@@ -735,6 +815,7 @@ public class DriveTrainController : MonoBehaviour
 	/// Determines whether traction control should reduce torque on a wheel.
 	/// </summary>
 	/// <param name="wheel">Wheel being evaluated.</param>
+	/// <returns><c>true</c> if traction control should reduce torque; otherwise <c>false</c>.</returns>
 	private bool ShouldApplyTractionControl(WheelCollider wheel)
 	{
 		if (!tractionControlEnabled)
@@ -759,6 +840,7 @@ public class DriveTrainController : MonoBehaviour
 	/// Calculates base motor torque for one driven wheel.
 	/// </summary>
 	/// <param name="throttle">Throttle input after modifiers.</param>
+	/// <returns>Motor torque assigned to one driven wheel.</returns>
 	private float CalculateWheelTorque(float throttle)
 	{
 		if (_drivenWheelCount <= 0)
@@ -785,13 +867,15 @@ public class DriveTrainController : MonoBehaviour
 
 	#endregion
 
-	#region Private Helpers: Limited Slip Differenctial
+	#region Private Helpers: Limited Slip Differential
 
 	/// <summary>
-	/// Applies a simplified limited-slip differential effect by reducing torque on driven wheels
-	/// that spin much faster than the driven-wheel average, while optionally supporting slower
-	/// driven wheels with more torque.
+	/// Applies a simplified limited-slip differential effect.
 	/// </summary>
+	/// <remarks>
+	/// Driven wheels spinning much faster than the driven-wheel average receive reduced motor torque
+	/// and optional brake torque. Slower driven wheels can receive a torque boost.
+	/// </remarks>
 	private void ApplyLimitedSlipDifferential()
 	{
 		if (!limitedSlipEnabled)
@@ -872,7 +956,7 @@ public class DriveTrainController : MonoBehaviour
 	#region Private Helpers: Braking
 
 	/// <summary>
-	/// Applies service brake and handbrake behavior to all wheels.
+	/// Applies service brake and handbrake behaviour to all wheels.
 	/// </summary>
 	/// <param name="braking">Brake input after reverse preprocessing.</param>
 	/// <param name="handbrake">Whether the handbrake is active.</param>
@@ -883,8 +967,7 @@ public class DriveTrainController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Applies braking, handbrake friction, lock-related friction, and grip-circle
-	/// friction to one wheel.
+	/// Applies braking, handbrake friction, lock-related friction, and grip-circle friction to one wheel.
 	/// </summary>
 	/// <param name="wheelIndex">Wheel index.</param>
 	/// <param name="braking">Brake input.</param>
@@ -939,6 +1022,7 @@ public class DriveTrainController : MonoBehaviour
 	/// Determines whether ABS should reduce brake torque for a wheel.
 	/// </summary>
 	/// <param name="wheel">Wheel being evaluated.</param>
+	/// <returns><c>true</c> if ABS should reduce brake torque; otherwise <c>false</c>.</returns>
 	private bool ShouldApplyAbs(WheelCollider wheel)
 	{
 		if (!absEnabled)
@@ -953,7 +1037,7 @@ public class DriveTrainController : MonoBehaviour
 	/// <summary>
 	/// Applies handbrake torque and handbrake tire-friction changes to a rear wheel.
 	/// </summary>
-	/// <param name="wheel">Rear wheel receiving handbrake behavior.</param>
+	/// <param name="wheel">Rear wheel receiving handbrake behaviour.</param>
 	/// <param name="currentBrake">Brake torque already calculated for the wheel.</param>
 	/// <returns>Final brake torque after handbrake torque is considered.</returns>
 	private float ApplyHandbrakeToWheel(WheelCollider wheel, float currentBrake)
@@ -971,6 +1055,7 @@ public class DriveTrainController : MonoBehaviour
 	/// </summary>
 	/// <param name="wheel">Wheel being evaluated.</param>
 	/// <param name="brake">Current brake torque for the wheel.</param>
+	/// <returns><c>true</c> if the wheel is near lock-up; otherwise <c>false</c>.</returns>
 	private bool IsWheelNearLock(WheelCollider wheel, float brake)
 	{
 		if (brake < maxBrakeTorque * lockBrakeTorqueThreshold)
@@ -1160,16 +1245,15 @@ public class DriveTrainController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Applies a simplified traction-circle effect by reducing available tire grip
-	/// when the wheel uses too much combined forward and sideways slip.
+	/// Applies a simplified traction-circle effect.
 	/// </summary>
+	/// <param name="wheel">Wheel whose friction should be modified.</param>
 	/// <remarks>
 	/// Unity WheelCollider uses separate forward and sideways friction curves.
 	/// This method links them together by reducing forward grip when sideways usage is high
 	/// and reducing sideways grip when forward usage is high. This creates a simplified
-	/// "grip budget" similar to a real traction circle.
+	/// grip budget similar to a real traction circle.
 	/// </remarks>
-	/// <param name="wheel">Wheel whose friction should be modified.</param>
 	private void ApplyGripCircleFriction(WheelCollider wheel)
 	{
 		if (!gripCircleEnabled)
@@ -1185,9 +1269,10 @@ public class DriveTrainController : MonoBehaviour
 		float forwardSlip = Mathf.Abs(hit.forwardSlip);
 		float sidewaysSlip = Mathf.Abs(hit.sidewaysSlip);
 
-		float forwardUsage = Mathf.InverseLerp(0f, gripCircleFullSlip, forwardSlip);
+		float fullSlip = Mathf.Max(gripCircleFullSlip, gripCircleStartSlip + 0.001f);
 
-		float sidewaysUsage = Mathf.InverseLerp(0f, gripCircleFullSlip, sidewaysSlip);
+		float forwardUsage = Mathf.InverseLerp(gripCircleStartSlip, fullSlip, forwardSlip);
+		float sidewaysUsage = Mathf.InverseLerp(gripCircleStartSlip, fullSlip, sidewaysSlip);
 
 		float sidewaysMultiplier = Mathf.Lerp(1f, minSidewaysGripCircleMultiplier, Mathf.Clamp01(forwardUsage));
 

@@ -1,0 +1,12 @@
+<map id="Systems" name="Systems">
+<area shape="rect" id="Node000002" href="$group__audio__mgr.html" title="Centralized background music and sound&#45;effect playback with pooling, clip reuse for loops,..." alt="" coords="141,5,250,32"/>
+<area shape="rect" id="Node000003" href="$group__car__ctrl.html" title="Modular four&#45;wheel car stack: input, drivetrain, transmission, audio, lights, VFX,..." alt="" coords="141,56,250,83"/>
+<area shape="rect" id="Node000004" href="$group__core__utils.html" title="Small shared helpers for commands, layer masks, content hashing, singletons, and serializable diction..." alt="" coords="147,107,244,133"/>
+<area shape="rect" id="Node000005" href="$group__game__data.html" title="Persistent progression data, selected level state, best times, checkpoint splits, replays,..." alt="" coords="151,157,240,184"/>
+<area shape="rect" id="Node000006" href="$group__level__gen.html" title="Procedural creation, representation, validation, and placement support for grid&#45;based race tracks." alt="" coords="136,208,255,235"/>
+<area shape="rect" id="Node000007" href="$group__replay__system.html" title="Race replay recording, replay data storage, replay playback, replay camera support,..." alt="" coords="140,259,251,285"/>
+<area shape="rect" id="Node000008" href="$group__scene__mgmt.html" title="Centralized scene loading with editor&#45;friendly scene references and scene&#45;to&#45;music pairing." alt="" coords="127,309,264,336"/>
+<area shape="rect" id="Node000001" title="Runtime subsystems used by the racing game." alt="" coords="5,208,79,235"/>
+<area shape="rect" id="Node000009" href="$group__track__mng.html" title="Race flow control (start/restart, laps, checkpoints, respawn) and player car spawning." alt="" coords="141,360,250,387"/>
+<area shape="rect" id="Node000010" href="$group__ui.html" title="Runtime UI widgets, menus, overlays, popups, settings, notifications, previews, and button actions." alt="" coords="143,411,248,437"/>
+</map>

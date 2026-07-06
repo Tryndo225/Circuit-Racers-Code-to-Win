@@ -1,0 +1,5 @@
+<map id="Replay.Copy" name="Replay.Copy">
+<area shape="rect" id="Node000001" title="Creates a copy of this replay." alt="" coords="5,5,102,32"/>
+<area shape="rect" id="Node000002" href="$class_replay.html#a879d021442a94d1ff897e35171332a6e" title="Creates an empty replay." alt="" coords="150,5,256,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,16,137,18,132,19,102,21"/>
+</map>

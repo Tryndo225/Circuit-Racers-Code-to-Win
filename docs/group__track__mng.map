@@ -1,0 +1,4 @@
+<map id="Track Manager" name="Track Manager">
+<area shape="rect" id="Node000002" href="$group__systems.html" title="Runtime subsystems used by the racing game." alt="" coords="5,5,79,32"/>
+<area shape="rect" id="Node000001" title="Race flow control (start/restart, laps, checkpoints, respawn) and player car spawning." alt="" coords="127,5,235,32"/>
+</map>

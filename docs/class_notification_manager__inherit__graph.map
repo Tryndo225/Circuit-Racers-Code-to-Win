@@ -1,0 +1,7 @@
+<map id="NotificationManager" name="NotificationManager">
+<area shape="rect" id="Node000001" title="Persistent UI notification manager that displays one text popup at a time." alt="" coords="14,325,141,544"/>
+<area shape="rect" id="Node000002" href="$class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components." alt="" coords="5,123,150,277"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,290,80,326,75,325,77,295"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="27,5,128,75"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="78,87,80,123,75,123,77,92"/>
+</map>

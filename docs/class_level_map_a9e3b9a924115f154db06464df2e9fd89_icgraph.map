@@ -1,0 +1,9 @@
+<map id="LevelMap.GetUnflattenedTiles" name="LevelMap.GetUnflattenedTiles">
+<area shape="rect" id="Node000001" title="Rebuilds a 2D tile grid from a flattened tile array." alt="" coords="522,47,719,73"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#a0f56a9c1b0c5a0463aff81eef8346158" title="Attempts to decode a shareable level string into a LevelMap." alt="" coords="260,39,474,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="504,60,475,63,474,57,509,60"/>
+<area shape="rect" id="Node000003" href="$class_import_export_manager.html#af3dc16446e865c4f2d1b668750a9e20d" title="Attempts to decode a level map from the system clipboard." alt="" coords="5,5,212,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="242,45,212,43,212,37,247,44"/>
+<area shape="rect" id="Node000005" href="$class_import_export_manager.html#a319cd853c8b35b89b8f127c596513084" title="Attempts to decode a level string and add the resulting level to game data." alt="" coords="5,72,212,115"/>
+<area shape="poly" id="edge3_Node000002_Node000005" title=" " alt="" coords="242,76,212,83,212,77,247,75"/>
+</map>

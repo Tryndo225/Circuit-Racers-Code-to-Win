@@ -2,68 +2,116 @@
 # Project
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "Circuit-Racers : Code-To-Win"
-PROJECT_NUMBER         = 1.0
-PROJECT_BRIEF          = "Docs for level generation, track management, UI, editor utilities, and deprecated wheel prototype."
+PROJECT_NUMBER         = 1.6
+PROJECT_BRIEF          = "Documentation for Circuit Racers runtime systems, tools, UI, level generation, replay, vehicle control, and game data."
+
 OUTPUT_DIRECTORY       = ./docs
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
+
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
 ALWAYS_DETAILED_SEC    = YES
+
 FULL_PATH_NAMES        = NO
 STRIP_FROM_PATH        = ./
+
 INLINE_INHERITED_MEMB  = YES
 TAB_SIZE               = 4
-OPTIMIZE_OUTPUT_FOR_CSHARP = YES
+
+# Doxygen does not have a C#-specific optimize flag.
+# This is commonly the closest useful option for C#-style namespace/class output.
+OPTIMIZE_OUTPUT_JAVA   = YES
+
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
 EXTRACT_PACKAGE        = YES
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
+
 HIDE_UNDOC_MEMBERS     = NO
 HIDE_UNDOC_CLASSES     = NO
 HIDE_SCOPE_NAMES       = NO
+
 SHOW_USED_FILES        = YES
 SHOW_FILES             = YES
 SHOW_NAMESPACES        = YES
+
 SORT_MEMBERS_CTORS_1ST = YES
 SORT_BRIEF_DOCS        = YES
 SORT_BY_SCOPE_NAME     = YES
 ALPHABETICAL_INDEX     = YES
+
 MULTILINE_CPP_IS_BRIEF = NO
 JAVADOC_AUTOBRIEF      = YES
 QT_AUTOBRIEF           = NO
+
 TOC_INCLUDE_HEADINGS   = 3
+
 INPUT_ENCODING         = UTF-8
 MARKDOWN_SUPPORT       = YES
 AUTOLINK_SUPPORT       = YES
 
 #---------------------------------------------------------------------------
-# Build
+# Build / Warnings
 #---------------------------------------------------------------------------
 QUIET                  = NO
+
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = NO
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO
+
 WARN_FORMAT            = "$file:$line: $text"
 WARN_LOGFILE           =
 
 #---------------------------------------------------------------------------
 # Input
 #---------------------------------------------------------------------------
-# Adjust INPUT as needed. This setup crawls the whole repo except ./docs.
-INPUT                  = ./
+# Put this Doxyfile in the Unity project root, next to:
+# Assets/
+# Packages/
+# ProjectSettings/
+#
+# This scans the Unity Assets folder and the top-level Markdown files.
+INPUT                  = ./Assets \
+                         ./README.md \
+                         ./Specification.md
+
 RECURSIVE              = YES
-FILE_PATTERNS          = *.cs *.md
-EXCLUDE                = ./docs
-EXCLUDE_PATTERNS       = */obj/* */bin/* */Library/* */Temp/* */Logs/* */.git/*
+FILE_PATTERNS          = *.cs \
+                         *.md
+
+EXCLUDE                = ./docs \
+                         ./Library \
+                         ./Temp \
+                         ./Obj \
+                         ./Build \
+                         ./Builds \
+                         ./Logs \
+                         ./Packages \
+                         ./ProjectSettings \
+                         ./UserSettings
+
+EXCLUDE_PATTERNS       = */obj/* \
+                         */bin/* \
+                         */Library/* \
+                         */Temp/* \
+                         */Logs/* \
+                         */.git/* \
+                         */TextMesh\ Pro/* \
+                         */Plugins/*
 
 #---------------------------------------------------------------------------
 # HTML Output
 #---------------------------------------------------------------------------
 GENERATE_HTML          = YES
+
+# Because OUTPUT_DIRECTORY is ./docs and HTML_OUTPUT is ".",
+# the generated index will be:
+# ./docs/index.html
 HTML_OUTPUT            = .
+
 HTML_TIMESTAMP         = NO
 GENERATE_TREEVIEW      = YES
 ENUM_VALUES_PER_LINE   = 1
@@ -81,11 +129,14 @@ GENERATE_XML           = NO
 GENERATE_PERLMOD       = NO
 
 #---------------------------------------------------------------------------
-# Diagrams (Dot / GraphViz)
+# Diagrams / GraphViz
 #---------------------------------------------------------------------------
 HAVE_DOT               = YES
+
+# Adjust this if Graphviz is installed somewhere else.
 DOT_PATH               = "C:/Program Files/Graphviz/bin"
 DOT_FONTPATH           = "C:/Windows/Fonts"
+
 DOT_NUM_THREADS        = 0
 DOT_IMAGE_FORMAT       = svg
 DOT_TRANSPARENT        = YES
@@ -93,17 +144,23 @@ DOT_MULTI_TARGETS      = YES
 INTERACTIVE_SVG        = YES
 
 # High-level graphs
-CLASS_DIAGRAMS         = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+DIRECTORY_GRAPH        = YES
+
+# These can make generation slower.
+# If Doxygen becomes too slow, set CALL_GRAPH and CALLER_GRAPH to NO.
 CALL_GRAPH             = YES
 CALLER_GRAPH           = YES
+
 REFERENCED_BY_RELATION = YES
 REFERENCES_RELATION    = YES
+
 INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
-DIRECTORY_GRAPH        = YES
-GROUP_GRAPHS           = YES
 
-# Tuning to keep page weights reasonable on GH Pages
+# Tuning to keep page weights reasonable on GitHub Pages.
 DOT_GRAPH_MAX_NODES    = 50
 MAX_DOT_GRAPH_DEPTH    = 2
 UML_LOOK               = YES
@@ -122,6 +179,6 @@ STRIP_CODE_COMMENTS    = NO
 ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = NO
-PREDEFINED             = \
-  UNITY_EDITOR \
-  DOXYGEN
+
+PREDEFINED             = UNITY_EDITOR \
+                         DOXYGEN

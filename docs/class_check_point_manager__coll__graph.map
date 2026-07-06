@@ -1,0 +1,7 @@
+<map id="CheckPointManager" name="CheckPointManager">
+<area shape="rect" id="Node000001" title="Central registry and activation controller for checkpoints in the current track scene." alt="" coords="5,325,235,587"/>
+<area shape="rect" id="Node000002" href="$class_generic_1_1_scene_singleton-1-g.html" title="Scene&#45;local singleton base for Unity components." alt="" coords="30,208,211,277"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,290,123,326,118,325,120,295"/>
+<area shape="rect" id="Node000003" href="$class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components." alt="" coords="48,5,193,160"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="121,172,123,209,118,208,120,178"/>
+</map>

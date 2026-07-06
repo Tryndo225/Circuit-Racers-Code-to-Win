@@ -1,5 +1,5 @@
 <map id="Coordinates.operator&#45;" name="Coordinates.operator&#45;">
 <area shape="rect" id="Node000001" title="Subtracts two coordinate vectors component&#45;wise." alt="" coords="5,5,152,32"/>
-<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates (x, y)." alt="" coords="200,5,365,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,16,184,16,184,21,152,21"/>
+<area shape="rect" id="Node000002" href="$struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7" title="Constructs coordinates from integer components." alt="" coords="200,5,365,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,16,187,19,181,19,152,21"/>
 </map>

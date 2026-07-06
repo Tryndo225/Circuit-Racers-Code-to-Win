@@ -1,0 +1,7 @@
+<map id="ReplayPreviewer" name="ReplayPreviewer">
+<area shape="rect" id="Node000001" title="Plays back recorded race replays by moving a replay car through recorded snapshots." alt="" coords="8,325,185,629"/>
+<area shape="rect" id="Node000002" href="$class_generic_1_1_scene_singleton-1-g.html" title="Scene&#45;local singleton base for Unity components." alt="" coords="5,208,187,277"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,290,99,326,94,325,96,295"/>
+<area shape="rect" id="Node000003" href="$class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components." alt="" coords="24,5,168,160"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,172,99,208,94,208,96,178"/>
+</map>

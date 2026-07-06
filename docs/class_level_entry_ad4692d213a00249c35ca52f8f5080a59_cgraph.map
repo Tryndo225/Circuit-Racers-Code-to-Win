@@ -1,0 +1,7 @@
+<map id="LevelEntry.ExportLevelButton" name="LevelEntry.ExportLevelButton">
+<area shape="rect" id="Node000001" title="Exports this entry&#39;s level data to the system clipboard." alt="" coords="5,13,199,40"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#ad9421a683f04ca3046b3a9921e10511b" title="Encodes a level map and copies the encoded string to the system clipboard." alt="" coords="247,5,435,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,24,234,26,229,27,199,29"/>
+<area shape="rect" id="Node000003" href="$class_import_export_manager.html#adc3ded0f143550dfbed23d9e1bf63b6e" title="Encodes a LevelMap into a compact shareable string." alt="" coords="483,5,677,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="435,24,470,27,465,27,435,29"/>
+</map>

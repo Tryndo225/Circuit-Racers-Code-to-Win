@@ -1,0 +1,5 @@
+<map id="GameDataManager.GameData.GameData" name="GameDataManager.GameData.GameData">
+<area shape="rect" id="Node000001" title="Deserialization constructor used by serializers that rely on ISerializable." alt="" coords="5,5,211,48"/>
+<area shape="rect" id="Node000002" href="$class_game_data_manager_1_1_game_data.html#a29cca5dfabc4907e957123dbd51f968e" title="Ensures loaded game data is usable even if it came from an older save format." alt="" coords="259,5,464,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,24,245,27,240,27,211,29"/>
+</map>

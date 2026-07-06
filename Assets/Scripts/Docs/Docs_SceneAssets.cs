@@ -1,88 +1,129 @@
 /**
- * @file Docs_Scene.cs
+ * @file Docs_SceneAssets.cs
  * @brief Documentation entry for the Scene Management subsystem.
  *
- * @defgroup scene_mgr Scene Management
+ * @defgroup scene_mgmt Scene Management
  * @ingroup systems
- * @brief Centralized scene loading with editor-friendly scene references and scene->music pairing.
+ * @brief Centralized scene loading with editor-friendly scene references and scene-to-music pairing.
  *
  * @details
  * The scene system is implemented by:
- * - ::SceneManagement — a Singleton that loads scenes, normalizes time scale, and selects background music.
- * - ::SceneAssetHelper — a serializable, editor-friendly scene reference (name + path) that stays in sync with a SceneAsset.
- * - ::SceneAssetHelperAudioClipPair — a scene reference paired with an AudioClip used for automatic music selection.
+ * - ::SceneManagement, a singleton scene loader and background-music router.
+ * - ::SceneAssetHelper, a serializable editor-friendly scene reference that stores a scene name and path.
+ * - ::SceneAssetHelperAudioClipPair, a scene reference paired with an AudioClip for automatic music selection.
+ *
+ * Scene changes can be triggered directly through ::SceneManagement or indirectly through
+ * ::SceneAssetHelper::Run because SceneAssetHelper derives from ::SerializableRunnable.
  *
  * Contents:
- * - see scene_mgr_overview
- * - see scene_mgr_inspector
- * - see scene_mgr_lifecycle
- * - see scene_mgr_usage
- * - see scene_mgr_api
- * - see scene_mgr_integration
- * - see scene_mgr_performance
- * - see scene_mgr_troubleshooting
- * - see scene_mgr_versions
+ * - @ref scene_mgmt_overview
+ * - @ref scene_mgmt_inspector
+ * - @ref scene_mgmt_lifecycle
+ * - @ref scene_mgmt_usage
+ * - @ref scene_mgmt_api
+ * - @ref scene_mgmt_integration
+ * - @ref scene_mgmt_performance
+ * - @ref scene_mgmt_troubleshooting
+ * - @ref scene_mgmt_versions
  *
  * ----------------------------------------------------------------------
- * @section scene_mgr_overview Overview
+ * @section scene_mgmt_overview Overview
  *
  * Responsibilities:
- * - Single entry point for scene changes (string or helper-based).
- * - Time normalization: sets Time.timeScale = 1 after scene loads.
- * - Music pairing: picks a background track based on configured scene->clip pairs.
- * - Quit sentinel: recognizes the scene name "Quit Game" and exits the application.
+ * - Provide a single scene-change entry point.
+ * - Load scenes from either a ::SceneAssetHelper or a string.
+ * - Restore Time.timeScale to 1 after starting a scene load.
+ * - Match loaded scenes to configured music clips.
+ * - Play matched music through ::SoundManager.
+ * - Support a "Quit Game" scene-name sentinel that calls Application.Quit().
  *
  * Dependencies:
- * - Generic.Singleton<T> base type (for ::SceneManagement).
- * - ::SoundManager (for background music via PlayMusic).
- * - UnityEditor-only API (for ::SceneAssetHelper editor synchronization).
+ * - Generic::Singleton<T> base type for ::SceneManagement.
+ * - ::SoundManager for background music playback.
+ * - ::SerializableRunnable for runnable scene actions.
+ * - UnityEngine.SceneManagement for scene loading and scene lookup.
+ * - UnityEditor.SceneAsset and UnityEditor.AssetDatabase in editor-only synchronization code.
  *
  * Threading:
- * - Unity main thread. Initialization in Start(), scene operations via SceneManager.LoadScene().
+ * - Unity main thread only.
+ * - Scene loading uses SceneManager.LoadScene.
+ * - Music matching is performed through Unity coroutines.
  *
  * Invariants:
- * - Exactly one ::SceneManagement instance is active (enforced by Singleton).
- * - ::SceneAssetHelper equality is defined by scene path (string compare).
+ * - Exactly one ::SceneManagement instance should be active.
+ * - ::SceneAssetHelper stores scene name and scene path as serialized strings.
+ * - Editor-only SceneAsset references are guarded behind UNITY_EDITOR.
+ * - ::SceneAssetHelper equality and hashing are based on scene path.
  *
  * ----------------------------------------------------------------------
- * @section scene_mgr_inspector Inspector (Key Components)
+ * @section scene_mgmt_inspector Inspector
  *
- * SceneManagement:
- * - sceneAudioClipPairs (List<SceneAssetHelperAudioClipPair>):
- *   Array of “scene helper + AudioClip” items. When a scene is loaded, the manager searches this list
- *   and plays the first AudioClip whose helper matches the loaded scene.
+ * ::SceneManagement:
+ * - sceneAudioClipPairs:
+ *   List of ::SceneAssetHelperAudioClipPair entries.
+ *   When a scene is loaded, the first pair matching the scene name or scene path is used.
  *
- * SceneAssetHelper (when nested/serialized in other components):
- * - sceneName (string, ReadOnly): cached name of the scene (auto-filled in Editor).
- * - scenePath (string, ReadOnly): cached asset path of the scene (auto-filled in Editor).
- * - (Editor only) sceneAsset (UnityEditor.SceneAsset): drag a scene here to keep name/path consistent.
- * - Name (property): public getter for sceneName.
- * - Path (property): public getter for scenePath.
+ * ::SceneAssetHelper:
+ * - sceneName:
+ *   Serialized scene name, shown read-only in the Inspector.
  *
- * SceneAssetHelperAudioClipPair:
- * - Inherits all ::SceneAssetHelper fields.
- * - audioClip (AudioClip): the music track to play when this scene is loaded.
+ * - scenePath:
+ *   Serialized scene asset path, shown read-only in the Inspector.
+ *
+ * - sceneAsset:
+ *   Editor-only UnityEditor.SceneAsset reference.
+ *   When assigned in the Unity Editor, it fills sceneName and scenePath before serialization.
+ *
+ * - Name:
+ *   Public getter for sceneName.
+ *
+ * - Path:
+ *   Public getter for scenePath.
+ *
+ * ::SceneAssetHelperAudioClipPair:
+ * - Inherits sceneName, scenePath, editor synchronization, conversions, and equality from ::SceneAssetHelper.
+ * - audioClip:
+ *   Music clip used when this scene pair is matched.
+ *
+ * - AudioClip:
+ *   Public getter for the paired music clip.
  *
  * ----------------------------------------------------------------------
- * @section scene_mgr_lifecycle Lifecycle
+ * @section scene_mgmt_lifecycle Lifecycle
  *
  * SceneManagement.Start:
- * - Reads the currently active scene (SceneManager.GetActiveScene()) and attempts to match a music clip
- *   via sceneAudioClipPairs. If a match is found, calls SoundManager.Instance.PlayMusic().
+ * - Waits until ::SoundManager.Instance exists.
+ * - Reads the currently active scene through SceneManager.GetActiveScene().
+ * - Attempts to match the active scene to a configured music clip.
+ * - Plays the matched music through ::SoundManager::PlayMusic.
  *
- * Scene changes (any path):
- * - Load target scene using SceneManager.LoadScene(...).
- * - Reset Time.timeScale = 1 to ensure deterministic gameplay speed.
- * - Attempt to match and play a background track via sceneAudioClipPairs.
+ * SceneManagement.ChangeScene(SceneAssetHelper):
+ * - Rejects null helpers.
+ * - If scene.Name is "Quit Game", calls Application.Quit() instead of loading a scene.
+ * - Chooses scene.Name when available, otherwise scene.Path.
+ * - Rejects empty scene identifiers.
+ * - Calls SceneManager.LoadScene.
+ * - Restores Time.timeScale to 1.
+ * - Starts music matching for the requested scene name/path.
  *
- * Editor-only serialization (SceneAssetHelper):
- * - OnBeforeSerialize(): when a SceneAsset is assigned, updates sceneName and scenePath to match the asset.
- * - OnAfterDeserialize(): no-op (values are already consistent).
+ * SceneManagement.ChangeScene(string):
+ * - Rejects null, empty, or whitespace scene names.
+ * - Calls SceneManager.LoadScene with the provided string.
+ * - Restores Time.timeScale to 1.
+ * - Starts music matching and passes the string as both scene name and scene path.
+ *
+ * SceneAssetHelper.OnBeforeSerialize:
+ * - In the editor, synchronizes sceneName and scenePath from the assigned SceneAsset.
+ * - At runtime, does nothing because the editor-only SceneAsset is not available.
+ *
+ * SceneAssetHelper.OnAfterDeserialize:
+ * - Intentionally empty.
+ * - Stored sceneName and scenePath are already serialized directly.
  *
  * ----------------------------------------------------------------------
- * @section scene_mgr_usage Usage
+ * @section scene_mgmt_usage Usage
  *
- * Helper-based change (preferred):
+ * Helper-based scene change:
  * @code{.cs}
  * public class PlayButton : MonoBehaviour
  * {
@@ -95,102 +136,169 @@
  * }
  * @endcode
  *
- * String-based change (quick but fragile):
+ * String-based scene change:
  * @code{.cs}
  * SceneManagement.Instance.ChangeScene("Main Menu");
+ * @endcode
+ *
+ * Runnable scene action:
+ * @code{.cs}
+ * [SerializeField] private SceneAssetHelper targetScene;
+ *
+ * public void RunAction()
+ * {
+ *     targetScene.Run();
+ * }
  * @endcode
  *
  * Implicit conversions:
  * @code{.cs}
  * // Scene -> SceneAssetHelper
- * var active = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
- * SceneAssetHelper helper = active; // captures name and path
+ * Scene active = SceneManager.GetActiveScene();
+ * SceneAssetHelper helper = active;
  *
- * // SceneAssetHelper -> Scene (identifies scene by path; not necessarily loaded)
+ * // SceneAssetHelper -> Scene
+ * // This resolves by path and only returns a valid Scene if that scene is loaded.
  * Scene scene = helper;
  * @endcode
  *
  * Quit sentinel:
  * @code{.cs}
- * // If helper.Name == "Quit Game", the manager will call Application.Quit();
- * SceneManagement.Instance.ChangeScene(new SceneAssetHelper("Quit Game", "Assets/Scenes/Quit Game.unity"));
+ * SceneAssetHelper quit = new SceneAssetHelper("Quit Game", string.Empty);
+ * SceneManagement.Instance.ChangeScene(quit);
+ * @endcode
+ *
+ * Scene-to-music pair:
+ * @code{.cs}
+ * // Configure SceneAssetHelperAudioClipPair entries in the SceneManagement inspector.
+ * // When the scene name or path matches, SceneManagement plays pair.AudioClip.
  * @endcode
  *
  * ----------------------------------------------------------------------
- * @section scene_mgr_api Public API Reference
+ * @section scene_mgmt_api Public API Reference
  *
- * SceneManagement (Singleton):
- * - void ChangeScene(SceneAssetHelper scene):
- *     Loads by scene.Name, resets time scale to 1, then attempts to play mapped music.
- *     If scene.Name == "Quit Game", calls Application.Quit() instead.
- * - void ChangeScene(string sceneName):
- *     Convenience overload for string-based loading; also resets time scale and matches music via a temporary helper.
+ * ::SceneManagement:
+ * - void ChangeScene(SceneAssetHelper scene)
+ *   Loads the scene described by the helper. Uses scene.Name first and scene.Path as fallback.
+ *   If scene.Name equals "Quit Game", quits the application instead.
  *
- * SceneAssetHelper (SerializableRunnable):
- * - string Name { get; } — scene name (serialized).
- * - string Path { get; } — scene asset path (serialized).
- * - void Run(): delegates to SceneManagement.Instance.ChangeScene(this).
- * - (Editor only) OnBeforeSerialize(): syncs Name/Path from SceneAsset.
- * - Implicit conversions:
- *     static implicit operator SceneAssetHelper(Scene scene)
- *     static implicit operator Scene(SceneAssetHelper helper)
- *     (Editor only) static implicit operator SceneAssetHelper(UnityEditor.SceneAsset sceneAsset)
- * - Equality:
- *     operator ==, operator !=, Equals(object), GetHashCode() — all based on Path.
+ * - void ChangeScene(string sceneName)
+ *   Loads a scene by string name or path and uses the same string for music matching.
  *
- * SceneAssetHelperAudioClipPair : SceneAssetHelper
- * - AudioClip AudioClip { get; } — the music to use for this scene.
+ * ::SceneAssetHelper:
+ * - string Name
+ *   Gets the serialized scene name.
+ *
+ * - string Path
+ *   Gets the serialized scene path.
+ *
+ * - SceneAssetHelper()
+ *   Creates an empty scene helper.
+ *
+ * - SceneAssetHelper(string sceneName, string scenePath)
+ *   Creates a helper from known scene-name and scene-path strings.
+ *
+ * - void Run()
+ *   Delegates to SceneManagement.Instance.ChangeScene(this).
+ *
+ * - void OnBeforeSerialize()
+ *   Synchronizes editor scene data before serialization.
+ *
+ * - void OnAfterDeserialize()
+ *   Runtime/editor deserialization hook. Intentionally does nothing.
+ *
+ * - static implicit operator SceneAssetHelper(Scene scene)
+ *   Creates a helper from a loaded Unity scene.
+ *
+ * - static implicit operator Scene(SceneAssetHelper sceneAssetHelper)
+ *   Resolves a Unity Scene by stored scene path.
+ *
+ * - static implicit operator SceneAssetHelper(UnityEditor.SceneAsset sceneAsset)
+ *   Editor-only conversion from a SceneAsset to a helper.
+ *
+ * - operator == and operator !=
+ *   Compare helpers by scene path, with null-safe handling.
+ *
+ * - bool Equals(object obj)
+ *   Compares helpers by scene path.
+ *
+ * - int GetHashCode()
+ *   Computes a hash from the stored scene path.
+ *
+ * ::SceneAssetHelperAudioClipPair:
+ * - AudioClip AudioClip
+ *   Gets the music clip associated with the scene helper.
  *
  * ----------------------------------------------------------------------
- * @section scene_mgr_integration Integration Notes
- *
- * Audio:
- * - Requires ::SoundManager singleton with PlayMusic(AudioClip). Ensure exactly one AudioListener in the scene.
+ * @section scene_mgmt_integration Integration Notes
  *
  * UI:
- * - Serialize SceneAssetHelper fields on UI buttons or menus to provide robust scene selection in the Editor.
+ * - ::ChangeSceneButton uses ::SceneManagement to load a configured ::SceneAssetHelper.
+ * - Replay, edit, and gameplay buttons can validate game state before calling the scene-change action.
+ * - SceneAssetHelper fields are useful for Inspector-configured menu buttons.
  *
- * Transitions / UX:
- * - This centralized manager is the best place to add fades, loading screens, or audio mixer snapshots
- *   before/after SceneManager.LoadScene().
+ * Game data:
+ * - Gameplay scene buttons may choose day or night scene helpers based on ::LevelMap::IsDayTrack.
+ * - ::GameDataManager::GoToSelectedLevel can also route into scene loading.
  *
- * Async/Additive:
- * - For large scenes or streaming, extend with LoadSceneAsync, additive loading, and unload flows.
- *   Decide how music selection should behave across additive scenes (first-load wins, priority, etc.).
+ * Audio:
+ * - SceneManagement waits for ::SoundManager before matching and playing music.
+ * - Each scene can be paired with a music clip through sceneAudioClipPairs.
+ * - Matching prefers scene name, then scene path.
+ * - A string-based scene load passes the same string as both name and path for matching.
  *
- * Build Settings:
- * - All target scenes must be listed in File -> Build Settings, or runtime loads will fail in builds.
+ * Build settings:
+ * - Scenes loaded by name must be included in Build Settings.
+ * - Scene paths are useful in the editor and for matching, but loaded scenes still need to be build-accessible.
  *
- * ----------------------------------------------------------------------
- * @section scene_mgr_performance Performance and GC
- *
- * - Helper-based references avoid string lookups at call sites and keep inspector data consistent.
- * - Music selection uses a linear scan of sceneAudioClipPairs; keep the list compact or swap to a dictionary keyed by path.
- * - Avoid redundant ChangeScene calls in a single frame to prevent spurious loads.
- *
- * ----------------------------------------------------------------------
- * @section scene_mgr_troubleshooting Troubleshooting
- *
- * - Nothing loads:
- *   - Ensure the scene is added to Build Settings.
- *   - Verify the helper’s Name matches the actual scene name.
- *
- * - No music on scene load:
- *   - Confirm a matching SceneAssetHelperAudioClipPair exists (equality uses Path).
- *   - Ensure SoundManager exists in the scene and the clip is assigned.
- *
- * - Quit does nothing in Editor:
- *   - Application.Quit() is ignored in the Editor. Test in a build or wrap with editor handling.
- *
- * - Helper shows empty Name/Path:
- *   - Assign a SceneAsset in the Editor. The helper syncs Name/Path on serialization.
+ * Extensibility:
+ * - Fades, loading screens, async loading, additive loading, or mixer snapshot transitions can be added centrally here.
+ * - For additive scenes, define a music priority rule before extending music matching.
  *
  * ----------------------------------------------------------------------
- * @section scene_mgr_versions Version History
+ * @section scene_mgmt_performance Performance and GC
  *
- * - v1.4: Added Docs_Scene.cs; improved documentation.
- * - v1.3: Made SceneAssetHelperAudioClipPair; added music pairing in SceneManagement.
- * - v1.2: Made SceneAssetHelper; added implicit conversions and equality.
- * - v1.1: Added Quit sentinel.
- * - v1.0: Initial version with scene loading.
+ * - Scene music matching scans sceneAudioClipPairs linearly.
+ * - This is fine for small menus and a small number of scenes.
+ * - If the project grows many scene/music pairs, use a dictionary keyed by scene name or path.
+ * - Avoid calling ChangeScene multiple times in the same frame.
+ *
+ * ----------------------------------------------------------------------
+ * @section scene_mgmt_troubleshooting Troubleshooting
+ *
+ * Scene does not load:
+ * - Check that the scene exists in Build Settings.
+ * - Check that SceneAssetHelper.Name is not empty.
+ * - If loading by path, check that the path is valid for the intended context.
+ *
+ * Helper shows empty name/path:
+ * - Assign a SceneAsset in the Unity Editor.
+ * - SceneAssetHelper clears sceneName and scenePath when the editor SceneAsset field is empty.
+ *
+ * No music plays:
+ * - Ensure ::SoundManager exists.
+ * - Ensure sceneAudioClipPairs contains a matching pair.
+ * - Ensure the pair's AudioClip is assigned.
+ * - Check whether the loaded scene name/path matches the stored helper name/path.
+ *
+ * Music appears delayed:
+ * - SceneManagement waits for ::SoundManager.Instance before matching music.
+ * - Make sure SoundManager exists early enough in the startup scene.
+ *
+ * Quit does nothing in the Unity Editor:
+ * - Application.Quit() has no visible effect in editor play mode.
+ * - Test quitting in a build, or add editor-specific handling if desired.
+ *
+ * Multiple scene managers:
+ * - SceneManagement derives from Singleton, so duplicates are destroyed.
+ * - Keep only one intended SceneManagement object in bootstrap/menu scenes.
+ *
+ * ----------------------------------------------------------------------
+ * @section scene_mgmt_versions Version History
+ *
+ * - v1.4: Updated documentation to use the scene_mgmt group and current helper/music matching behaviour.
+ * - v1.3: Added SceneAssetHelperAudioClipPair and scene-to-music matching.
+ * - v1.2: Added SceneAssetHelper, editor SceneAsset synchronization, implicit conversions, and path-based equality.
+ * - v1.1: Added "Quit Game" sentinel.
+ * - v1.0: Initial centralized scene loading.
  */

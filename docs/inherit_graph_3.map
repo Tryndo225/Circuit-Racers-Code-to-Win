@@ -1,27 +1,29 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
 <area shape="rect" id="Node000000" title=" " alt="" coords="49,13,133,40"/>
-<area shape="rect" id="Node000001" href="$class_serializable_dictionary-2-g.html" title="Unity&#45;serializable wrapper around Dictionary&lt;TKey, TValue&gt; that round&#45;trips keys and values via paral..." alt="" coords="252,5,399,48"/>
-<area shape="poly" id="edge8_Node000000_Node000001" title=" " alt="" coords="149,24,251,24,251,29,149,29"/>
-<area shape="rect" id="Node000002" href="$class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor." alt="" coords="474,13,654,40"/>
-<area shape="poly" id="edge9_Node000001_Node000002" title=" " alt="" coords="415,24,474,24,474,29,415,29"/>
+<area shape="rect" id="Node000001" href="$class_serializable_dictionary-2-g.html" title="Unity&#45;serializable wrapper around Dictionary&lt;TKey, TValue&gt;." alt="" coords="266,5,414,48"/>
+<area shape="poly" id="edge16_Node000000_Node000001" title=" " alt="" coords="148,24,268,25,264,28,150,29"/>
+<area shape="rect" id="Node000002" href="$class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor." alt="" coords="503,13,683,40"/>
+<area shape="poly" id="edge17_Node000001_Node000002" title=" " alt="" coords="429,24,505,26,500,28,430,29"/>
 <area shape="rect" id="Node000007" title=" " alt="" coords="49,173,133,200"/>
-<area shape="rect" id="Node000006" href="$struct_coordinates.html" title="Integer coordinate pair with arithmetic, equality, and serialization support." alt="" coords="280,173,371,200"/>
-<area shape="poly" id="edge10_Node000007_Node000006" title=" " alt="" coords="148,184,279,184,279,189,148,189"/>
+<area shape="rect" id="Node000006" href="$struct_coordinates.html" title="Integer coordinate pair with arithmetic, equality, and serialization support." alt="" coords="294,173,386,200"/>
+<area shape="poly" id="edge18_Node000007_Node000006" title=" " alt="" coords="147,184,295,185,292,189,148,189"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="45,224,137,251"/>
-<area shape="poly" id="edge11_Node000005_Node000006" title=" " alt="" coords="152,222,279,194,280,199,153,227"/>
-<area shape="rect" id="Node000008" href="$class_game_data_manager_1_1_game_data.html" title="Serializable container for all saved progression data." alt="" coords="225,224,426,251"/>
-<area shape="poly" id="edge12_Node000005_Node000008" title=" " alt="" coords="153,235,224,235,224,240,153,240"/>
-<area shape="rect" id="Node000009" href="$class_game_data_manager_1_1_level_data.html" title="Serializable record containing a LevelMap reference and its best (lowest) time." alt="" coords="227,275,424,301"/>
-<area shape="poly" id="edge13_Node000005_Node000009" title=" " alt="" coords="153,248,261,271,259,277,152,253"/>
-<area shape="rect" id="Node000004" href="$class_level_map.html" title="Serializable level definition for a grid&#45;based track: dimensions, circuit flag, endpoints,..." alt="" coords="287,123,364,149"/>
-<area shape="poly" id="edge14_Node000005_Node000004" title=" " alt="" coords="151,221,175,210,190,198,198,185,208,172,223,159,254,146,286,138,287,143,256,151,226,164,212,175,203,188,194,201,178,214,153,226"/>
+<area shape="poly" id="edge19_Node000005_Node000006" title=" " alt="" coords="151,222,295,194,292,198,153,228"/>
+<area shape="rect" id="Node000008" href="$class_game_data_manager_1_1_assists_settings.html" title="Serializable assist&#45;settings record." alt="" coords="225,224,455,251"/>
+<area shape="poly" id="edge20_Node000005_Node000008" title=" " alt="" coords="152,235,227,236,222,239,153,240"/>
+<area shape="rect" id="Node000009" href="$class_game_data_manager_1_1_game_data.html" title="Serializable container for all saved progression data." alt="" coords="239,275,440,301"/>
+<area shape="poly" id="edge21_Node000005_Node000009" title=" " alt="" coords="152,247,273,273,269,276,152,252"/>
+<area shape="rect" id="Node000010" href="$class_game_data_manager_1_1_level_data.html" title="Serializable record containing a level map and its best saved run data." alt="" coords="241,325,438,352"/>
+<area shape="poly" id="edge22_Node000005_Node000010" title=" " alt="" coords="125,257,172,285,226,311,264,325,258,325,224,316,170,290,124,262"/>
+<area shape="rect" id="Node000004" href="$class_level_map.html" title="Serializable level definition for a grid&#45;based race track." alt="" coords="301,123,378,149"/>
+<area shape="poly" id="edge23_Node000005_Node000004" title=" " alt="" coords="151,221,175,210,190,198,198,185,208,172,223,159,262,144,303,138,298,140,263,149,226,164,211,175,203,188,193,201,178,214,153,226"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="5,64,177,107"/>
-<area shape="poly" id="edge16_Node000003_Node000001" title=" " alt="" coords="191,58,251,43,252,48,192,63"/>
-<area shape="poly" id="edge15_Node000003_Node000004" title=" " alt="" coords="193,105,287,125,286,130,191,110"/>
-<area shape="rect" id="Node000010" href="$class_serializable_runnable.html" title="Base class for serializable “commands” that expose a callable entry point via Run." alt="" coords="254,72,397,99"/>
-<area shape="poly" id="edge17_Node000003_Node000010" title=" " alt="" coords="192,83,253,83,253,88,192,88"/>
-<area shape="rect" id="Node000011" href="$class_scene_asset_helper.html" title="Serializable, editor&#45;friendly scene reference that stores scene name and path, supports implicit conv..." alt="" coords="499,72,629,99"/>
-<area shape="poly" id="edge18_Node000010_Node000011" title=" " alt="" coords="413,83,498,83,498,88,413,88"/>
-<area shape="rect" id="Node000012" href="$class_scene_asset_helper_audio_clip_pair.html" title="A SceneAssetHelper extended with an AudioClip to be used by SceneManagement for automatic background ..." alt="" coords="702,72,912,99"/>
-<area shape="poly" id="edge19_Node000011_Node000012" title=" " alt="" coords="645,83,702,83,702,88,645,88"/>
+<area shape="poly" id="edge25_Node000003_Node000001" title=" " alt="" coords="190,59,268,42,264,46,193,64"/>
+<area shape="poly" id="edge24_Node000003_Node000004" title=" " alt="" coords="191,103,303,127,299,130,192,108"/>
+<area shape="rect" id="Node000011" href="$class_serializable_runnable.html" title="Base class for serializable commands that expose a callable entry point through Run." alt="" coords="268,72,412,99"/>
+<area shape="poly" id="edge26_Node000003_Node000011" title=" " alt="" coords="191,83,270,84,265,87,193,88"/>
+<area shape="rect" id="Node000012" href="$class_scene_asset_helper.html" title="Serializable, editor&#45;friendly scene reference that stores a scene name and path." alt="" coords="528,72,658,99"/>
+<area shape="poly" id="edge27_Node000011_Node000012" title=" " alt="" coords="427,83,530,84,525,86,428,88"/>
+<area shape="rect" id="Node000013" href="$class_scene_asset_helper_audio_clip_pair.html" title="Scene reference paired with an audio clip." alt="" coords="731,72,941,99"/>
+<area shape="poly" id="edge28_Node000012_Node000013" title=" " alt="" coords="673,83,733,85,728,86,674,88"/>
 </map>

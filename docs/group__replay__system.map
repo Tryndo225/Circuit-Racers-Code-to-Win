@@ -1,0 +1,6 @@
+<map id="Replay System" name="Replay System">
+<area shape="rect" id="Node000001" title="Race replay recording, replay data storage, replay playback, replay camera support,..." alt="" coords="128,37,239,64"/>
+<area shape="rect" id="Node000004" href="$group__scene__mgmt.html" title="Centralized scene loading with editor&#45;friendly scene references and scene&#45;to&#45;music pairing." alt="" coords="445,5,583,32"/>
+<area shape="rect" id="Node000003" href="$group__ui.html" title="Runtime UI widgets, menus, overlays, popups, settings, notifications, previews, and button actions." alt="" coords="462,68,566,95"/>
+<area shape="rect" id="Node000002" href="$group__systems.html" title="Runtime subsystems used by the racing game." alt="" coords="5,37,79,64"/>
+</map>

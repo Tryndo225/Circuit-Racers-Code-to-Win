@@ -1,0 +1,7 @@
+<map id="ReplayButton" name="ReplayButton">
+<area shape="rect" id="Node000001" title="Button strategy that opens the replay scene only when the selected level has a saved best replay." alt="" coords="36,261,126,331"/>
+<area shape="rect" id="Node000002" href="$class_change_scene_button.html" title="Button strategy that changes to a configured scene through SceneManagement." alt="" coords="5,123,157,213"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,226,84,262,79,261,80,231"/>
+<area shape="rect" id="Node000003" href="$class_button_type.html" title="Abstract base class for serialized UI button actions." alt="" coords="43,5,120,75"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="82,87,84,123,79,123,81,92"/>
+</map>

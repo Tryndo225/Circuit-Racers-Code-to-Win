@@ -1,9 +1,9 @@
 <map id="SerializableDictionary&lt; TKey, TValue &gt;" name="SerializableDictionary&lt; TKey, TValue &gt;">
-<area shape="rect" id="Node000001" title="Unity&#45;serializable wrapper around Dictionary&lt;TKey, TValue&gt; that round&#45;trips keys and values via paral..." alt="" coords="96,139,238,587"/>
+<area shape="rect" id="Node000001" title="Unity&#45;serializable wrapper around Dictionary&lt;TKey, TValue&gt;." alt="" coords="96,139,238,587"/>
 <area shape="rect" id="Node000004" href="$class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor." alt="" coords="82,635,252,704"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,602,170,635,164,635,164,602"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="169,599,169,636,165,634,165,604"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,5,166,91"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,104,112,138,106,139,97,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,102,112,139,106,139,100,107"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="190,5,309,91"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="238,105,229,139,223,138,232,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,102,229,140,223,138,234,107"/>
 </map>

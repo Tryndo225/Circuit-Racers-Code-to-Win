@@ -1,0 +1,5 @@
+<map id="GameDataManager.LevelData.EnsureValid" name="GameDataManager.LevelData.EnsureValid">
+<area shape="rect" id="Node000001" title="Ensures loaded data is usable even if it came from an older save format." alt="" coords="255,5,456,48"/>
+<area shape="rect" id="Node000002" href="$class_game_data_manager_1_1_level_data.html#aa82a9b5316e63fffec227d1a94819037" title="Deserialization constructor used by serializers that rely on ISerializable." alt="" coords="5,5,207,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,27,207,29,207,24,242,27"/>
+</map>

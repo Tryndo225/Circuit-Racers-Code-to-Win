@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['scene_20management_0',['Scene Management',['../group__scene__mgr.html',1,'']]]
+  ['management_0',['Scene Management',['../group__scene__mgmt.html',1,'']]],
+  ['manager_1',['Manager',['../group__audio__mgr.html',1,'Audio Manager'],['../group__track__mng.html',1,'Track Manager']]]
 ];

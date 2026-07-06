@@ -4,282 +4,496 @@
  *
  * @defgroup car_ctrl Vehicle Control
  * @ingroup systems
- * @brief Modular 4-wheel car stack: input, drivetrain, transmission, audio, lights, VFX, and camera follow.
+ * @brief Modular four-wheel car stack: input, drivetrain, transmission, audio, lights, VFX, collision SFX, and camera follow.
  *
  * @details
  * The Vehicle Control subsystem is composed of small, focused MonoBehaviours:
- * - ::VehicleController orchestrates input, delegates to drivetrain/transmission, and wires audio/lights.
- * - ::DriveTrainContoller applies steering, traction/brake torques, anti-roll, and syncs wheel meshes.
- * - ::TransmissionController converts wheel RPM to engine RPM and manages auto-shifting with slip gating.
- * - ::EngineSound synthesizes engine audio from RPM and throttle using 4-band crossfades (on/off layers).
- * - ::LightsController drives head/day/rear/reverse/brake lights with optional fading and color presets.
- * - ::TyreEffects spawns skid VFX (particles, trail) and optional skid audio based on slip.
- * - ::CollisionDetection plays crash SFX using collision impulse with cooldown and layer filtering.
- * - ::FollowCamera is a simple, stable third-person follow camera with offset and fixed pitch.
+ * - ::VehicleController orchestrates input, reads saved assists, delegates to drivetrain/transmission, and wires audio/lights.
+ * - ::DriveTrainController applies steering, motor torque, braking, reverse logic, ABS, traction control,
+ *   limited-slip differential approximation, anti-roll, dynamic grip, grip-circle coupling, and wheel-mesh sync.
+ * - ::TransmissionController converts grounded driven-wheel RPM into engine RPM and manages automatic shifting with slip gating.
+ * - ::EngineSound blends on-throttle and off-throttle engine layers across four RPM bands.
+ * - ::LightsController drives front, day, rear, reverse, and brake light groups with fading and shared-bulb restoration.
+ * - ::TyreEffects emits smoke, skid trails, and looping skid audio based on WheelCollider slip.
+ * - ::CollisionDetection plays crash SFX from collision impact speed, with cooldown and layer filtering.
+ * - ::FollowCamera provides a stable third-person camera using movement-direction-based positioning.
+ * - ::WheelSpec and ::WheelFrictionSettings provide inspector-friendly wheel and friction configuration.
  *
  * Key design goals:
- * - Explicit dependencies (Init/SetUp), small clear responsibilities, inspector-first tuning.
- * - Deterministic physics path (FixedUpdate), minimal GC, predictable audio.
+ * - Inspector-first tuning.
+ * - Explicit subsystem responsibilities.
+ * - Centralized vehicle setup through VehicleController.
+ * - Physics work kept in the FixedUpdate path.
+ * - Low allocation during normal driving.
  *
  * Contents:
- * - see car_overview
- * - see car_scene_setup
- * - see car_inspector
- * - see car_lifecycle
- * - see car_usage
- * - see car_api
- * - see car_integration
- * - see car_performance
- * - see car_troubleshooting
- * - see car_versions
+ * - @ref car_overview
+ * - @ref car_scene_setup
+ * - @ref car_inspector
+ * - @ref car_lifecycle
+ * - @ref car_usage
+ * - @ref car_api
+ * - @ref car_integration
+ * - @ref car_performance
+ * - @ref car_troubleshooting
+ * - @ref car_versions
  *
  * ----------------------------------------------------------------------
  * @section car_overview Overview
  *
- * Flow (per physics tick):
- * 1) ::VehicleController reads input (Input System), routes steering/throttle/brakes to ::DriveTrainContoller.
- * 2) ::DriveTrainContoller queries grounded driven wheels, computes average RPM and slip,
- *    calls ::TransmissionController::HandleShifting(...), applies motor/brake torques and anti-roll forces,
- *    then syncs wheel visuals.
- * 3) ::VehicleController updates ::EngineSound with current engine RPM and throttle.
- * 4) ::LightsController is updated for brake/reverse states; manual toggle handles head/day/rear sets.
- * 5) ::TyreEffects reacts to per-wheel slip and spawns smoke/trails/skid audio.
- * 6) ::CollisionDetection triggers crash SFX on significant impulses.
- * 7) ::FollowCamera smooth-follows the target with local-space offset and fixed pitch.
+ * Runtime flow:
+ * 1) ::VehicleController reads Unity Input System actions for throttle, steering, brake, handbrake, and lights.
+ * 2) ::VehicleController calls ::DriveTrainController::ApplyWheelControls(...) during FixedUpdate.
+ * 3) ::DriveTrainController handles steering, reverse logic, throttle/brake conflict handling, drive torque,
+ *    braking torque, limited-slip correction, anti-roll forces, dynamic grip, grip-circle coupling, and wheel visuals.
+ * 4) ::DriveTrainController queries ::TransmissionController for automatic shifting and torque-cut state.
+ * 5) ::VehicleController updates ::EngineSound with engine RPM and throttle/load.
+ * 6) ::VehicleController updates ::LightsController brake and reverse states.
+ * 7) ::TyreEffects reads per-wheel slip and displays smoke, trails, and skid audio.
+ * 8) ::CollisionDetection plays crash SFX when collision impact severity is high enough.
+ * 9) ::FollowCamera follows the spawned car using planar movement direction and smoothing.
  *
  * Physics principles:
- * - WheelCollider drives traction; forward/sideways friction curves are configurable per axle.
- * - Anti-roll applies force difference across left/right to resist body roll.
- * - Traction control reduces motor torque when slip > threshold; ABS reduces brake torque similarly.
+ * - Unity WheelCollider is used for wheel contact, suspension, and basic tire forces.
+ * - Forward and sideways WheelFrictionCurve values are configured per axle.
+ * - Traction control reduces driven-wheel motor torque when combined slip is too high.
+ * - ABS reduces brake torque when braking slip is too high.
+ * - Locked-wheel grip modifiers reduce grip when a wheel is near lock-up under hard braking.
+ * - Handbrake reduces rear grip and applies rear brake torque.
+ * - Limited-slip differential approximation cuts torque from over-spinning driven wheels and may add brake torque.
+ * - Anti-roll forces compare left/right suspension travel and resist excessive body roll.
+ * - Grip-circle coupling reduces sideways grip from forward slip and forward grip from sideways slip.
  *
  * Audio principles:
- * - Engine audio is 4 bands (idle/low/mid/high) with on/off-throttle layers crossfaded by RPM and load.
- * - Gear shift "flare" briefly boosts pitch; a soft limiter attenuates near redline.
+ * - Engine audio is handled by ::EngineSound using idle, low, mid, and high RPM bands.
+ * - Each band has on-throttle and off-throttle layers.
+ * - Gear shifts call ::EngineSound::OnShift to add a short pitch flare.
+ * - Crash SFX are routed through ::SoundManager.
+ * - Skid audio in ::TyreEffects uses a local AudioSource on the wheel effect object.
  *
  * ----------------------------------------------------------------------
  * @section car_scene_setup Scene Setup
  *
- * Required:
- * - A GameObject with:
- *     - Rigidbody (non-kinematic).
- *     - 4 WheelCollider components (FL, FR, RL, RR).
- *     - 4 wheel visual Transforms in the same order for mesh sync.
- *     - ::VehicleController, ::DriveTrainContoller, ::TransmissionController, ::EngineSound, ::LightsController.
- * - Optional:
- *     - ::TyreEffects on each wheel (next to the WheelCollider).
- *     - ::CollisionDetection on the body (requires Rigidbody).
- *     - ::FollowCamera in the scene, target set to the vehicle root.
+ * Required vehicle object:
+ * - Rigidbody on the vehicle root.
+ * - ::VehicleController on the vehicle root.
+ * - ::DriveTrainController on the vehicle root.
+ * - ::TransmissionController on the vehicle root.
+ * - ::EngineSound on the vehicle root.
+ * - ::LightsController on the vehicle root.
+ * - Exactly four ::WheelSpec entries in the VehicleController inspector:
+ *   - front-left,
+ *   - front-right,
+ *   - rear-left,
+ *   - rear-right.
  *
- * Layering:
- * - Use a "Track" or "Ground" layer for drivable surfaces. Configure ::CollisionDetection ignoreLayers accordingly.
+ * Each WheelSpec should contain:
+ * - WheelCollider reference.
+ * - Visual wheel Transform reference.
+ * - powered flag.
+ * - steering flag.
  *
- * Audio:
- * - Route engine and SFX to appropriate AudioMixerGroups. Ensure a single active AudioListener (usually main camera).
+ * Optional vehicle components:
+ * - ::TyreEffects on wheel objects that contain WheelCollider components.
+ * - ::CollisionDetection on the vehicle body object.
+ * - ::FollowCamera in the scene, with target assigned directly or through TrackManager spawning.
+ *
+ * Audio setup:
+ * - Assign engine clips in ::EngineSound.
+ * - Assign crash clips in ::CollisionDetection.
+ * - Assign skid clip and mixer group in ::TyreEffects if skid audio is desired.
+ * - Ensure a ::SoundManager exists when crash SFX should be played.
+ * - Ensure one active AudioListener exists, usually on the main camera.
  *
  * ----------------------------------------------------------------------
- * @section car_inspector Inspector (Main Components)
+ * @section car_inspector Inspector
  *
  * ::VehicleController
- * - wheels[4]: (WheelCollider, wheel visual, powered, steering) in order FL, FR, RL, RR.
- * - Input actions: throttle, steer, brake, handbrake, lights toggle (auto-create bindings optional).
- * - Vehicle: center of mass offset, Ackermann factor, max speeds, steering angles/speed, input exponent.
- * - Motor/Brake: max motor power, max brake torque, handbrake torque.
- * - Transmission: forward gear ratios, final drive, idle/redline/shift RPMs, shift duration, slip threshold.
- * - Stability: anti-roll front/rear stiffness.
- * - TCS/ABS: enable flags and slip limits.
- * - Friction: per-axle forward/sideways stiffness and curve values.
- * - Lights: intensities/colors and light lists; fade duration; initial on/off.
- * - EngineSound: mixer group, volumes, curves, centers, sharpness, on/off clips, shift flare, limiter.
+ * - wheels[4]: WheelCollider, visual Transform, powered flag, and steering flag in FL, FR, RL, RR order.
+ * - Input actions: throttle, steer, brake, handbrake, lights toggle.
+ * - autoCreateDefaultBindingsIfMissing: creates simple runtime bindings when no input actions are assigned.
+ * - Vehicle tuning: center of mass, Ackermann factor, maximum speeds, steering angles, steering speed, and input exponent.
+ * - Motor/brake tuning: max motor power, max brake torque, and handbrake torque.
+ * - Transmission tuning: forward gears, final drive, idle RPM, redline RPM, shift thresholds, shift duration, and shift slip threshold.
+ * - Stability: anti-roll toggle and front/rear anti-roll stiffness.
+ * - Traction control and ABS: enable flags and slip thresholds.
+ * - Dynamic grip: handbrake grip multipliers, locked-wheel grip multipliers, and lock detection thresholds.
+ * - Grip circle: enable flag, start slip, full slip, and minimum forward/sideways grip multipliers.
+ * - Friction: front/rear forward and sideways ::WheelFrictionSettings values.
+ * - Lights: light lists, colors, intensities, fade duration, and initial light state.
+ * - Engine sound: output group, volumes, on/off clips, smoothing, band centers, pitch curve, shift flare, and limiter.
  *
- * ::DriveTrainContoller
- * - Mirrors tuning from VehicleController (SetUp fills these).
- * - Requires Init(Rigidbody, TransmissionController, WheelCollider[], Transform[], bool[] driven, bool[] steering).
+ * ::DriveTrainController
+ * - Receives tuning from ::VehicleController.
+ * - Requires Init(...) before normal control.
+ * - SetUp() configures WheelCollider substeps, Rigidbody solver iterations, initial friction, and center of mass.
  *
  * ::TransmissionController
- * - forwardGears[], finalDrive, idle/redline, shiftUp/shiftDown RPM, shiftDuration, slipThreshold.
- * - OnShift: list of callbacks (EngineSound::OnShift is added by VehicleController).
+ * - forwardGears[]: forward gear ratios, where index 0 is first gear.
+ * - finalDrive: final drive multiplier.
+ * - idleRPM and redlineRPM: RPM normalization range.
+ * - shiftUpRPM and shiftDownRPM: automatic shift thresholds.
+ * - shiftDuration: time during which torque is cut while shifting.
+ * - slipThreshold: wheel slip above which shifting is suppressed.
+ * - OnShift: runtime callback list used for shift effects such as ::EngineSound::OnShift.
  *
  * ::EngineSound
- * - min/max RPM, on/off clips (idle/low/mid/high), mixer group, volumes, smoothing speeds,
- *   pitch vs RPM curve, band centers/sharpness, on/off balance, shift flare, limiter parameters.
+ * - RPM and throttle: runtime values fed by ::VehicleController.
+ * - minRPM and maxRPM: normalization range.
+ * - outputGroup: mixer group used by engine audio sources.
+ * - masterVolume, spatialBlend, and dopplerLevel.
+ * - on_Idle, on_Low, on_Mid, on_High.
+ * - off_Idle, off_Low, off_Mid, off_High.
+ * - rpmLerpSpeed and throttleLerpSpeed.
+ * - pitchVsRpm.
+ * - bandCenters and bandSharpness.
+ * - throttleShape and onThrottleBoost.
+ * - shiftFlareAmount, shiftFlareTime, limiterStart, and limiterDepth.
  *
  * ::LightsController
- * - front/day/rear/reverse/brake lights (lists), colors and intensities, fade duration, initial on/off.
+ * - frontLights, dayLights, rearLights, reverseLights, and brakeLights.
+ * - Color and intensity for each light group.
+ * - fadeDuration for front/day/rear light fading.
+ * - startLightsOn for initial normal-light state.
  *
- * ::TyreEffects (per wheel)
- * - smoke prefab (ParticleSystem), skid TrailRenderer prefab, skid clip and mixer group.
- * - slipThreshold, maxEmissionRatePerSecond, maxEmissionRateAtSlip, groundOffset.
+ * ::TyreEffects
+ * - smokePrefab: optional ParticleSystem prefab.
+ * - skidTrailPrefab: optional TrailRenderer prefab.
+ * - skidAudioClip: optional looping skid clip.
+ * - skidAudioMixerGroup: optional mixer group for skid audio.
+ * - slipThreshold: combined slip needed before effects begin.
+ * - maxEmissionRatePerSecond: maximum smoke emission rate.
+ * - maxEmissionRateAtSlip: slip value where smoke/audio reach maximum intensity.
+ * - groundOffset: visual offset above the contact point.
  *
  * ::CollisionDetection
- * - crashClips[], volume curve, min pitch/max pitch, cooldown.
- * - minImpulse/maxImpulse mapping, ignoreLayers.
+ * - crashClips: crash audio clips available for random selection.
+ * - minimumVolume: lower volume bound for valid impacts.
+ * - minImpactSpeed: impact speed that starts producing crash audio.
+ * - maxImpactSpeed: impact speed that maps to full severity.
+ * - minSeverityToPlay: minimum normalized severity required before a crash sound is played.
+ * - volumeCurve and baseVolume: volume shaping.
+ * - minPitch and maxPitch: pitch range.
+ * - cooldown: minimum time between crash sounds.
+ * - ignoreLayers: layers ignored for crash SFX.
  *
  * ::FollowCamera
- * - target, local offset, follow speed, yaw smoothness, fixed pitch angle.
+ * - target: Transform followed by the camera.
+ * - targetRb: optional Rigidbody used to choose movement direction.
+ * - offset: camera side, height, and follow distance.
+ * - positionSmoothTime: position smoothing.
+ * - rotationSmoothTime: yaw smoothing.
+ * - fixedPitchAngle: fixed camera pitch.
+ * - lookAheadDistance: distance added along movement direction.
+ * - minVelocityForDirection: minimum planar speed before velocity direction is used.
  *
  * ----------------------------------------------------------------------
  * @section car_lifecycle Lifecycle
  *
- * Boot:
- * - VehicleController::Reset/Start/OnValidate wires missing components, pushes config via SetUp(), and
- *   creates default input bindings if enabled.
+ * VehicleController.OnValidate:
+ * - Validates that exactly four wheels are configured.
+ * - Ensures each WheelSpec has a WheelCollider and visual Transform.
+ * - Calls internal setup when the configuration is complete.
  *
- * Per physics tick:
- * - FixedUpdate in VehicleController:
- *   - Read input, call DriveTrainContoller::ApplyWheelControls(throttle, braking, handbrake, steer, isGamepad).
- *   - Update ::LightsController brake/reverse states.
- *   - Refresh engine audio inputs (RPM and throttle).
+ * VehicleController.Reset:
+ * - Adds or resolves ::EngineSound, ::TransmissionController, ::DriveTrainController, and ::LightsController.
+ * - Calls internal setup.
  *
- * Per frame:
- * - FollowCamera::Update smooths camera.
- * - EngineSound::Update applies smoothing, band mixing, limiter, and shift flare.
- * - TyreEffects::FixedUpdate spawns smoke/trails and skid audio based on slip.
- * - CollisionDetection::OnCollisionEnter plays crash SFX if severity passes threshold.
+ * VehicleController.Start:
+ * - Calls internal setup.
+ *
+ * VehicleController.FixedUpdate:
+ * - Reads throttle, steering, brake, and handbrake input.
+ * - Calls ::DriveTrainController::ApplyWheelControls.
+ * - Updates brake and reverse lights.
+ * - Updates engine audio input values.
+ *
+ * DriveTrainController.SetUp:
+ * - Configures WheelCollider substeps.
+ * - Increases Rigidbody solver iterations.
+ * - Applies initial friction settings.
+ * - Sets the Rigidbody center of mass.
+ *
+ * TransmissionController.HandleShifting:
+ * - Calculates engine RPM from driven-wheel RPM.
+ * - Suppresses shifting during high wheel slip.
+ * - Starts upshift or downshift coroutines when thresholds are crossed.
+ * - Returns true while torque should be cut due to shifting.
+ *
+ * EngineSound.Update:
+ * - Smooths RPM and throttle.
+ * - Crossfades between RPM bands.
+ * - Applies pitch mapping, shift flare, and limiter behavior.
+ *
+ * LightsController.Start:
+ * - Applies the configured initial normal-light state.
+ *
+ * TyreEffects.FixedUpdate:
+ * - Reads WheelCollider ground hit and slip.
+ * - Emits smoke, enables skid trail, and plays skid audio when slip is high enough.
+ * - Stops effects when the wheel is not grounded or slip is below threshold.
+ *
+ * CollisionDetection.OnCollisionEnter:
+ * - Ignores configured layers.
+ * - Calculates severity from collision velocity into contact normals.
+ * - Applies severity threshold and cooldown.
+ * - Plays a crash clip through ::SoundManager.
+ *
+ * FollowCamera.LateUpdate:
+ * - Computes the movement direction.
+ * - Smoothly moves and rotates the camera after the target has moved.
  *
  * ----------------------------------------------------------------------
  * @section car_usage Usage
  *
- * Minimal code to spawn and drive:
+ * Minimal spawn:
  * @code{.cs}
  * public class Spawner : MonoBehaviour
  * {
  *     public GameObject carPrefab;
  *     public Transform spawnPoint;
  *
- *     void Start()
+ *     private void Start()
  *     {
- *         var car = Instantiate(carPrefab, spawnPoint.position, spawnPoint.rotation);
- *         // Ensure wheels array and visuals are assigned in prefab's VehicleController.
+ *         Instantiate(carPrefab, spawnPoint.position, spawnPoint.rotation);
  *     }
  * }
  * @endcode
  *
  * Reading vehicle state:
  * @code{.cs}
- * var vc = car.GetComponent<VehicleController>();
- * // Example: hook up UI to RPM
- * var rpm = car.GetComponent<TransmissionController>().EngineRPM;
+ * DriveTrainController drivetrain = car.GetComponent<DriveTrainController>();
+ * TransmissionController transmission = car.GetComponent<TransmissionController>();
+ *
+ * float speedKmh = drivetrain.GetSpeed();
+ * float engineRpm = transmission.EngineRPM;
+ * int gear = transmission.CurrentGear;
+ * bool braking = drivetrain.Braking;
+ * bool reversing = drivetrain.Reversing;
  * @endcode
  *
- * Tuning friction (example):
+ * Tuning friction at runtime:
  * @code{.cs}
- * // Increase front grip
- * var dt = car.GetComponent<DriveTrainContoller>();
- * dt.frontSidewaysFriction[0] = 2.5f; // stiffness
+ * DriveTrainController drivetrain = car.GetComponent<DriveTrainController>();
+ *
+ * WheelFrictionSettings frontSideways = drivetrain.frontSidewaysFriction;
+ * frontSideways.stiffness = 2.5f;
+ * drivetrain.frontSidewaysFriction = frontSideways;
+ *
+ * drivetrain.SetUp();
  * @endcode
  *
- * Manual lights:
+ * Manual light toggle:
  * @code{.cs}
- * car.GetComponent<LightsController>().ToggleLights();
+ * LightsController lights = car.GetComponent<LightsController>();
+ * lights.ToggleLights();
+ * @endcode
+ *
+ * Snapping a follow camera after teleport or respawn:
+ * @code{.cs}
+ * FollowCamera camera = FindFirstObjectByType<FollowCamera>();
+ *
+ * if (camera != null)
+ * {
+ *     camera.SetTarget(car.transform);
+ *     camera.SyncCamera();
+ * }
  * @endcode
  *
  * ----------------------------------------------------------------------
- * @section car_api Public API Reference (Selected)
+ * @section car_api Public API Reference
  *
- * ::VehicleController
- * - void SetUp(): resolves dependencies, pushes inspector config to subsystems.
- *
- * ::DriveTrainContoller
- * - void Init(Rigidbody rb, TransmissionController tx, WheelCollider[] wc, Transform[] meshes,
+ * ::DriveTrainController
+ * - void Init(Rigidbody carRigidBody, TransmissionController transmissionController,
+ *             WheelCollider[] wheelsColliders, Transform[] wheelMeshes,
  *             bool[] driven, bool[] steering)
- * - void SetUp(): configures wheel substeps, solver iterations, friction, center of mass.
- * - void ApplyWheelControls(float throttle, bool braking, bool handbrake, float steering, bool gamepadSteering)
- * - bool Braking (property): true if service brakes active.
- * - bool Reversing (property): true if reversing mode active.
+ *   Initializes required drivetrain references.
+ *
+ * - void SetUp()
+ *   Applies WheelCollider, Rigidbody, friction, and center-of-mass setup.
+ *
+ * - void ApplyWheelControls(float throttle, float braking, bool handbrake,
+ *                           float steering, bool gamepadSteering)
+ *   Applies control input for one physics tick.
+ *
+ * - float GetSpeed()
+ *   Returns current vehicle speed in km/h.
+ *
+ * - float GetMaxSpeed()
+ *   Returns configured maximum forward speed.
+ *
+ * - float GetMaxReverseSpeed()
+ *   Returns configured maximum reverse speed.
+ *
+ * - float GetSteeringAngle()
+ *   Returns current smoothed steering angle.
+ *
+ * - float GetMaxSteeringAngle()
+ *   Returns low-speed steering limit.
+ *
+ * - float GetMaxSteeringAngleAtTopSpeed()
+ *   Returns top-speed steering limit.
+ *
+ * - void ApplyReplayWheelVisuals(float replaySteeringAngle)
+ *   Updates visual wheel steering and mesh synchronization during replay playback.
+ *
+ * - bool Braking
+ *   True when service braking is active.
+ *
+ * - bool Reversing
+ *   True when reverse mode is active.
  *
  * ::TransmissionController
- * - bool HandleShifting(float wheelRPM, float wheelSlip): updates EngineRPM and schedules shift coroutines;
- *   returns true while shifting (torque cut).
- * - int  CurrentGear (property)
- * - float EngineRPM (property)
+ * - bool HandleShifting(float wheelRPM, float wheelSlip)
+ *   Updates RPM and automatic shifting. Returns true while torque should be cut.
+ *
+ * - float GetNormalizedRPM()
+ *   Returns normalized RPM between idle and redline.
+ *
+ * - int CurrentGear
+ *   Current zero-based forward gear index.
+ *
+ * - float EngineRPM
+ *   Current calculated engine RPM.
  *
  * ::EngineSound
- * - void OnShift(): triggers short pitch flare.
- * - void SetUp(): clamps and applies inspector parameters to sources.
+ * - void OnShift()
+ *   Triggers the shift flare effect.
  *
  * ::LightsController
  * - void ToggleLights()
+ *   Toggles front, day, and rear lights.
+ *
+ * - void SetLights(bool active)
+ *   Sets front, day, and rear lights together.
+ *
+ * - void SetFrontLights(bool active)
+ *   Fades front lights on or off.
+ *
+ * - void SetDayLights(bool active)
+ *   Fades day lights on or off.
+ *
+ * - void SetRearLights(bool active)
+ *   Fades rear lights on or off.
+ *
  * - void SetBrakeLights(bool active)
+ *   Sets brake lights instantly, restoring shared rear lights when needed.
+ *
  * - void SetReverseLights(bool active)
- * - void SetLights(bool active), SetFrontLights(bool), SetDayLights(bool), SetRearLights(bool)
- *
- * ::TyreEffects
- * - Emits particles/trail and plays skid audio automatically based on WheelCollider slip.
- *
- * ::CollisionDetection
- * - Plays one-shot crash SFX based on collision impulse; respects cooldown and layer mask.
+ *   Sets reverse lights instantly, restoring shared rear lights when needed.
  *
  * ::FollowCamera
- * - void SyncCamera(): immediate snap to target position/rotation with fixed pitch.
+ * - void SetTarget(Transform newTarget)
+ *   Assigns a target and immediately synchronizes the camera.
+ *
+ * - void SyncCamera()
+ *   Instantly places and rotates the camera to its desired pose.
+ *
+ * ::CollisionDetection
+ * - No public gameplay API. It reacts automatically to OnCollisionEnter.
+ *
+ * ::TyreEffects
+ * - No public gameplay API. It reacts automatically during FixedUpdate.
  *
  * ----------------------------------------------------------------------
  * @section car_integration Integration Notes
  *
  * Input:
- * - Uses the Unity Input System. VehicleController can auto-create basic bindings for keyboard/gamepad.
- * - Device detection switches "gamepad steering" which uses input exponent shaping.
+ * - Uses the Unity Input System.
+ * - VehicleController can create default runtime bindings when autoCreateDefaultBindingsIfMissing is enabled.
+ * - Device detection affects steering shaping for gamepad input.
+ *
+ * Saved assists:
+ * - VehicleController reads ABS and traction-control settings from ::GameDataManager when available.
  *
  * Audio:
- * - Connect TransmissionController::OnShift to EngineSound::OnShift (VehicleController does this).
- * - Use SoundManager (see audio_mgr) to unify SFX routing; CollisionDetection expects SoundManager.Instance.
+ * - VehicleController registers EngineSound::OnShift with the transmission shift callback list.
+ * - CollisionDetection expects ::SoundManager.Instance for crash SFX.
+ * - TyreEffects uses its own looping AudioSource for skid audio.
  *
- * VFX:
- * - Assign TyreEffects prefabs (particles/trails) in the wheel objects; ensure proper layer/materials.
+ * Replay:
+ * - ::DriveTrainController::ApplyReplayWheelVisuals updates wheel visuals without applying live torque or braking.
  *
- * Camera:
- * - Assign FollowCamera.target to the vehicle root; tune offset and smoothing for your game feel.
- *
- * Networking (out of scope here):
- * - Keep physics authority on server or host; send inputs and replicate high-level state (gear, RPM, lights).
+ * Race spawning:
+ * - ::TrackManager spawns the car prefab, tags it as Player, and assigns ::FollowCamera to the spawned car.
  *
  * ----------------------------------------------------------------------
  * @section car_performance Performance and GC
  *
- * - Avoid frequent array reallocation in gameplay; arrays are configured once in SetUp().
- * - WheelCollider.GetGroundHit is used only when grounded; keep friction and solver iterations reasonable.
- * - EngineSound pre-creates sources in Awake; clips should be compressed/streamed as appropriate.
- * - TyreEffects accumulates fractional particles to keep emission stable at fixed delta.
- * - CollisionDetection uses a short cooldown to prevent SFX spam.
+ * - Wheel arrays and control arrays are initialized during setup and reused.
+ * - WheelCollider.GetGroundHit is used only where wheel contact data is needed.
+ * - EngineSound pre-creates its RPM-band AudioSources.
+ * - TyreEffects accumulates fractional particles so smoke emission remains stable across fixed steps.
+ * - CollisionDetection uses a cooldown to prevent crash SFX spam.
+ * - SoundManager pooling is used for crash SFX.
  *
- * Suggested physics defaults:
- * - Rigidbody.solverIterations and solverVelocityIterations set to 12 for stability.
- * - WheelCollider.ConfigureVehicleSubsteps(0.5, 20, 30) called for each wheel.
+ * Suggested stability defaults:
+ * - Rigidbody solverIterations and solverVelocityIterations are raised to 12 by DriveTrainController.
+ * - WheelCollider.ConfigureVehicleSubsteps(0.5f, 20, 30) is applied to each wheel.
  *
  * ----------------------------------------------------------------------
  * @section car_troubleshooting Troubleshooting
  *
  * Vehicle will not move:
- * - Check WheelCollider mass/friction setup and that at least one axle is marked "powered."
- * - Verify ground colliders and layers; WheelColliders must contact a collider to generate forces.
+ * - Check that at least one wheel is marked powered.
+ * - Check that WheelColliders touch ground colliders.
+ * - Check maxMotorPower and forward friction stiffness.
+ * - Check that the drivetrain was initialized by VehicleController.
  *
  * Steering feels unresponsive:
- * - Increase maxSteerAngle and/or steerSpeedDegPerSec; reduce maxSpeed or increase inputExponent.
+ * - Increase maxSteerAngle or steerSpeedDegPerSec.
+ * - Increase maxSteerAngleAtTopSpeed if the car barely turns at speed.
+ * - Adjust inputExponent for gamepad steering feel.
  *
  * Excessive wheelspin:
- * - Enable tractionControlEnabled and reduce tractionSlipLimit; tune forward friction stiffness/curve.
+ * - Enable traction control.
+ * - Reduce tractionSlipLimit.
+ * - Increase forward friction stiffness.
+ * - Tune limited-slip settings for driven wheels.
  *
- * Brakes ineffective or lock instantly:
- * - Enable absEnabled and increase absSlipLimit; adjust maxBrakeTorque and friction curves.
+ * Brakes lock too easily:
+ * - Enable ABS.
+ * - Tune absSlipLimit.
+ * - Reduce maxBrakeTorque.
+ * - Adjust locked-wheel grip multipliers.
  *
- * Audio missing or flat:
- * - Assign on/off band clips; verify minRPM/maxRPM and pitchVsRpm curve; check AudioMixer routing.
+ * Car rolls too much:
+ * - Enable antiRollToggle.
+ * - Increase antiRollStiffnessFront and/or antiRollStiffnessRear.
+ * - Lower the center of mass.
+ *
+ * Engine audio missing:
+ * - Assign on/off throttle clips.
+ * - Check minRPM, maxRPM, and masterVolume.
+ * - Check output AudioMixerGroup routing.
  *
  * Lights do not toggle:
- * - Ensure lists contain valid Light references; verify the lights input binding and that
- *   VehicleController hooks OnLightsPerformed.
+ * - Check light lists.
+ * - Check lightsToggleAction binding.
+ * - Check that VehicleController has a LightsController reference.
  *
  * Crash SFX never plays:
- * - Lower minImpulse, raise baseVolume, ensure cooldown is not constantly active.
- * - Verify ignoreLayers mask does not include your collision targets.
+ * - Assign crashClips.
+ * - Ensure ::SoundManager exists.
+ * - Lower minImpactSpeed or minSeverityToPlay.
+ * - Check ignoreLayers.
+ * - Check cooldown.
+ *
+ * Skid effects never appear:
+ * - Assign smokePrefab or skidTrailPrefab.
+ * - Lower slipThreshold.
+ * - Check WheelCollider grounding.
+ * - Check that TyreEffects is placed on the same object as the WheelCollider.
  *
  * ----------------------------------------------------------------------
  * @section car_versions Version History
  *
- * - v1.5: Added Documentation; minor tuning improvements.
- * - v1.4: Rewamp of slip values.
- * - v1.3.5: Refractored VehicleController, DriveTrainController, TransmissionController.
- * - v1.3: TyreEffects skid VFX and audio, CollisionDetection crash SFX.
- * - v1.2: Engine audio with crossfades, skid effects, collision SFX.
- * - v1.1: Transmission auto-shift.
- * - v1.0: Initial 4-wheel drivetrain, Traction/ABS gates, anti-roll pair forces, friction setup arrays.
+ * - v1.6: Added grip-circle coupling, limited-slip approximation, replay wheel-visual support, and expanded documentation.
+ * - v1.5: Added documentation and tuning cleanup.
+ * - v1.4: Reworked slip values and dynamic grip behaviour.
+ * - v1.3.5: Refactored VehicleController, DriveTrainController, and TransmissionController.
+ * - v1.3: Added TyreEffects skid VFX/audio and CollisionDetection crash SFX.
+ * - v1.2: Added engine audio with RPM-band crossfades.
+ * - v1.1: Added automatic transmission shifting.
+ * - v1.0: Initial four-wheel drivetrain, traction/ABS gates, anti-roll forces, and friction setup.
  */

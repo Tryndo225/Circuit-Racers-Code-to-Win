@@ -1,3 +1,3 @@
 <map id="LevelCheckPointMaker" name="LevelCheckPointMaker">
-<area shape="rect" id="Node000001" title="Utility that scans a generated LevelMap road (tile value 1) and stamps checkpoint tiles (&#45;2) along su..." alt="" coords="5,5,165,75"/>
+<area shape="rect" id="Node000001" title="Utility that scans a generated LevelMap road and places checkpoint tiles on long straight segments." alt="" coords="5,5,165,75"/>
 </map>

@@ -7,8 +7,10 @@ var searchData=
   ['characterselectionevent_4',['CharacterSelectionEvent',['../class_t_m_pro_1_1_t_m_p___text_event_handler_1_1_character_selection_event.html',1,'TMPro::TMP_TextEventHandler']]],
   ['chatcontroller_5',['ChatController',['../class_chat_controller.html',1,'']]],
   ['checkpointlistener_6',['CheckPointListener',['../class_check_point_listener.html',1,'']]],
-  ['clearlevelsbutton_7',['ClearLevelsButton',['../class_clear_levels_button.html',1,'']]],
-  ['collisiondetection_8',['CollisionDetection',['../class_collision_detection.html',1,'']]],
-  ['coordinates_9',['Coordinates',['../struct_coordinates.html',1,'']]],
-  ['curvature_10',['Curvature',['../classsc_1_1terrain_1_1proceduralpainter_1_1_curvature.html',1,'sc::terrain::proceduralpainter']]]
+  ['checkpointmanager_7',['CheckPointManager',['../class_check_point_manager.html',1,'']]],
+  ['clearlevelsbutton_8',['ClearLevelsButton',['../class_clear_levels_button.html',1,'']]],
+  ['closepopupbutton_9',['ClosePopUpButton',['../class_close_pop_up_button.html',1,'']]],
+  ['collisiondetection_10',['CollisionDetection',['../class_collision_detection.html',1,'']]],
+  ['coordinates_11',['Coordinates',['../struct_coordinates.html',1,'']]],
+  ['curvature_12',['Curvature',['../classsc_1_1terrain_1_1proceduralpainter_1_1_curvature.html',1,'sc::terrain::proceduralpainter']]]
 ];

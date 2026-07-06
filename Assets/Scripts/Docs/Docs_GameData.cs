@@ -2,175 +2,405 @@
  * @file Docs_GameData.cs
  * @brief Documentation entry for the Game Data subsystem.
  *
- * @defgroup game_data_mgr Game Data Manager
+ * @defgroup game_data Game Data
  * @ingroup systems
- * @brief Persistent progression (levels list, selected level, best times) managed by ::GameDataManager.
+ * @brief Persistent progression data, selected level state, best times, checkpoint splits, replays, and assist settings.
  *
- * @details
- * The Game Data subsystem centers on ::GameDataManager (a Generic::Singleton<GameDataManager>).
- * It owns a ::GameData instance that stores a list of ::LevelData records
- * (each linking a ::LevelMap and its best completion time). Data is persisted as JSON via
- * Unity's PlayerPrefs under the "GameData" key.
+ * The Game Data subsystem centers on ::GameDataManager, which derives from Generic::Singleton<GameDataManager>.
+ * It owns a ::GameData instance, persists it through Unity PlayerPrefs as JSON under the key "GameData",
+ * tracks the currently selected ::LevelMap, and exposes APIs for level lists, best times, checkpoint splits,
+ * best replays, assist settings, and editable level replacement.
  *
  * Contents:
- * - see gdm_overview
- * - see gdm_data_model
- * - see gdm_lifecycle
- * - see gdm_usage
- * - see gdm_api
- * - see gdm_integration
- * - see gdm_persistence
- * - see gdm_performance
- * - see gdm_troubleshooting
- * - see gdm_versions
+ * - @ref gdm_overview
+ * - @ref gdm_data_model
+ * - @ref gdm_lifecycle
+ * - @ref gdm_usage
+ * - @ref gdm_api
+ * - @ref gdm_level_editing
+ * - @ref gdm_integration
+ * - @ref gdm_persistence
+ * - @ref gdm_performance
+ * - @ref gdm_troubleshooting
+ * - @ref gdm_versions
  *
  * ----------------------------------------------------------------------
  * @section gdm_overview Overview
  *
  * Responsibilities:
- * - Load and save ::GameData to PlayerPrefs (JSON).
- * - Track the currently selected ::LevelMap.
- * - Add, remove, clear levels; update best times.
- * - Maintain a content hash (Hash) of the Levels list and notify listeners on change.
+ * - Load and save ::GameData to PlayerPrefs as JSON.
+ * - Maintain the currently selected ::LevelMap for gameplay scene transitions.
+ * - Store custom levels and their best completion data.
+ * - Store practice/test-map best time, checkpoint splits, and replay.
+ * - Store driving assist settings: ABS and traction control.
+ * - Add, remove, clear, edit, and replace saved levels.
+ * - Record best times only when a completed run improves the stored result.
+ * - Store checkpoint split arrays for best-run comparison.
+ * - Store best ::Replay objects for custom levels and the practice/test map.
+ * - Compute a content hash of the level list and notify listeners when it changes.
  *
  * Dependencies:
  * - Generic::Singleton<T> base type.
- * - IEnumerableExtention::IEnumerableExtensions::GetContentHash for hash computation.
+ * - IEnumerableExtensions::IEnumerableExtensions::GetContentHash for level-list hash computation.
  * - UnityEngine.PlayerPrefs and JsonUtility for persistence.
- * - ::SceneManagement for scene changes (e.g., "Level" scene).
+ * - ::SceneManagement for loading the gameplay scene.
+ * - ::LevelMap for level layout data.
+ * - ::Replay for best-run replay storage.
  *
  * Threading:
- * - Unity main thread.
+ * - Unity main thread only.
  *
  * Invariants:
- * - Exactly one ::GameDataManager exists (Singleton).
- * - Best times are only improved (never made worse).
+ * - Exactly one ::GameDataManager instance should be active.
+ * - Custom level best times are only replaced when the new time is lower.
+ * - Practice/test-map best time is only replaced when the new time is lower.
+ * - A null CurrentLevelMap means the practice/test map is being used.
+ * - Listener callbacks are invoked only when the stored level-list hash changes.
  *
  * ----------------------------------------------------------------------
  * @section gdm_data_model Data Model
  *
- * Types:
- * - ::LevelData: { LevelMap, Time } where Time is best completion in seconds
- *   (float.MaxValue indicates unknown).
- * - ::GameData: { List<LevelData> Levels }.
- * - ::GameDataManager: owns the active ::GameData and selected ::LevelMap.
+ * ::GameDataManager
+ * - Owns the active ::GameData through CurrentGameData.
+ * - Stores the currently selected custom level in CurrentLevelMap.
+ * - Exposes CurrentLevelReplay for the selected custom level or the practice/test map.
+ * - Exposes Hash for level-list change detection.
  *
- * Equality:
- * - LevelData equality compares by LevelMap reference; Time does not affect equality.
+ * ::GameDataManager::GameData
+ * - Levels: List<GameDataManager::LevelData> containing custom levels and their best runs.
+ * - PracticeMapTime: best practice/test-map time, or float.MaxValue when unknown.
+ * - PracticeMapSplits: best practice/test-map checkpoint splits.
+ * - PracticeMapReplay: best practice/test-map replay.
+ * - AssistsSettings: saved ABS and traction-control settings.
  *
- * Hashing:
- * - GameDataManager::Hash is computed over Levels using GetContentHash() to detect changes.
+ * ::GameDataManager::LevelData
+ * - LevelMap: associated custom level.
+ * - Time: best completion time in seconds, or float.MaxValue when unknown.
+ * - CheckpointTimeSplits: checkpoint split times for the stored best run.
+ * - BestReplay: replay associated with the stored best run.
+ *
+ * ::GameDataManager::AssistsSettings
+ * - ABS: whether anti-lock braking assist is enabled.
+ * - TC: whether traction-control assist is enabled.
+ *
+ * Equality and hashing:
+ * - LevelData equality compares LevelMap, Time, CheckpointTimeSplits, and BestReplay.
+ * - LevelData.GetHashCode includes the level map, time, replay, and split values.
+ * - GameDataManager::Hash is computed from CurrentGameData.Levels using GetContentHash().
+ *
+ * Validation and fallback:
+ * - GameData.EnsureValid() removes null level records and repairs missing arrays/settings.
+ * - LevelData.EnsureValid() creates default split arrays when missing.
+ * - Default custom-level split count is based on CheckpointCountPerLap * Laps + 1.
+ * - PracticeMapSplits defaults to an array of length 30.
  *
  * ----------------------------------------------------------------------
  * @section gdm_lifecycle Lifecycle
  *
- * Start():
- * - If PlayerPrefs has "GameData", loads it; otherwise starts with an empty ::GameData.
+ * GameDataManager.Awake:
+ * - Enforces the singleton rule.
+ * - If PlayerPrefs contains "GameData", loads it.
+ * - Otherwise initializes a fresh ::GameData instance and computes the initial Hash.
  *
- * OnApplicationQuit():
- * - Saves ::GameData to PlayerPrefs.
+ * GameDataManager.OnApplicationQuit:
+ * - Saves CurrentGameData to PlayerPrefs.
+ *
+ * SaveGameData:
+ * - Calls CurrentGameData.EnsureValid().
+ * - Serializes CurrentGameData with JsonUtility.ToJson().
+ * - Stores the JSON string in PlayerPrefs under "GameData".
+ * - Calls PlayerPrefs.Save().
+ *
+ * LoadGameData:
+ * - Reads JSON from PlayerPrefs key "GameData".
+ * - Deserializes it with JsonUtility.FromJson<GameData>().
+ * - Repairs missing or older-format data with EnsureValid().
+ * - Recomputes Hash from CurrentGameData.Levels.
+ * - Falls back to a new empty ::GameData if loading fails.
  *
  * Data change:
- * - Any structural change to Levels triggers a recomputation of Hash and invokes observers.
+ * - Add, remove, clear, replace, and improved custom-level completion can recompute Hash.
+ * - When the hash changes, registered listeners are invoked safely.
  *
  * ----------------------------------------------------------------------
  * @section gdm_usage Usage
  *
- * Quick start: load, select, play
+ * Select an existing level and start gameplay:
  * @code{.cs}
- * // Load is automatic in Start if PlayerPrefs has "GameData".
- * // To select a level that already exists in data:
  * GameDataManager.Instance.SelectingLevelMap(levelMap);
- * GameDataManager.Instance.GoToSelectedLevel(); // loads "Level" scene
+ * GameDataManager.Instance.GoToSelectedLevel();
  * @endcode
  *
- * Add a level and record a best time
+ * Add a new custom level:
  * @code{.cs}
- * var mgr = GameDataManager.Instance;
- * mgr.AddLevel(levelMap);           // adds with Time = float.MaxValue if new
- * mgr.SelectingLevelMap(levelMap);  // select for play
- * // ... after finishing the level:
- * mgr.CompleteLevel(elapsedSeconds); // improves stored best time if better
+ * GameDataManager.Instance.AddLevel(levelMap);
  * @endcode
  *
- * Observe changes
+ * Complete the current level:
  * @code{.cs}
- * void OnGameDataChanged() { Debug.Log("Data changed! Hash = " + GameDataManager.Instance.Hash); }
- * void OnEnable() { GameDataManager.Instance.AddListener(OnGameDataChanged); }
- * void OnDisable(){ GameDataManager.Instance.RemoveListener(OnGameDataChanged); }
+ * float elapsedSeconds = RaceTimeManager.Instance.GetCurrentRaceTime();
+ * float[] splits = RaceTimeManager.Instance.CheckPointSplitsTimes.ToArray();
+ * Replay replay = ReplayManager.Instance.SaveReplay();
+ *
+ * GameDataManager.Instance.CompleteLevel(elapsedSeconds, splits, replay);
+ * @endcode
+ *
+ * Read the current best replay:
+ * @code{.cs}
+ * Replay replay = GameDataManager.Instance.CurrentLevelReplay;
+ * @endcode
+ *
+ * Read a saved checkpoint split:
+ * @code{.cs}
+ * float referenceSplit = GameDataManager.Instance.GetCurrentMapSplit(splitIndex);
+ * @endcode
+ *
+ * Read and update assists:
+ * @code{.cs}
+ * bool absEnabled = GameDataManager.Instance.GetABS();
+ * bool tcEnabled = GameDataManager.Instance.GetTC();
+ *
+ * GameDataManager.Instance.SetABS(true);
+ * GameDataManager.Instance.SetTC(true);
+ * @endcode
+ *
+ * Observe level-list changes:
+ * @code{.cs}
+ * private void OnEnable()
+ * {
+ *     GameDataManager.Instance.AddListener(OnGameDataChanged);
+ * }
+ *
+ * private void OnDisable()
+ * {
+ *     if (GameDataManager.Instance != null)
+ *     {
+ *         GameDataManager.Instance.RemoveListener(OnGameDataChanged);
+ *     }
+ * }
+ *
+ * private void OnGameDataChanged()
+ * {
+ *     Debug.Log("Game data changed. Hash = " + GameDataManager.Instance.Hash);
+ * }
+ * @endcode
+ *
+ * Create and save an edited level:
+ * @code{.cs}
+ * LevelMap original = GameDataManager.Instance.CurrentLevelMap;
+ * LevelMap editable = GameDataManager.Instance.CreateEditableCopy(original);
+ *
+ * if (editable != null)
+ * {
+ *     editable.Name = "Edited Level";
+ *     GameDataManager.Instance.ReplaceLevel(original, editable);
+ * }
  * @endcode
  *
  * ----------------------------------------------------------------------
  * @section gdm_api Public API Reference
  *
  * Properties:
- * - GameData CurrentGameData: active data set (Levels list).
- * - LevelMap CurrentLevelMap: currently selected level (may be null).
- * - int Hash: content hash of CurrentGameData.Levels.
+ * - GameData CurrentGameData:
+ *   Active saved game-data set.
  *
- * Selection and flow:
- * - void SelectingLevelMap(LevelMap map): selects an existing level by reference.
- * - void GoToSelectedLevel(): loads the "Level" scene if a level is selected.
+ * - LevelMap CurrentLevelMap:
+ *   Currently selected custom level. Null means the practice/test map is selected.
  *
- * Progression updates:
- * - void CompleteLevel(float time): for CurrentLevelMap, improves best time if lower and saves.
- * - void AddLevel(LevelMap map): adds a new level if not present; triggers hash change.
- * - void RemoveLevel(LevelMap map): removes if present; triggers hash change.
- * - void ClearLevels(): clears Levels; triggers hash change.
+ * - Replay CurrentLevelReplay:
+ *   Best replay for the selected custom level, or the practice/test-map replay when no custom level is selected.
+ *
+ * - int Hash:
+ *   Content hash of the current custom-level list.
+ *
+ * Assist settings:
+ * - bool GetABS()
+ *   Returns whether ABS assist is enabled.
+ *
+ * - void SetABS(bool enabled)
+ *   Updates and saves the ABS assist setting.
+ *
+ * - bool GetTC()
+ *   Returns whether traction control assist is enabled.
+ *
+ * - void SetTC(bool enabled)
+ *   Updates and saves the traction-control assist setting.
  *
  * Observers:
- * - void AddListener(Action action): registers a hash-change callback.
- * - void RemoveListener(Action action): unregisters the callback.
+ * - void AddListener(Action action)
+ *   Registers a callback for level-list hash changes.
  *
- * Persistence (internal):
- * - Saves to PlayerPrefs key "GameData" on quit and after improvements.
+ * - void RemoveListener(Action action)
+ *   Removes a previously registered callback.
+ *
+ * Selection and flow:
+ * - void SelectingLevelMap(LevelMap map)
+ *   Selects a custom level for play. The map must already exist in CurrentGameData.
+ *
+ * - void GoToSelectedLevel()
+ *   Loads the "Level" scene through ::SceneManagement when CurrentLevelMap is set.
+ *
+ * - float GetCurrentMapSplit(int splitIndex)
+ *   Returns a saved split for the selected custom level, or the practice/test-map split if no custom level is selected.
+ *
+ * - Replay GetCurrentMapReplay()
+ *   Returns the best replay for the selected custom level, or the practice/test-map replay if no custom level is selected.
+ *
+ * Progression:
+ * - void CompleteLevel(float time, float[] checkpointSplits, Replay replay)
+ *   Records completion of the currently selected level. If CurrentLevelMap is null, the result is stored as
+ *   a practice/test-map result. Otherwise, the selected custom level is updated if the time improves.
+ *
+ * - void AddLevel(LevelMap map)
+ *   Adds a custom level if it is not already present.
+ *
+ * - void RemoveLevel(LevelMap levelMap)
+ *   Removes a custom level if present. Clears CurrentLevelMap if the removed level was selected.
+ *
+ * - void ClearLevels()
+ *   Removes all custom levels and clears the current custom-level selection.
+ *
+ * Level editing:
+ * - LevelMap CreateEditableCopy(LevelMap sourceMap)
+ *   Returns a copy of a stored level map for editing, or null if the map is invalid or not stored.
+ *
+ * - bool ReplaceLevel(LevelMap originalMap, LevelMap editedMap)
+ *   Replaces a stored level with an edited copy. This resets best time, splits, and replay for that level.
+ *
+ * Context menu helpers:
+ * - void CopySavedGameDataToClipboard()
+ *   Copies the raw saved JSON from PlayerPrefs to the clipboard.
+ *
+ * ----------------------------------------------------------------------
+ * @section gdm_level_editing Level Editing
+ *
+ * The level editing flow avoids directly mutating the stored level until the user confirms the edit.
+ *
+ * Recommended flow:
+ * - Call CreateEditableCopy(originalMap).
+ * - Modify the returned copy in the editor UI.
+ * - Validate the edited map.
+ * - Call ReplaceLevel(originalMap, editedMap) to save the result.
+ *
+ * Replacement behavior:
+ * - The edited map is copied before storage.
+ * - The old LevelData record is replaced with a new LevelData record.
+ * - Best time, checkpoint splits, and replay are reset for the edited level.
+ * - If the original map was selected, CurrentLevelMap is moved to the saved edited copy.
+ * - Hash change detection and saving are triggered.
  *
  * ----------------------------------------------------------------------
  * @section gdm_integration Integration Notes
  *
- * Scene flow:
- * - Pair with ::SceneManagement to swap scenes after selection (GoToSelectedLevel uses "Level").
+ * Race flow:
+ * - ::RaceTimeManager calls ::GameDataManager::CompleteLevel with final time, checkpoint splits, and replay.
+ * - ::GameDataManager stores custom-level records or practice/test-map records depending on CurrentLevelMap.
+ *
+ * Replay system:
+ * - ::ReplayManager produces the replay passed into CompleteLevel.
+ * - ::ReplayPreviewer can read CurrentLevelReplay or GetCurrentMapReplay() to preview the best run.
+ *
+ * Track building:
+ * - ::RaceTrackPlacer reads GameDataManager::CurrentLevelMap when building custom tracks.
+ * - A null CurrentLevelMap represents the practice/test-map flow.
  *
  * UI:
- * - Build menus that list GameData.Levels; use SelectingLevelMap and GoToSelectedLevel.
+ * - Saved-level lists should read CurrentGameData.Levels.
+ * - Level list UI can use AddListener and RemoveListener to rebuild when Hash changes.
+ * - Level editor UI should use CreateEditableCopy and ReplaceLevel.
  *
- * Content building:
- * - Ensure LevelMap references remain valid between sessions (e.g., do not destroy and recreate).
+ * Vehicle settings:
+ * - Settings UI can use GetABS, SetABS, GetTC, and SetTC.
+ * - VehicleController can read these settings when applying assist configuration.
+ *
+ * Scene flow:
+ * - GoToSelectedLevel loads the "Level" scene through ::SceneManagement.
+ * - SelectingLevelMap only succeeds for levels already present in CurrentGameData.
+ *
+ * Import/export:
+ * - Imported levels should be added with AddLevel.
+ * - Removing or replacing levels triggers hash-change notifications.
  *
  * ----------------------------------------------------------------------
  * @section gdm_persistence Persistence and Format
  *
  * Storage:
- * - PlayerPrefs string under key "GameData".
+ * - PlayerPrefs key: "GameData".
+ * - Value: JSON produced by JsonUtility.ToJson(CurrentGameData).
  *
- * Format:
- * - JsonUtility serialization of ::GameData containing a List<LevelData>.
- * - LevelMap fields must be serializable or reference-stable across sessions.
+ * Saved data includes:
+ * - Custom level list.
+ * - Best custom-level times.
+ * - Best custom-level checkpoint split arrays.
+ * - Best custom-level replays.
+ * - Practice/test-map best time.
+ * - Practice/test-map split array.
+ * - Practice/test-map replay.
+ * - ABS and traction-control settings.
  *
- * Versioning:
- * - If the schema changes, consider a migration step before JsonUtility.FromJson().
+ * Loading:
+ * - Missing older fields are repaired through EnsureValid().
+ * - Missing split arrays are recreated.
+ * - Missing assist settings are recreated.
+ * - Null level records are removed.
+ *
+ * Limitations:
+ * - PlayerPrefs is convenient for small saves, but not ideal for very large data.
+ * - Stored replay data can grow quickly if many snapshots are saved.
+ * - JsonUtility has Unity serialization limitations and does not support every C# type equally.
  *
  * ----------------------------------------------------------------------
  * @section gdm_performance Performance and GC
  *
- * - PlayerPrefs writes are small and infrequent (on quit and when best times improve).
- * - GetContentHash iterates Levels; cost is linear in number of entries.
- * - Avoid excessive Save operations inside tight loops.
+ * - Saving is done on quit and after meaningful data changes.
+ * - GetContentHash iterates the Levels list and is linear in the number of saved levels.
+ * - Listener invocation copies callbacks to an array before calling them, avoiding mutation issues during callbacks.
+ * - Avoid saving repeatedly in tight loops.
+ * - Large replay objects increase JSON size and save/load cost.
  *
  * ----------------------------------------------------------------------
  * @section gdm_troubleshooting Troubleshooting
  *
- * - Data not loading:
- *   - Ensure PlayerPrefs has "GameData". Check platform-specific PlayerPrefs persistence rules.
- * - Level selection fails:
- *   - SelectingLevelMap requires the map to exist in CurrentGameData; call AddLevel first.
- * - Hash not changing:
- *   - Only structural changes to Levels (add/remove/clear) affect the hash. Updating a time may not
- *     change the structure but should still be followed by persistence.
+ * Data not loading:
+ * - Check that PlayerPrefs contains the "GameData" key.
+ * - Check the console for JsonUtility or EnsureValid errors.
+ * - Check whether an older schema needs fallback handling.
+ *
+ * Selected level does not start:
+ * - SelectingLevelMap requires the map to already exist in CurrentGameData.
+ * - Call AddLevel before SelectingLevelMap for imported or newly generated custom levels.
+ * - GoToSelectedLevel refuses to load if CurrentLevelMap is null.
+ *
+ * Practice/test-map result is being updated instead of a custom level:
+ * - CurrentLevelMap is null.
+ * - Select a custom level before starting the race.
+ *
+ * Best time does not update:
+ * - New times only replace stored times when they are lower.
+ * - Check whether the race is storing to the practice/test map or a custom level.
+ *
+ * Checkpoint split is zero:
+ * - No split was stored at that index.
+ * - The split index may be out of range.
+ * - The level may not have a saved best run yet.
+ *
+ * Replay missing:
+ * - A replay is returned only when it exists, has snapshots, and has duration greater than zero.
+ * - Check that ReplayManager saved a replay before CompleteLevel was called.
+ *
+ * UI does not refresh:
+ * - AddListener only fires when the level-list hash changes.
+ * - Practice-map time changes or assist-setting changes may save data without changing the custom-level list hash.
+ *
+ * Level replacement loses best time:
+ * - This is intentional. ReplaceLevel creates a fresh LevelData record for the edited map.
  *
  * ----------------------------------------------------------------------
  * @section gdm_versions Version History
  *
- * - v1.1: Added hash-based change notifications and observer list.
- * - v1.0: Basic load/save, level selection, add/remove/clear, best time updates.
+ * - v1.4: Added assist settings, best replays, checkpoint splits, editable copies, and level replacement.
+ * - v1.3: Added practice/test-map best time and split storage.
+ * - v1.2: Added hash-based change notifications and observer list.
+ * - v1.1: Added selected-level scene flow and custom-level management.
+ * - v1.0: Basic save/load, level list, and best time tracking.
  */

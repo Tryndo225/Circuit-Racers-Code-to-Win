@@ -1,10 +1,19 @@
 var searchData=
 [
-  ['raceoverlay_0',['RaceOverLay',['../class_race_over_lay.html',1,'']]],
-  ['racetrackplacer_1',['RaceTrackPlacer',['../class_race_track_placer.html',1,'']]],
-  ['readonlyattribute_2',['ReadOnlyAttribute',['../class_read_only_attribute.html',1,'']]],
-  ['readonlydrawer_3',['ReadOnlyDrawer',['../class_read_only_drawer.html',1,'']]],
-  ['removelevelbutton_4',['RemoveLevelButton',['../class_remove_level_button.html',1,'']]],
-  ['resolutiondropdown_5',['ResolutionDropdown',['../classsc_1_1terrain_1_1proceduralpainter_1_1_attributes_1_1_resolution_dropdown.html',1,'sc::terrain::proceduralpainter::Attributes']]],
-  ['resolutiondropdownattributedrawer_6',['ResolutionDropdownAttributeDrawer',['../classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_resolution_dropdown_attribute_drawer.html',1,'sc::terrain::proceduralpainter::PropertyDrawers']]]
+  ['raceoverlay_0',['RaceOverlay',['../class_race_overlay.html',1,'']]],
+  ['raceoverlaysource_1',['RaceOverlaySource',['../class_race_overlay_source.html',1,'']]],
+  ['raceoverlaystate_2',['RaceOverlayState',['../struct_race_overlay_state.html',1,'']]],
+  ['racetimemanager_3',['RaceTimeManager',['../class_race_time_manager.html',1,'']]],
+  ['racetrackplacer_4',['RaceTrackPlacer',['../class_race_track_placer.html',1,'']]],
+  ['readonlyattribute_5',['ReadOnlyAttribute',['../class_read_only_attribute.html',1,'']]],
+  ['readonlydrawer_6',['ReadOnlyDrawer',['../class_read_only_drawer.html',1,'']]],
+  ['removelevelbutton_7',['RemoveLevelButton',['../class_remove_level_button.html',1,'']]],
+  ['replay_8',['Replay',['../class_replay.html',1,'']]],
+  ['replaybutton_9',['ReplayButton',['../class_replay_button.html',1,'']]],
+  ['replaymanager_10',['ReplayManager',['../class_replay_manager.html',1,'']]],
+  ['replaypreviewer_11',['ReplayPreviewer',['../class_replay_previewer.html',1,'']]],
+  ['replayraceoverlaysource_12',['ReplayRaceOverlaySource',['../class_replay_race_overlay_source.html',1,'']]],
+  ['replaysnapshot_13',['ReplaySnapshot',['../struct_replay_snapshot.html',1,'']]],
+  ['resolutiondropdown_14',['ResolutionDropdown',['../classsc_1_1terrain_1_1proceduralpainter_1_1_attributes_1_1_resolution_dropdown.html',1,'sc::terrain::proceduralpainter::Attributes']]],
+  ['resolutiondropdownattributedrawer_15',['ResolutionDropdownAttributeDrawer',['../classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_resolution_dropdown_attribute_drawer.html',1,'sc::terrain::proceduralpainter::PropertyDrawers']]]
 ];

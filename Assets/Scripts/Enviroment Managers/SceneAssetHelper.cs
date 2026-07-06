@@ -1,277 +1,298 @@
 using System;
-using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Serializable, editor-friendly scene reference that stores scene name and path,
-/// supports implicit conversions to and from <see cref="Scene"/>, and can be
-/// invoked to load the scene via <see cref="SceneManagement"/>.
+/// Serializable, editor-friendly scene reference that stores a scene name and path.
 /// </summary>
 /// <remarks>
 /// @ingroup scene_mgmt
-/// @thread Unity main thread only (for <see cref="Run"/> and scene loads).
-/// @invariant When assigned via the Unity Editor, <c>sceneName</c> and <c>scenePath</c>
-///            mirror the selected <c>SceneAsset</c> (kept in sync in editor-only code).
-/// @req <c>SerializableRunnable</c> base provides <c>Run</c>, <c>OnBeforeSerialize</c>, <c>OnAfterDeserialize</c>.
-/// @req <see cref="SceneManagement"/> singleton exists for <see cref="Run"/> to work.
+/// @brief Wraps a Unity scene reference so it can be serialized, compared, converted, and executed as a scene load action.
+///
+/// This helper stores the scene name and scene path. In the Unity Editor, it can also keep those
+/// values synchronized with a selected <c>SceneAsset</c>.
+///
+/// It can be used as a runnable scene action through <see cref="Run"/>, which loads the scene through
+/// <see cref="SceneManagement"/>.
+///
+/// Threading:
+/// - Unity main thread only for <see cref="Run"/> and scene loading.
 /// </remarks>
 [Serializable]
 public class SceneAssetHelper : SerializableRunnable
 {
-    #region Inspector (backing data)
+	#region Inspector (backing data)
 
-    /// <summary>
-    /// Backing scene name. Kept in sync with the editor scene asset when available.
-    /// </summary>
-    [SerializeField, ReadOnly] protected string sceneName;
+	/// <summary>
+	/// Backing scene name.
+	/// </summary>
+	/// <remarks>
+	/// In the editor, this is kept in sync with the selected scene asset when available.
+	/// </remarks>
+	[Tooltip("Scene name stored from the selected scene asset.")]
+	[SerializeField, ReadOnly] protected string sceneName;
 
-    /// <summary>
-    /// Backing scene path (as in Build Settings / AssetDatabase). Kept in sync with editor asset.
-    /// </summary>
-    [SerializeField, ReadOnly] protected string scenePath;
+	/// <summary>
+	/// Backing scene path.
+	/// </summary>
+	/// <remarks>
+	/// In the editor, this is kept in sync with the selected scene asset when available.
+	/// </remarks>
+	[Tooltip("Scene path stored from the selected scene asset.")]
+	[SerializeField, ReadOnly] protected string scenePath;
 
 #if UNITY_EDITOR
-    /// <summary>
-    /// Editor-only scene asset reference used to maintain <see cref="sceneName"/> and <see cref="scenePath"/>.
-    /// </summary>
-    [SerializeField] private UnityEditor.SceneAsset sceneAsset;
+	/// <summary>
+	/// Editor-only scene asset reference used to maintain <see cref="sceneName"/> and <see cref="scenePath"/>.
+	/// </summary>
+	[Tooltip("Editor-only scene asset reference used to fill the scene name and scene path.")]
+	[SerializeField] private UnityEditor.SceneAsset sceneAsset;
 #endif
 
-    #endregion
+	#endregion
 
-    #region Public properties
+	#region Public properties
 
-    /// <summary>
-    /// Scene name (read-only). If no scene is assigned, this is an empty string.
-    /// </summary>
-    public string Name => sceneName;
+	/// <summary>
+	/// Gets the stored scene name.
+	/// </summary>
+	public string Name => sceneName;
 
-    /// <summary>
-    /// Scene path (read-only). If no scene is assigned, this is an empty string.
-    /// </summary>
-    public string Path => scenePath;
+	/// <summary>
+	/// Gets the stored scene path.
+	/// </summary>
+	public string Path => scenePath;
 
-    #endregion
+	#endregion
 
-    #region Constructors
+	#region Constructors
 
-    /// <summary>
-    /// Default constructor. Initializes with empty name and path.
-    /// </summary>
-    public SceneAssetHelper()
-    {
-        sceneName = string.Empty;
-        scenePath = string.Empty;
-    }
+	/// <summary>
+	/// Creates an empty scene reference.
+	/// </summary>
+	public SceneAssetHelper()
+	{
+		sceneName = string.Empty;
+		scenePath = string.Empty;
+	}
 
 #if UNITY_EDITOR
-    /// <summary>
-    /// Editor-only constructor from a <c>SceneAsset</c>. Populates name and path.
-    /// </summary>
-    /// <param name="scene">Scene asset selected in the editor.</param>
-    public SceneAssetHelper(UnityEditor.SceneAsset scene)
-    {
-        sceneAsset = scene;
-        ConsistencyKeep();
-    }
+	/// <summary>
+	/// Creates a scene reference from an editor scene asset.
+	/// </summary>
+	/// <param name="scene">Scene asset selected in the editor.</param>
+	public SceneAssetHelper(UnityEditor.SceneAsset scene)
+	{
+		sceneAsset = scene;
+		ConsistencyKeep();
+	}
 #endif
 
-    /// <summary>
-    /// Direct constructor when you already know name and path.
-    /// </summary>
-    /// <param name="sceneName">Scene name.</param>
-    /// <param name="scenePath">Scene path (Assets/... or build path).</param>
-    public SceneAssetHelper(string sceneName, string scenePath)
-    {
-        this.sceneName = sceneName;
-        this.scenePath = scenePath;
-    }
+	/// <summary>
+	/// Creates a scene reference from a known scene name and scene path.
+	/// </summary>
+	/// <param name="sceneName">Scene name.</param>
+	/// <param name="scenePath">Scene path.</param>
+	public SceneAssetHelper(string sceneName, string scenePath)
+	{
+		this.sceneName = sceneName;
+		this.scenePath = scenePath;
+	}
 
-    #endregion
+	#endregion
 
-    #region Execution
+	#region Execution
 
-    /// <summary>
-    /// Loads this scene via <see cref="SceneManagement.ChangeScene(SceneAssetHelper)"/>.
-    /// </summary>
-    public override void Run()
-    {
-        SceneManagement.Instance.ChangeScene(this);
-    }
+	/// <summary>
+	/// Loads this scene through <see cref="SceneManagement"/>.
+	/// </summary>
+	public override void Run()
+	{
+		SceneManagement.Instance.ChangeScene(this);
+	}
 
-    #endregion
+	#endregion
 
-    #region Serialization hooks
+	#region Serialization hooks
 
 #if UNITY_EDITOR
-    /// <summary>
-    /// Editor-only pre-serialize hook. Ensures <see cref="sceneName"/> and <see cref="scenePath"/> reflect the editor asset.
-    /// </summary>
-    public override void OnBeforeSerialize()
-    {
-        ConsistencyKeep();
-    }
+	/// <summary>
+	/// Updates stored scene data from the editor scene asset before serialization.
+	/// </summary>
+	public override void OnBeforeSerialize()
+	{
+		ConsistencyKeep();
+	}
 
-    /// <summary>
-    /// Editor-only post-deserialize hook. No-op (data comes from <see cref="ConsistencyKeep"/>).
-    /// </summary>
-    public override void OnAfterDeserialize()
-    {
-    }
+	/// <summary>
+	/// Handles Unity deserialization.
+	/// </summary>
+	/// <remarks>
+	/// This is intentionally empty because editor synchronization is handled before serialization.
+	/// </remarks>
+	public override void OnAfterDeserialize()
+	{
+	}
 #else
-    /// <summary>
-    /// Runtime pre-serialize hook. No-op at runtime (no editor asset available).
-    /// </summary>
-    public override void OnBeforeSerialize() { }
+	/// <summary>
+	/// Handles Unity pre-serialization at runtime.
+	/// </summary>
+	/// <remarks>
+	/// This is intentionally empty because the editor scene asset is not available at runtime.
+	/// </remarks>
+	public override void OnBeforeSerialize() { }
 
-    /// <summary>
-    /// Runtime post-deserialize hook. No-op at runtime.
-    /// </summary>
-    public override void OnAfterDeserialize() { }
+	/// <summary>
+	/// Handles Unity post-deserialization at runtime.
+	/// </summary>
+	/// <remarks>
+	/// This is intentionally empty because the stored scene name and path are already serialized directly.
+	/// </remarks>
+	public override void OnAfterDeserialize() { }
 #endif
 
-    /// <summary>
-    /// Synchronizes <see cref="sceneName"/> and <see cref="scenePath"/> with the editor asset (editor only).
-    /// If the asset is null, clears both fields.
-    /// </summary>
-    private void ConsistencyKeep()
-    {
+	/// <summary>
+	/// Synchronizes <see cref="sceneName"/> and <see cref="scenePath"/> with the editor scene asset.
+	/// </summary>
+	/// <remarks>
+	/// In the editor, assigned scene assets populate the stored scene name and path.
+	/// When no asset is assigned, both fields are cleared.
+	/// </remarks>
+	private void ConsistencyKeep()
+	{
 #if UNITY_EDITOR
-        if (sceneAsset != null)
-        {
-            sceneName = sceneAsset.name;
-            scenePath = UnityEditor.AssetDatabase.GetAssetPath(sceneAsset);
-        }
-        else
-        {
-            sceneName = string.Empty;
-            scenePath = string.Empty;
-        }
+		if (sceneAsset != null)
+		{
+			sceneName = sceneAsset.name;
+			scenePath = UnityEditor.AssetDatabase.GetAssetPath(sceneAsset);
+		}
+		else
+		{
+			sceneName = string.Empty;
+			scenePath = string.Empty;
+		}
 #endif
-    }
+	}
 
-    #endregion
+	#endregion
 
-    #region Implicit conversions
+	#region Implicit conversions
 
-    /// <summary>
-    /// Creates a helper from a loaded <see cref="Scene"/> by copying name and path.
-    /// </summary>
-    /// <param name="scene">Loaded Unity scene.</param>
-    public static implicit operator SceneAssetHelper(Scene scene)
-    {
-        return new SceneAssetHelper(scene.name, scene.path);
-    }
+	/// <summary>
+	/// Creates a scene helper from a loaded Unity scene.
+	/// </summary>
+	/// <param name="scene">Loaded Unity scene.</param>
+	public static implicit operator SceneAssetHelper(Scene scene)
+	{
+		return new SceneAssetHelper(scene.name, scene.path);
+	}
 
-    /// <summary>
-    /// Converts the helper to a loaded <see cref="Scene"/> using its stored <see cref="scenePath"/>.
-    /// </summary>
-    /// <param name="sceneAssetHelper">Helper to convert.</param>
-    /// <returns>A scene resolved by path. If not loaded, returns an invalid Scene (Scene.isLoaded == false).</returns>
-    public static implicit operator Scene(SceneAssetHelper sceneAssetHelper)
-    {
-        return SceneManager.GetSceneByPath(sceneAssetHelper.scenePath);
-    }
+	/// <summary>
+	/// Resolves a Unity scene from a scene helper's stored path.
+	/// </summary>
+	/// <param name="sceneAssetHelper">Scene helper to convert.</param>
+	/// <returns>Scene resolved by path.</returns>
+	/// <remarks>
+	/// If the scene is not loaded, Unity returns an invalid scene.
+	/// </remarks>
+	public static implicit operator Scene(SceneAssetHelper sceneAssetHelper)
+	{
+		return SceneManager.GetSceneByPath(sceneAssetHelper.scenePath);
+	}
 
 #if UNITY_EDITOR
-    /// <summary>
-    /// Editor-only implicit conversion from <c>SceneAsset</c> to <see cref="SceneAssetHelper"/>.
-    /// </summary>
-    /// <param name="sceneAsset">Scene asset reference.</param>
-    public static implicit operator SceneAssetHelper(UnityEditor.SceneAsset sceneAsset)
-    {
-        return new SceneAssetHelper(sceneAsset);
-    }
+	/// <summary>
+	/// Creates a scene helper from an editor scene asset.
+	/// </summary>
+	/// <param name="sceneAsset">Scene asset reference.</param>
+	public static implicit operator SceneAssetHelper(UnityEditor.SceneAsset sceneAsset)
+	{
+		return new SceneAssetHelper(sceneAsset);
+	}
 #endif
 
-    #endregion
+	#endregion
 
-    #region Equality and hashing
+	#region Equality and hashing
 
-    /// <summary>
-    /// Equality operator. Compares by <see cref="scenePath"/>. Treats two nulls as equal.
-    /// </summary>
-    public static bool operator ==(SceneAssetHelper a, SceneAssetHelper b)
-    {
-        if (a is not null && b is not null)
-        {
-            return a.scenePath == b.scenePath;
-        }
-        return a is null && b is null;
-    }
+	/// <summary>
+	/// Checks whether two scene helpers reference the same scene path.
+	/// </summary>
+	/// <param name="a">First scene helper.</param>
+	/// <param name="b">Second scene helper.</param>
+	/// <returns><c>true</c> when both helpers are null or have the same scene path; otherwise <c>false</c>.</returns>
+	public static bool operator ==(SceneAssetHelper a, SceneAssetHelper b)
+	{
+		if (a is not null && b is not null)
+		{
+			return a.scenePath == b.scenePath;
+		}
+		return a is null && b is null;
+	}
 
-    /// <summary>
-    /// Inequality operator. Logical negation of <see cref="operator =="/>.
-    /// </summary>
-    public static bool operator !=(SceneAssetHelper a, SceneAssetHelper b)
-    {
-        return !(a == b);
-    }
+	/// <summary>
+	/// Checks whether two scene helpers reference different scene paths.
+	/// </summary>
+	/// <param name="a">First scene helper.</param>
+	/// <param name="b">Second scene helper.</param>
+	/// <returns><c>true</c> when the helpers differ; otherwise <c>false</c>.</returns>
+	public static bool operator !=(SceneAssetHelper a, SceneAssetHelper b)
+	{
+		return !(a == b);
+	}
 
-    /// <summary>
-    /// Object equality override. Compares by <see cref="scenePath"/>.
-    /// </summary>
-    public override bool Equals(object obj)
-    {
-        if (obj is SceneAssetHelper other)
-        {
-            return scenePath == other.scenePath;
-        }
-        return false;
-    }
+	/// <summary>
+	/// Checks whether this scene helper equals another object.
+	/// </summary>
+	/// <param name="obj">Object to compare with this scene helper.</param>
+	/// <returns><c>true</c> when the other object is a scene helper with the same scene path; otherwise <c>false</c>.</returns>
+	public override bool Equals(object obj)
+	{
+		if (obj is SceneAssetHelper other)
+		{
+			return scenePath == other.scenePath;
+		}
+		return false;
+	}
 
-    /// <summary>
-    /// Hash code override based on <see cref="scenePath"/>.
-    /// </summary>
-    public override int GetHashCode()
-    {
-        return scenePath != null ? scenePath.GetHashCode() : 0;
-    }
+	/// <summary>
+	/// Computes a hash code from the stored scene path.
+	/// </summary>
+	/// <returns>Hash code for this scene helper.</returns>
+	public override int GetHashCode()
+	{
+		return scenePath != null ? scenePath.GetHashCode() : 0;
+	}
 
-    #endregion
-
-    #region ISerializable
-
-    /// <summary>
-    /// Adds <see cref="sceneName"/> and <see cref="scenePath"/> to the serialization info.
-    /// </summary>
-    /// <param name="info">Serialization info bag.</param>
-    /// <param name="context">Streaming context.</param>
-    public void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        info.AddValue("sceneName", sceneName);
-        info.AddValue("scenePath", scenePath);
-    }
-
-    #endregion
+	#endregion
 }
 
 /// <summary>
-/// A <see cref="SceneAssetHelper"/> extended with an <see cref="AudioClip"/> to be used
-/// by <see cref="SceneManagement"/> for automatic background music selection.
+/// Scene reference paired with an audio clip.
 /// </summary>
 /// <remarks>
 /// @ingroup scene_mgmt
+/// @brief Extends <see cref="SceneAssetHelper"/> with a music clip used by <see cref="SceneManagement"/>.
 /// </remarks>
 [Serializable]
 public class SceneAssetHelperAudioClipPair : SceneAssetHelper
 {
-    #region Inspector
+	#region Inspector
 
-    /// <summary>
-    /// Music clip to play when this scene is loaded.
-    /// </summary>
-    [SerializeField] private AudioClip audioClip;
+	/// <summary>
+	/// Music clip associated with this scene.
+	/// </summary>
+	[Tooltip("Music clip to play when this scene is loaded.")]
+	[SerializeField] private AudioClip audioClip;
 
-    #endregion
+	#endregion
 
-    #region Public API
+	#region Public API
 
-    /// <summary>
-    /// Read-only access to the configured music clip.
-    /// </summary>
-    public AudioClip AudioClip => audioClip;
+	/// <summary>
+	/// Gets the music clip associated with this scene.
+	/// </summary>
+	public AudioClip AudioClip => audioClip;
 
-    #endregion
+	#endregion
 }

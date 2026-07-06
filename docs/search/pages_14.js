@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['ui_20bits_0',['Menus &amp;amp; UI Bits',['../index.html#autotoc_md60',1,'']]],
-  ['usage_1',['Usage',['../group__audio__mgr.html#audio_mgr_usage',1,'Usage'],['../group__car__ctrl.html#car_usage',1,'Usage'],['../group__game__data__mgr.html#gdm_usage',1,'Usage'],['../group__scene__mgr.html#scene_mgr_usage',1,'Usage'],['../group__track__mng.html#track_mng_usage',1,'Usage'],['../group__ui.html#ui_usage',1,'Usage']]],
-  ['usage_20examples_2',['Usage Examples',['../group__editor__util.html#editor_util_usage',1,'']]],
-  ['usage_20not_20recommended_3',['Usage (Not Recommended)',['../group__car__ctrl__deprecated.html#car_ctrl_deprecated_usage',1,'']]]
+  ['validation_0',['Validation',['../group__level__gen.html#level_gen_validation',1,'']]],
+  ['vehicle_20handling_1',['Vehicle Handling',['../md__specification.html#autotoc_md174',1,'']]],
+  ['version_20history_2',['Version History',['../group__audio__mgr.html#audio_mgr_versions',1,'Version History'],['../group__car__ctrl.html#car_versions',1,'Version History'],['../group__core__utils.html#core_utils_versions',1,'Version History'],['../group__editor__attrs.html#editor_attrs_versions',1,'Version History'],['../group__editor__util.html#editor_util_versions',1,'Version History'],['../group__game__data.html#gdm_versions',1,'Version History'],['../group__level__gen.html#level_gen_versions',1,'Version History'],['../group__replay__system.html#replay_system_versions',1,'Version History'],['../group__scene__mgmt.html#scene_mgmt_versions',1,'Version History'],['../group__track__mng.html#track_mng_versions',1,'Version History'],['../group__ui.html#ui_versions',1,'Version History']]],
+  ['view_3',['View',['../md__specification.html#autotoc_md200',1,'Race View'],['../md__specification.html#autotoc_md201',1,'Replay View']]],
+  ['vision_4',['Long-Term Vision',['../md__specification.html#autotoc_md206',1,'']]],
+  ['visual_20style_5',['Visual Style',['../md__specification.html#autotoc_md183',1,'']]]
 ];

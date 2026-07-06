@@ -1,7 +1,7 @@
 <map id="SceneAssetHelper" name="SceneAssetHelper">
-<area shape="rect" id="Node000001" title="Serializable, editor&#45;friendly scene reference that stores scene name and path, supports implicit conv..." alt="" coords="5,299,197,709"/>
-<area shape="rect" id="Node000002" href="$class_serializable_runnable.html" title="Base class for serializable “commands” that expose a callable entry point via Run." alt="" coords="30,139,172,251"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,266,104,299,99,299,99,266"/>
+<area shape="rect" id="Node000001" title="Serializable, editor&#45;friendly scene reference that stores a scene name and path." alt="" coords="5,299,197,688"/>
+<area shape="rect" id="Node000002" href="$class_serializable_runnable.html" title="Base class for serializable commands that expose a callable entry point through Run." alt="" coords="30,139,172,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,263,104,299,99,299,101,269"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="21,5,182,91"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,106,104,139,99,139,99,106"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,103,104,139,99,139,101,108"/>
 </map>

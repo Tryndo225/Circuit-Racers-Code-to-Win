@@ -1,5 +1,7 @@
 <map id="DriveTrainController" name="DriveTrainController">
-<area shape="rect" id="Node000001" title="Handles steering, throttle, braking, anti&#45;roll, and wheel friction setup for a 4&#45;wheel vehicle." alt="" coords="5,123,156,491"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="30,5,131,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,89,84,123,78,123,78,89"/>
+<area shape="rect" id="Node000001" title="Handles drivetrain, steering, braking, grip modifiers, and wheel visuals for a four&#45;wheel vehicle." alt="" coords="35,296,221,829"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,48,106,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,129,90,296,85,297,63,135"/>
+<area shape="rect" id="Node000003" href="$struct_wheel_friction_settings.html" title="Serializable tuning container for one Unity WheelFrictionCurve." alt="" coords="130,5,269,160"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,157,173,280,168,279,188,162"/>
 </map>

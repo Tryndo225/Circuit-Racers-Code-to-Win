@@ -1,0 +1,7 @@
+<map id="ImportExportManager.EncodeLevel" name="ImportExportManager.EncodeLevel">
+<area shape="rect" id="Node000001" title="Encodes a LevelMap into a compact shareable string." alt="" coords="483,5,677,48"/>
+<area shape="rect" id="Node000002" href="$class_import_export_manager.html#ad9421a683f04ca3046b3a9921e10511b" title="Encodes a level map and copies the encoded string to the system clipboard." alt="" coords="247,5,435,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="465,27,436,29,436,24,470,27"/>
+<area shape="rect" id="Node000003" href="$class_level_entry.html#ad4692d213a00249c35ca52f8f5080a59" title="Exports this entry&#39;s level data to the system clipboard." alt="" coords="5,13,199,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="228,27,199,29,199,24,234,26"/>
+</map>
