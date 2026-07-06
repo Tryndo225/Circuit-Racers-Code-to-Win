@@ -174,11 +174,14 @@ public struct Coordinates : IEquatable<Coordinates>, ISerializable
 /// </summary>
 /// <remarks>
 /// @ingroup level_gen
-/// @brief Produces <see cref="LevelMap"/> instances by carving connected roads through a tile grid.
+/// @brief Produces validated <see cref="LevelMap"/> instances by carving connected roads through a tile grid.
 ///
-/// The generator starts from a random start position, repeatedly chooses target points, uses a flood-fill
-/// search to find paths, backtracks those paths into road tiles, and applies spacer tiles around roads
-/// to keep generated roads separated.
+/// The generator starts from a random start position, prepares an initial opening, repeatedly chooses
+/// target points, uses a flood-fill search to find paths, backtracks those paths into road tiles,
+/// and applies spacer tiles around roads to keep generated roads separated.
+///
+/// Circuit maps are closed by connecting the last generated road point back to the start point.
+/// Generated maps are checked with <see cref="LevelMapValidator"/> before being returned.
 ///
 /// Tile values used by the generator come from <see cref="LevelMap.LevelTileTypes"/>:
 /// - <see cref="LevelMap.LevelTileTypes.Grass"/>: empty tile.
@@ -239,7 +242,7 @@ public static class LevelGenerator
 	/// <param name="stepLength">Maximum coordinate offset used when attempting to pick a target.</param>
 	/// <param name="maxAttempts">Maximum number of target-picking attempts per step.</param>
 	/// <param name="seed">Seed used to initialize the random generator.</param>
-	/// <returns>A populated <see cref="LevelMap"/>.</returns>
+	/// <returns>A populated and validated <see cref="LevelMap"/>.</returns>
 	public static LevelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLength, int maxAttempts, int seed)
 	{
 		return GenerateLevel(width, height, isCircuit, steps, stepLength, maxAttempts, new Random(seed));
@@ -255,9 +258,11 @@ public static class LevelGenerator
 	/// <param name="stepLength">Maximum coordinate offset used when attempting to pick a target.</param>
 	/// <param name="maxAttempts">Maximum number of target-picking attempts per step.</param>
 	/// <param name="rng">Random generator used for all random choices during generation.</param>
-	/// <returns>A populated <see cref="LevelMap"/>.</returns>
+	/// <returns>A populated and validated <see cref="LevelMap"/>.</returns>
 	/// <remarks>
-	/// If the generated road coverage is too small, generation retries recursively using the same random source.
+	/// If circuit finishing fails, generated road coverage is too small, or the final map fails
+	/// <see cref="LevelMapValidator"/> validation, generation retries recursively using the same
+	/// random source.
 	/// </remarks>
 	public static LevelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLength, int maxAttempts, Random rng)
 	{
@@ -299,7 +304,14 @@ public static class LevelGenerator
 
 		if (isCircuit)
 		{
-			CircuitFinisher(levelMap, lastValidPoint);
+			try
+			{
+				CircuitFinisher(levelMap, lastValidPoint);
+			}
+			catch
+			{
+				return GenerateLevel(width, height, isCircuit, steps, stepLength, maxAttempts, rng);
+			}
 		}
 		else
 		{
@@ -307,6 +319,11 @@ public static class LevelGenerator
 		}
 
 		if (levelMap.RoadTileCount < levelMap.Height * levelMap.Width / 5)
+		{
+			return GenerateLevel(width, height, isCircuit, steps, stepLength, maxAttempts, rng);
+		}
+
+		if (!LevelMapValidator.Validate(levelMap))
 		{
 			return GenerateLevel(width, height, isCircuit, steps, stepLength, maxAttempts, rng);
 		}
@@ -322,7 +339,7 @@ public static class LevelGenerator
 	/// <param name="currentPoint">Current road end from which the next target should be reached.</param>
 	/// <param name="levelMap">Level map being generated.</param>
 	/// <param name="stepLength">Maximum coordinate offset used when picking a target.</param>
-	/// <param name="maxAttempts">Maximum number of attempts to find a valid target.</param>
+	/// <param name="maxAttempts">Maximum number of candidate coordinates to test.</param>
 	/// <param name="rng">Random generator used for target selection.</param>
 	/// <returns>New road end point when successful; otherwise <c>(-1, -1)</c>.</returns>
 	/// <remarks>
@@ -361,9 +378,13 @@ public static class LevelGenerator
 	/// <param name="lastPoint">Current road end used as the center for random target selection.</param>
 	/// <param name="levelMap">Level map being generated.</param>
 	/// <param name="stepLength">Maximum coordinate offset from <paramref name="lastPoint"/>.</param>
-	/// <param name="maxAttempts">Maximum number of attempts to find a valid target.</param>
+	/// <param name="maxAttempts">Maximum number of candidate coordinates to test.</param>
 	/// <param name="rng">Random generator used for target selection.</param>
 	/// <returns>A valid target coordinate, or <c>(-1, -1)</c> when no valid target was found.</returns>
+	/// <remarks>
+	/// Out-of-bounds candidates count as attempts. This keeps target selection bounded even when the
+	/// current road end is near the map edge.
+	/// </remarks>
 	private static Coordinates PickTarget(Coordinates lastPoint, LevelMap levelMap, int stepLength, int maxAttempts, Random rng)
 	{
 		int count = 0;
@@ -371,6 +392,8 @@ public static class LevelGenerator
 
 		while (count < maxAttempts)
 		{
+			count++;
+
 			int newX = lastPoint.X + rng.Next(-stepLength, stepLength + 1);
 			int newY = lastPoint.Y + rng.Next(-stepLength, stepLength + 1);
 
@@ -385,7 +408,6 @@ public static class LevelGenerator
 			{
 				return target;
 			}
-			count++;
 		}
 
 		return new Coordinates(-1, -1);
@@ -451,8 +473,10 @@ public static class LevelGenerator
 	/// <param name="levelMap">Level map being generated.</param>
 	/// <param name="rng">Random generator used to choose the opening direction when applicable.</param>
 	/// <remarks>
-	/// Tiles around the start point are first marked as spacers. The method then opens horizontal or vertical
-	/// neighboring tiles so generation can continue away from the start point.
+	/// Tiles around the start point are first marked as spacers. The actual start tile is then restored
+	/// to a track tile. For circuit tracks, two opposite neighboring tiles are reopened so the circuit can
+	/// reconnect through the start/finish tile. For point-to-point tracks, one neighboring tile is reopened
+	/// so generation can continue away from the start.
 	/// </remarks>
 	private static void TrackStarter(LevelMap levelMap, Random rng)
 	{
@@ -462,44 +486,79 @@ public static class LevelGenerator
 			{
 				int checkX = levelMap.StartPoint.X + i;
 				int checkY = levelMap.StartPoint.Y + j;
+
 				if (levelMap.Tiles.InBounds(checkX, checkY))
 				{
-					levelMap.Tiles[checkX, checkY] = SpacerTile; // Fill the area around start point
+					levelMap.Tiles[checkX, checkY] = SpacerTile;
 				}
 			}
 		}
 
-		if (rng.Next(0, 2) % 2 == 0 && levelMap.Tiles.InBounds(levelMap.StartPoint.X - 1, levelMap.StartPoint.Y) && levelMap.Tiles.InBounds(levelMap.StartPoint.X + 1, levelMap.StartPoint.Y))
+		// Keep the actual start tile as track.
+		levelMap.Tiles.At(levelMap.StartPoint) = TrackTile;
+
+		bool canOpenHorizontal =
+			levelMap.Tiles.InBounds(levelMap.StartPoint.X - 1, levelMap.StartPoint.Y) &&
+			levelMap.Tiles.InBounds(levelMap.StartPoint.X + 1, levelMap.StartPoint.Y);
+
+		bool canOpenVertical =
+			levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y - 1) &&
+			levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y + 1);
+
+		bool useHorizontal = rng.Next(0, 2) == 0;
+
+		if (useHorizontal && canOpenHorizontal)
 		{
-			// Horizontal start
 			if (levelMap.Circuit)
 			{
 				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = GrassTile;
 				levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = GrassTile;
 			}
-			else if (rng.Next(0, 2) % 2 == 0)
+			else if (rng.Next(0, 2) == 0)
+			{
 				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = GrassTile;
+			}
 			else
+			{
 				levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = GrassTile;
+			}
 		}
-		else if (levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y - 1) && levelMap.Tiles.InBounds(levelMap.StartPoint.X, levelMap.StartPoint.Y + 1))
+		else if (canOpenVertical)
 		{
-			// Vertical start
 			if (levelMap.Circuit)
 			{
 				levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y + 1] = GrassTile;
 				levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y - 1] = GrassTile;
 			}
-			else if (rng.Next(0, 2) % 2 == 0)
-				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = GrassTile;
+			else if (rng.Next(0, 2) == 0)
+			{
+				levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y + 1] = GrassTile;
+			}
 			else
+			{
+				levelMap.Tiles[levelMap.StartPoint.X, levelMap.StartPoint.Y - 1] = GrassTile;
+			}
+		}
+		else if (canOpenHorizontal)
+		{
+			if (levelMap.Circuit)
+			{
+				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = GrassTile;
 				levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = GrassTile;
+			}
+			else if (rng.Next(0, 2) == 0)
+			{
+				levelMap.Tiles[levelMap.StartPoint.X + 1, levelMap.StartPoint.Y] = GrassTile;
+			}
+			else
+			{
+				levelMap.Tiles[levelMap.StartPoint.X - 1, levelMap.StartPoint.Y] = GrassTile;
+			}
 		}
 		else
 		{
-			throw new Exception("Circuit starting failed");
+			throw new Exception("Track starting failed");
 		}
-
 	}
 
 	#endregion Circuit Starting
@@ -514,6 +573,7 @@ public static class LevelGenerator
 	/// <remarks>
 	/// The method uses the same flood-fill and backtracking process as normal road generation.
 	/// On success, <see cref="LevelMap.FinishPoint"/> is set to <see cref="LevelMap.StartPoint"/>.
+	/// If no connection can be found, the method throws and the caller may retry generation.
 	/// </remarks>
 	private static void CircuitFinisher(LevelMap levelMap, Coordinates lastPoint)
 	{

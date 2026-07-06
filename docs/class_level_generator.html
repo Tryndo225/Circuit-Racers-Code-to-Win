@@ -137,8 +137,9 @@ Static Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Procedural level generator for circuit and point-to-point tracks. </p>
-<p>Produces LevelMap instances by carving connected roads through a tile grid.</p>
-<p>The generator starts from a random start position, repeatedly chooses target points, uses a flood-fill search to find paths, backtracks those paths into road tiles, and applies spacer tiles around roads to keep generated roads separated.</p>
+<p>Produces validated LevelMap instances by carving connected roads through a tile grid.</p>
+<p>The generator starts from a random start position, prepares an initial opening, repeatedly chooses target points, uses a flood-fill search to find paths, backtracks those paths into road tiles, and applies spacer tiles around roads to keep generated roads separated.</p>
+<p>Circuit maps are closed by connecting the last generated road point back to the start point. Generated maps are checked with LevelMapValidator before being returned.</p>
 <p>Tile values used by the generator come from LevelMap.LevelTileTypes:</p><ul>
 <li>LevelMap.LevelTileTypes.Grass: empty tile.</li>
 <li>LevelMap.LevelTileTypes.Track: road tile.</li>
@@ -151,7 +152,7 @@ Static Public Member Functions</h2></td></tr>
 <li>It mutates the LevelMap and tile arrays it owns or receives, so callers should not share the same map instance across threads. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="_level_generator_8cs_source.html#l00194">194</a> of file <a class="el" href="_level_generator_8cs_source.html">LevelGenerator.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_level_generator_8cs_source.html#l00197">197</a> of file <a class="el" href="_level_generator_8cs_source.html">LevelGenerator.cs</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="af36f7dc329dcf47670ffdd4a97b416ca" name="af36f7dc329dcf47670ffdd4a97b416ca"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af36f7dc329dcf47670ffdd4a97b416ca">&#9670;&#160;</a></span>GenerateLevel() <span class="overload">[1/2]</span></h2>
@@ -218,13 +219,13 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A populated LevelMap.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A populated and validated LevelMap.</dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_level_generator_8cs_source.html#l00243">243</a> of file <a class="el" href="_level_generator_8cs_source.html">LevelGenerator.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_level_generator_8cs_source.html#l00246">246</a> of file <a class="el" href="_level_generator_8cs_source.html">LevelGenerator.cs</a>.</p>
 
-<p class="reference">References <a class="el" href="_level_generator_8cs_source.html#l00243">GenerateLevel()</a>.</p>
+<p class="reference">References <a class="el" href="_level_generator_8cs_source.html#l00246">GenerateLevel()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_button_script_8cs_source.html#l00328">GenerateLevelButton.Action()</a>, <a class="el" href="_level_generator_8cs_source.html#l00243">GenerateLevel()</a>, and <a class="el" href="_level_generator_8cs_source.html#l00262">GenerateLevel()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_button_script_8cs_source.html#l00328">GenerateLevelButton.Action()</a>, <a class="el" href="_level_generator_8cs_source.html#l00246">GenerateLevel()</a>, and <a class="el" href="_level_generator_8cs_source.html#l00267">GenerateLevel()</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -303,16 +304,16 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A populated LevelMap.</dd></dl>
-<p>If the generated road coverage is too small, generation retries recursively using the same random source. </p>
+<dl class="section return"><dt>Returns</dt><dd>A populated and validated LevelMap.</dd></dl>
+<p>If circuit finishing fails, generated road coverage is too small, or the final map fails LevelMapValidator validation, generation retries recursively using the same random source. </p>
 
-<p class="definition">Definition at line <a class="el" href="_level_generator_8cs_source.html#l00262">262</a> of file <a class="el" href="_level_generator_8cs_source.html">LevelGenerator.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_level_generator_8cs_source.html#l00267">267</a> of file <a class="el" href="_level_generator_8cs_source.html">LevelGenerator.cs</a>.</p>
 
-<p class="reference">References <a class="el" href="_level_generator_8cs_source.html#l00243">GenerateLevel()</a>, <a class="el" href="_level_map_8cs_source.html#l00054">LevelMap.Height</a>, <a class="el" href="_level_map_8cs_source.html#l00093">LevelMap.RoadTileCount</a>, <a class="el" href="_level_map_8cs_source.html#l00066">LevelMap.StartPoint</a>, <a class="el" href="_level_map_8cs_source.html#l00117">LevelMap.Tiles</a>, and <a class="el" href="_level_map_8cs_source.html#l00048">LevelMap.Width</a>.</p>
+<p class="reference">References <a class="el" href="_level_generator_8cs_source.html#l00246">GenerateLevel()</a>, <a class="el" href="_level_map_8cs_source.html#l00054">LevelMap.Height</a>, <a class="el" href="_level_map_8cs_source.html#l00093">LevelMap.RoadTileCount</a>, <a class="el" href="_level_map_8cs_source.html#l00066">LevelMap.StartPoint</a>, <a class="el" href="_level_map_8cs_source.html#l00117">LevelMap.Tiles</a>, <a class="el" href="_level_map_validator_8cs_source.html#l00031">LevelMapValidator.Validate()</a>, and <a class="el" href="_level_map_8cs_source.html#l00048">LevelMap.Width</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="class_level_generator_a326a48767ad027968c11e9facaf67151_cgraph.svg" width="454" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="class_level_generator_a326a48767ad027968c11e9facaf67151_cgraph.svg" width="454" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
