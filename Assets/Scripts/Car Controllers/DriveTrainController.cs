@@ -537,9 +537,16 @@ public class DriveTrainController : MonoBehaviour
 	/// <returns><c>true</c> if the car is in reverse mode after this check; otherwise <c>false</c>.</returns>
 	private bool ReverseCheck(float braking)
 	{
-		bool brakingCheck = braking > 0.1f;
+		const float inputDeadzone = 0.05f;
+		const float reverseStartSpeed = 1f;
+		const float backwardsSpeedThreshold = 0.5f;
 
-		if (brakingCheck && CalculateSpeed() < 1f)
+		bool brakingCheck = braking > inputDeadzone;
+
+		float signedForwardSpeed = Vector3.Dot(_carRigidBody.linearVelocity, transform.forward);
+		bool movingBackwards = signedForwardSpeed < -backwardsSpeedThreshold;
+
+		if (brakingCheck && (CalculateSpeed() < reverseStartSpeed || movingBackwards))
 		{
 			_isReversing = true;
 			return true;

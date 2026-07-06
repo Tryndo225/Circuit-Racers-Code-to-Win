@@ -848,6 +848,19 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		CurrentLevelMap = map;
 	}
 
+	/// <summary>
+	/// Clears the currently selected level map.
+	/// </summary>
+	/// <remarks>
+	/// This removes the current level selection by setting <see cref="CurrentLevelMap"/>
+	/// to <c>null</c>. It is useful when leaving generated-track flow or starting a
+	/// scene-defined race where no saved level map should be active.
+	/// </remarks>
+	public void UnselectLevelMap()
+	{
+		CurrentLevelMap = null;
+	}
+
 	#endregion
 
 	#region Progression

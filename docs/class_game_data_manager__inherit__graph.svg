@@ -89,7 +89,7 @@ var sectionId = 'dynsection-0';
 <text xml:space="preserve" text-anchor="start" x="14" y="-54.25" font-family="Helvetica,sans-Serif" font-size="10.00">GetCurrentMapReplay()</text>
 <text xml:space="preserve" text-anchor="start" x="4" y="-38.25" font-family="Helvetica,sans-Serif" font-size="10.00">+</text>
 <text xml:space="preserve" text-anchor="start" x="14" y="-38.25" font-family="Helvetica,sans-Serif" font-size="10.00">GetCurrentMapSplit()</text>
-<text xml:space="preserve" text-anchor="start" x="14" y="-22.25" font-family="Helvetica,sans-Serif" font-size="10.00">and 8 more...</text>
+<text xml:space="preserve" text-anchor="start" x="14" y="-22.25" font-family="Helvetica,sans-Serif" font-size="10.00">and 9 more...</text>
 <text xml:space="preserve" text-anchor="start" x="4.38" y="-6.25" font-family="Helvetica,sans-Serif" font-size="10.00">#</text>
 <text xml:space="preserve" text-anchor="start" x="14" y="-6.25" font-family="Helvetica,sans-Serif" font-size="10.00">Awake()</text>
 <polygon fill="#666666" stroke="#666666" points="0,-258 0,-258 174,-258 174,-258 0,-258"/>

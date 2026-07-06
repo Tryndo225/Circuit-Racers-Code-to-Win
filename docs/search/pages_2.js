@@ -17,7 +17,7 @@ var searchData=
   ['components_14',['Components',['../group__ui.html#ui_components',1,'']]],
   ['contained_20assets_15',['Contained Assets',['../group__editor__util.html#editor_util_assets',1,'']]],
   ['content_20hashing_16',['Enumerable Content Hashing',['../group__core__utils.html#core_utils_hashing',1,'']]],
-  ['controls_17',['Controls',['../index.html#autotoc_md69',1,'']]],
+  ['controls_17',['Controls',['../index.html#autotoc_md69',1,'Controls'],['../md__r_e_a_d_m_e.html#autotoc_md155',1,'Controls']]],
   ['countdown_20respawn_20overlay_18',['Countdown / Respawn Overlay',['../index.html#autotoc_md74',1,'']]],
   ['counter_19',['Counter',['../index.html#autotoc_md78',1,'Checkpoint Counter'],['../index.html#autotoc_md77',1,'Lap Counter']]]
 ];

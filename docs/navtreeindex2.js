@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"class_game_data_manager_1_1_level_data.html#a4fca0da4037c738f8cde7471c91d5e33":[4,0,3,5,12],
 "class_game_data_manager_1_1_level_data.html#a59968a8b5aa348cb51fdb25ff28be7c0":[4,0,3,5,4],
 "class_game_data_manager_1_1_level_data.html#a64d1771dd77d8486023a4b52c9492b7f":[4,0,3,5,8],
 "class_game_data_manager_1_1_level_data.html#a872ef323fb57bb8cc55459df2113ac66":[4,0,3,5,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "class_race_time_manager.html#a44f24846ad54fdcc005ad37cac17050e":[4,0,7,2,7],
 "class_race_time_manager.html#a4a1fb54ad9a10a51685a725f9fcc4af7":[4,0,7,2,15],
 "class_race_time_manager.html#a50460bb8d9de34cbac0d30f47f460a53":[4,0,7,2,19],
-"class_race_time_manager.html#a569874cd3eaa4f9592abb79c65bb43bb":[4,0,7,2,17],
-"class_race_time_manager.html#a5818bbf868a02bb90b1d8b5cddc27e96":[4,0,7,2,16]
+"class_race_time_manager.html#a569874cd3eaa4f9592abb79c65bb43bb":[4,0,7,2,17]
 };

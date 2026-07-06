@@ -1,16 +1,16 @@
 var searchData=
 [
   ['editbutton_0',['EditButton',['../class_edit_button.html',1,'']]],
-  ['editing_1',['Editing',['../group__game__data.html#gdm_level_editing',1,'Level Editing'],['../md__specification.html#autotoc_md177',1,'Level Editing']]],
-  ['editor_2',['Level Editor',['../md__specification.html#autotoc_md199',1,'']]],
+  ['editing_1',['Editing',['../group__game__data.html#gdm_level_editing',1,'Level Editing'],['../md__specification.html#autotoc_md181',1,'Level Editing']]],
+  ['editor_2',['Level Editor',['../md__specification.html#autotoc_md203',1,'']]],
   ['editor_20attributes_3',['Editor Attributes',['../group__editor__attrs.html',1,'']]],
-  ['editor_20extensibility_4',['Runtime and Editor Extensibility',['../md__specification.html#autotoc_md189',1,'']]],
+  ['editor_20extensibility_4',['Runtime and Editor Extensibility',['../md__specification.html#autotoc_md193',1,'']]],
   ['editor_20utilities_5',['Editor Utilities',['../group__editor__util.html',1,'']]],
   ['elevationangle_6',['ElevationAngle',['../class_t_m_pro_1_1_examples_1_1_camera_controller.html#a8709e27c129e088a6da0f43c119d835a',1,'TMPro::Examples::CameraController']]],
   ['enabled_7',['enabled',['../classsc_1_1terrain_1_1proceduralpainter_1_1_layer_settings.html#a0fcca47a1f69eb77a5d0fb764f9fdd2b',1,'sc.terrain.proceduralpainter.LayerSettings.enabled'],['../classsc_1_1terrain_1_1proceduralpainter_1_1_modifier.html#a8c17fea0e188f7d526f78684e49d616b',1,'sc.terrain.proceduralpainter.Modifier.enabled']]],
   ['encodeflattilesrle_8',['EncodeFlatTilesRLE',['../class_import_export_manager.html#a09d133e74aacc3a38681fdf8d4a7fa38',1,'ImportExportManager']]],
   ['encodelevel_9',['EncodeLevel',['../class_import_export_manager.html#adc3ded0f143550dfbed23d9e1bf63b6e',1,'ImportExportManager']]],
-  ['engine_10',['Unity Engine',['../md__specification.html#autotoc_md173',1,'']]],
+  ['engine_10',['Unity Engine',['../md__specification.html#autotoc_md177',1,'']]],
   ['enginerpm_11',['EngineRPM',['../class_transmission_controller.html#a70cb683d21dcd4846c164fce4492dc67',1,'TransmissionController']]],
   ['enginesound_12',['EngineSound',['../class_engine_sound.html',1,'']]],
   ['enginesound_2ecs_13',['EngineSound.cs',['../_engine_sound_8cs.html',1,'']]],
@@ -22,10 +22,10 @@ var searchData=
   ['escape_19',['Escape',['../class_import_export_manager.html#a65ec41dbbfbef47ccf1529cadfbc1f3e',1,'ImportExportManager']]],
   ['examples_20',['Examples',['../group__editor__attrs.html#editor_attrs_usage',1,'Usage Examples'],['../group__editor__util.html#editor_util_usage',1,'Usage Examples']]],
   ['execute_21',['Execute',['../classsc_1_1terrain_1_1proceduralpainter_1_1_modifier.html#a7135b92f94c4acfb3bacc8928baadfeb',1,'sc::terrain::proceduralpainter::Modifier']]],
-  ['expected_20input_20output_22',['Expected Input / Output',['../md__specification.html#autotoc_md191',1,'']]],
+  ['expected_20input_20output_22',['Expected Input / Output',['../md__specification.html#autotoc_md195',1,'']]],
   ['exportlevelbutton_23',['ExportLevelButton',['../class_level_entry.html#ad4692d213a00249c35ca52f8f5080a59',1,'LevelEntry']]],
   ['exportleveltoclipboard_24',['ExportLevelToClipboard',['../class_import_export_manager.html#ad9421a683f04ca3046b3a9921e10511b',1,'ImportExportManager']]],
-  ['extensibility_25',['Runtime and Editor Extensibility',['../md__specification.html#autotoc_md189',1,'']]],
+  ['extensibility_25',['Runtime and Editor Extensibility',['../md__specification.html#autotoc_md193',1,'']]],
   ['extremumslip_26',['extremumSlip',['../struct_wheel_friction_settings.html#a40a7b1556edd2c39a3cac49bdbc712eb',1,'WheelFrictionSettings']]],
   ['extremumvalue_27',['extremumValue',['../struct_wheel_friction_settings.html#a77a150b410465000f298b997afe4930e',1,'WheelFrictionSettings']]]
 ];

@@ -1,7 +1,6 @@
 # Program Specification — *Circuit Racers: Code to Win*
 
 **Student:** Timotej Kotlín  
-**Subjects:** NPRG035 (Basic C#), NPRG038 (Advanced C#)  
 **Project Title:** Circuit Racers: Code to Win  
 **Repository:** <https://github.com/Tryndo225/Circuit-Racers-Code-to-Win>
 

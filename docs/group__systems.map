@@ -7,6 +7,6 @@
 <area shape="rect" id="Node000007" href="$group__replay__system.html" title="Race replay recording, replay data storage, replay playback, replay camera support,..." alt="" coords="140,259,251,285"/>
 <area shape="rect" id="Node000008" href="$group__scene__mgmt.html" title="Centralized scene loading with editor&#45;friendly scene references and scene&#45;to&#45;music pairing." alt="" coords="127,309,264,336"/>
 <area shape="rect" id="Node000001" title="Runtime subsystems used by the racing game." alt="" coords="5,208,79,235"/>
-<area shape="rect" id="Node000009" href="$group__track__mng.html" title="Race flow control (start/restart, laps, checkpoints, respawn) and player car spawning." alt="" coords="141,360,250,387"/>
+<area shape="rect" id="Node000009" href="$group__track__mng.html" title="Race flow control, checkpoint progression, restart/respawn handling, and player car spawning." alt="" coords="141,360,250,387"/>
 <area shape="rect" id="Node000010" href="$group__ui.html" title="Runtime UI widgets, menus, overlays, popups, settings, notifications, previews, and button actions." alt="" coords="143,411,248,437"/>
 </map>

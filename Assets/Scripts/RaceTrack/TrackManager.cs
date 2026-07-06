@@ -259,12 +259,20 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// <summary>
 	/// Initializes scene checkpoints and starts a race when no runtime track placer is present.
 	/// </summary>
+	/// <remarks>
+	/// If a <see cref="RaceTrackPlacer"/> exists, track setup is handled by the generated-track flow
+	/// and this method returns early. Otherwise, the currently selected level map is cleared,
+	/// existing scene checkpoints are collected automatically, and a race is started from the
+	/// scene-defined checkpoint layout.
+	/// </remarks>
 	private void Start()
 	{
 		if (FindFirstObjectByType<RaceTrackPlacer>() != null)
 		{
 			return;
 		}
+
+		GameDataManager.Instance.UnselectLevelMap();
 
 		CheckPointManager.Instance.ClearCheckPoints();
 		CheckPointManager.Instance.AutoAddCheckpoints();

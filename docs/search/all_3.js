@@ -71,7 +71,7 @@ var searchData=
   ['content_20hashing_68',['Enumerable Content Hashing',['../group__core__utils.html#core_utils_hashing',1,'']]],
   ['continuesfxclip_69',['ContinueSFXClip',['../class_sound_manager.html#a8c8138d9537ee3b5a330be3549b2232b',1,'SoundManager.ContinueSFXClip(AudioClip clip)'],['../class_sound_manager.html#ac8c641628ef7d5abe4d35381b7b7e9a7',1,'SoundManager.ContinueSFXClip(AudioClip clip, float volume)']]],
   ['control_70',['Vehicle Control',['../group__car__ctrl.html',1,'']]],
-  ['controls_71',['Controls',['../index.html#autotoc_md69',1,'']]],
+  ['controls_71',['Controls',['../index.html#autotoc_md69',1,'Controls'],['../md__r_e_a_d_m_e.html#autotoc_md155',1,'Controls']]],
   ['convertintarraytosbytearray_72',['ConvertIntArrayToSByteArray',['../class_import_export_manager.html#a683514cc3e3999d7652afbc5100a2312',1,'ImportExportManager']]],
   ['coordinates_73',['Coordinates',['../struct_coordinates.html',1,'Coordinates'],['../struct_coordinates.html#afdd2020d4304cee7a30d151f1beed0a7',1,'Coordinates.Coordinates(int x, int y)'],['../struct_coordinates.html#a3e04b921c4bb9a1e6b52b37ad1185a1f',1,'Coordinates.Coordinates(SerializationInfo info, StreamingContext context)']]],
   ['copy_74',['Copy',['../class_level_map.html#a0cc6441f610383baba061b75d97635f5',1,'LevelMap.Copy()'],['../class_replay.html#a3189d107ed3e2f8c4b57c1edf8f4873e',1,'Replay.Copy()']]],

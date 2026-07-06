@@ -180,6 +180,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a6b00c0e8c196fa8bc03c9ecbfd56e01f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the saved ABS assist state and persists game data.  <br /></td></tr>
 <tr class="memitem:ae104ca69a2307465fc79b1d6c085976e" id="r_ae104ca69a2307465fc79b1d6c085976e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae104ca69a2307465fc79b1d6c085976e">SetTC</a> (bool enabled)</td></tr>
 <tr class="memdesc:ae104ca69a2307465fc79b1d6c085976e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the saved traction control assist state and persists game data.  <br /></td></tr>
+<tr class="memitem:a3a1f25a26dc714878142d348f3a36d3a" id="r_a3a1f25a26dc714878142d348f3a36d3a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3a1f25a26dc714878142d348f3a36d3a">UnselectLevelMap</a> ()</td></tr>
+<tr class="memdesc:a3a1f25a26dc714878142d348f3a36d3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the currently selected level map.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -252,7 +254,7 @@ Properties</h2></td></tr>
 </dl>
 <p>Triggers hash-change detection and saves game data when a level is added. </p>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00887">887</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00900">900</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 <p class="reference">References <a class="el" href="_game_data_manager_8cs_source.html#l00588">CurrentGameData</a>.</p>
 
@@ -336,7 +338,7 @@ Properties</h2></td></tr>
 <p>Clears all custom levels from the data set. </p>
 <p>Also clears the current custom-level selection, triggers hash-change detection, and saves game data. </p>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00947">947</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00960">960</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 <p class="reference">References <a class="el" href="_game_data_manager_8cs_source.html#l00588">CurrentGameData</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00596">CurrentLevelMap</a>.</p>
 
@@ -417,7 +419,7 @@ Here is the caller graph for this function:</div>
 </dl>
 <p>If no custom level is selected, the completion is stored as a practice/test-map result. The data set is saved after the result is recorded. </p>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00865">865</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00878">878</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 <p class="reference">References <a class="el" href="_game_data_manager_8cs_source.html#l00588">CurrentGameData</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00596">CurrentLevelMap</a>.</p>
 
@@ -440,7 +442,7 @@ Here is the caller graph for this function:</div>
 
 <p>Copies the raw saved game-data JSON from PlayerPrefs to the system clipboard. </p>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l01067">1067</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l01080">1080</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 </div>
 </div>
@@ -468,7 +470,7 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Editable copy of the level map, or <code>null</code> if the source map is invalid or not stored.</dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00965">965</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00978">978</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 <p class="reference">References <a class="el" href="_game_data_manager_8cs_source.html#l00588">CurrentGameData</a>.</p>
 
@@ -491,7 +493,7 @@ Here is the caller graph for this function:</div>
 
 <p>Deletes the saved game-data JSON from PlayerPrefs. </p>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l01085">1085</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l01098">1098</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 </div>
 </div>
@@ -715,7 +717,7 @@ Here is the caller graph for this function:</div>
 </dl>
 <p>Triggers hash-change detection and saves game data when a level is removed. </p>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00914">914</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00927">927</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 <p class="reference">References <a class="el" href="_game_data_manager_8cs_source.html#l00588">CurrentGameData</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00596">CurrentLevelMap</a>.</p>
 
@@ -778,7 +780,7 @@ Here is the caller graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the stored level was replaced; otherwise <code>false</code>.</dd></dl>
 <p>Replacing a level resets its associated best time, splits, and replay by creating a new LevelData record for the edited map. </p>
 
-<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00994">994</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l01007">1007</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
 <p class="reference">References <a class="el" href="_level_map_8cs_source.html#l00303">LevelMap.Copy()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00588">CurrentGameData</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00596">CurrentLevelMap</a>.</p>
 <div class="dynheader">
@@ -872,6 +874,30 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="a3a1f25a26dc714878142d348f3a36d3a" name="a3a1f25a26dc714878142d348f3a36d3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a1f25a26dc714878142d348f3a36d3a">&#9670;&#160;</a></span>UnselectLevelMap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GameDataManager.UnselectLevelMap </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clears the currently selected level map. </p>
+<p>This removes the current level selection by setting CurrentLevelMap to <code>null</code>. It is useful when leaving generated-track flow or starting a scene-defined race where no saved level map should be active. </p>
+
+<p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00859">859</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
+
+<p class="reference">References <a class="el" href="_game_data_manager_8cs_source.html#l00596">CurrentLevelMap</a>.</p>
+
+</div>
+</div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="ad14b2970601459ddcbcb5f61b4f87d96" name="ad14b2970601459ddcbcb5f61b4f87d96"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad14b2970601459ddcbcb5f61b4f87d96">&#9670;&#160;</a></span>_instance</h2>
@@ -926,7 +952,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00588">588</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_game_data_manager_8cs_source.html#l00887">AddLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00688">Awake()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00947">ClearLevels()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00865">CompleteLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00965">CreateEditableCopy()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00610">GetABS()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00822">GetCurrentMapReplay()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00805">GetCurrentMapSplit()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00629">GetTC()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00914">RemoveLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00994">ReplaceLevel()</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00834">SelectingLevelMap()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_game_data_manager_8cs_source.html#l00900">AddLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00688">Awake()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00960">ClearLevels()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00878">CompleteLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00978">CreateEditableCopy()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00610">GetABS()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00822">GetCurrentMapReplay()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00805">GetCurrentMapSplit()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00629">GetTC()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00927">RemoveLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l01007">ReplaceLevel()</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00834">SelectingLevelMap()</a>.</p>
 
 </div>
 </div>
@@ -955,7 +981,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="_game_data_manager_8cs_source.html#l00596">596</a> of file <a class="el" href="_game_data_manager_8cs_source.html">GameDataManager.cs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_game_data_manager_8cs_source.html#l00947">ClearLevels()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00865">CompleteLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00822">GetCurrentMapReplay()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00805">GetCurrentMapSplit()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00787">GoToSelectedLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00914">RemoveLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00994">ReplaceLevel()</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00834">SelectingLevelMap()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_game_data_manager_8cs_source.html#l00960">ClearLevels()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00878">CompleteLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00822">GetCurrentMapReplay()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00805">GetCurrentMapSplit()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00787">GoToSelectedLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00927">RemoveLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l01007">ReplaceLevel()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00834">SelectingLevelMap()</a>, and <a class="el" href="_game_data_manager_8cs_source.html#l00859">UnselectLevelMap()</a>.</p>
 
 </div>
 </div>
@@ -1039,7 +1065,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="_scripts_2_miscellaneous_2_utilities_8cs_source.html#l00151">151</a> of file <a class="el" href="_scripts_2_miscellaneous_2_utilities_8cs_source.html">Scripts/Miscellaneous/Utilities.cs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_button_script_8cs_source.html#l00124">ChangeSceneButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00389">ClearLevelsButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00609">EditButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00684">GoPlayButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00416">GoToSelectedLevel.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00517">ImportLevelFromClipboardButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00643">NotificationButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00207">RemoveLevelButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00584">ReplayButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00170">SelectLevelButton.Action()</a>, <a class="el" href="_race_time_manager_8cs_source.html#l00107">RaceTimeManager.CheckpointPassed()</a>, <a class="el" href="_track_manager_8cs_source.html#l00559">TrackManager.CheckPointTaken()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00787">GameDataManager.GoToSelectedLevel()</a>, <a class="el" href="_level_pop_up_8cs_source.html#l00080">LevelPopUp.KeepMap()</a>, <a class="el" href="_level_entry_8cs_source.html#l00078">LevelEntry.LevelSelected()</a>, <a class="el" href="_notification_popup_8cs_source.html#l00078">NotificationPopup.OnPointerClick()</a>, <a class="el" href="_race_time_manager_8cs_source.html#l00153">RaceTimeManager.RaceEnd()</a>, <a class="el" href="_race_time_manager_8cs_source.html#l00076">RaceTimeManager.RaceStart()</a>, <a class="el" href="_level_entry_8cs_source.html#l00101">LevelEntry.RemoveLevel()</a>, <a class="el" href="_level_editor_manager_8cs_source.html#l00336">LevelEditorManager.ReplaceEditedLevel()</a>, <a class="el" href="_scene_asset_helper_8cs_source.html#l00109">SceneAssetHelper.Run()</a>, <a class="el" href="_level_editor_manager_8cs_source.html#l00313">LevelEditorManager.SaveEditedLevelAsNew()</a>, <a class="el" href="_replay_manager_8cs_source.html#l00083">ReplayManager.SaveReplay()</a>, <a class="el" href="_settings_panel_8cs_source.html#l00056">SettingsPanel.SetABS()</a>, <a class="el" href="_settings_panel_8cs_source.html#l00065">SettingsPanel.SetTC()</a>, <a class="el" href="_track_manager_8cs_source.html#l00521">TrackManager.StartRace()</a>, <a class="el" href="_replay_manager_8cs_source.html#l00049">ReplayManager.StartReplay()</a>, <a class="el" href="_track_race_overlay_source_8cs_source.html#l00056">TrackRaceOverlaySource.TryGetState()</a>, and <a class="el" href="_import_export_manager_8cs_source.html#l00180">ImportExportManager.TryImportLevelFromString()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_button_script_8cs_source.html#l00124">ChangeSceneButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00389">ClearLevelsButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00609">EditButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00684">GoPlayButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00416">GoToSelectedLevel.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00517">ImportLevelFromClipboardButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00643">NotificationButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00207">RemoveLevelButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00584">ReplayButton.Action()</a>, <a class="el" href="_button_script_8cs_source.html#l00170">SelectLevelButton.Action()</a>, <a class="el" href="_race_time_manager_8cs_source.html#l00107">RaceTimeManager.CheckpointPassed()</a>, <a class="el" href="_track_manager_8cs_source.html#l00567">TrackManager.CheckPointTaken()</a>, <a class="el" href="_game_data_manager_8cs_source.html#l00787">GameDataManager.GoToSelectedLevel()</a>, <a class="el" href="_level_pop_up_8cs_source.html#l00080">LevelPopUp.KeepMap()</a>, <a class="el" href="_level_entry_8cs_source.html#l00078">LevelEntry.LevelSelected()</a>, <a class="el" href="_notification_popup_8cs_source.html#l00078">NotificationPopup.OnPointerClick()</a>, <a class="el" href="_race_time_manager_8cs_source.html#l00153">RaceTimeManager.RaceEnd()</a>, <a class="el" href="_race_time_manager_8cs_source.html#l00076">RaceTimeManager.RaceStart()</a>, <a class="el" href="_level_entry_8cs_source.html#l00101">LevelEntry.RemoveLevel()</a>, <a class="el" href="_level_editor_manager_8cs_source.html#l00336">LevelEditorManager.ReplaceEditedLevel()</a>, <a class="el" href="_scene_asset_helper_8cs_source.html#l00109">SceneAssetHelper.Run()</a>, <a class="el" href="_level_editor_manager_8cs_source.html#l00313">LevelEditorManager.SaveEditedLevelAsNew()</a>, <a class="el" href="_replay_manager_8cs_source.html#l00083">ReplayManager.SaveReplay()</a>, <a class="el" href="_settings_panel_8cs_source.html#l00056">SettingsPanel.SetABS()</a>, <a class="el" href="_settings_panel_8cs_source.html#l00065">SettingsPanel.SetTC()</a>, <a class="el" href="_track_manager_8cs_source.html#l00529">TrackManager.StartRace()</a>, <a class="el" href="_replay_manager_8cs_source.html#l00049">ReplayManager.StartReplay()</a>, <a class="el" href="_track_race_overlay_source_8cs_source.html#l00056">TrackRaceOverlaySource.TryGetState()</a>, and <a class="el" href="_import_export_manager_8cs_source.html#l00180">ImportExportManager.TryImportLevelFromString()</a>.</p>
 
 </div>
 </div>

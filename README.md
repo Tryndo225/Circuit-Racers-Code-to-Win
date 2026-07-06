@@ -18,6 +18,38 @@ Read the full project specification here:
 
 ---
 
+## Controls
+
+### Keyboard
+
+| Action                                            | Input                |
+| ------------------------------------------------- | -------------------- |
+| Accelerate                                        | `W` or `Up Arrow`    |
+| Brake / Reverse                                   | `S` or `Down Arrow`  |
+| Steer Left                                        | `A` or `Left Arrow`  |
+| Steer Right                                       | `D` or `Right Arrow` |
+| Handbrake                                         | `Space`              |
+| Toggle Lights                                     | `L`                  |
+| Restart from Last Checkpoint                      | `Backspace`          |
+| Restart Track                                     | `Delete`             |
+| Open unfinished result screen / pause result flow | `Escape`             |
+
+### Gamepad
+
+| Action                       | Input                                                |
+| ---------------------------- | ---------------------------------------------------- |
+| Accelerate                   | Right Trigger                                        |
+| Brake / Reverse              | Left Trigger                                         |
+| Steer                        | Left Stick                                           |
+| Handbrake                    | South Button (`A` on Xbox / `X` on PlayStation)      |
+| Toggle Lights                | D-Pad Up                                             |
+| Restart from Last Checkpoint | North Button (`Y` on Xbox / Triangle on PlayStation) |
+| Restart Track                | Start Button                                         |
+
+The game detects the last used input device and adjusts steering behavior accordingly. Keyboard input is smoothed to approximate analog steering, while gamepad input uses the analog stick directly.
+
+---
+
 ## Main Features
 
 - Unity/C# racing game.

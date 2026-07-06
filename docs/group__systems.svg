@@ -136,7 +136,7 @@
 <!-- Node9 -->
 <g id="Node000009" class="node">
 <title>Node9</title>
-<g id="a_Node000009"><a xlink:href="group__track__mng.html" target="_top" xlink:title="Race flow control (start/restart, laps, checkpoints, respawn) and player car spawning.">
+<g id="a_Node000009"><a xlink:href="group__track__mng.html" target="_top" xlink:title="Race flow control, checkpoint progression, restart/respawn handling, and player car spawning.">
 <polygon fill="white" stroke="#666666" points="183.12,-58 101.88,-58 101.88,-38 183.12,-38 183.12,-58"/>
 <text xml:space="preserve" text-anchor="middle" x="142.5" y="-44.5" font-family="Helvetica,sans-Serif" font-size="10.00">Track Manager</text>
 </a>

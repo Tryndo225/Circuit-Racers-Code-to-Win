@@ -1584,12 +1584,12 @@ MonoBehaviour:
       m_Name: Throttle
       m_Type: 0
       m_ExpectedControlType: Axis
-      m_Id: d830c820-2cf6-463b-8e6c-e26c5ad63c9c
+      m_Id: e7b32b0f-41bb-4d29-b45e-d2440d37c93f
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 1DAxis
-        m_Id: 8c1e9e73-5f17-40ad-9c48-919794741879
+        m_Id: 886a517f-8fa2-42d5-bb43-c5fc227e1ab6
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1597,7 +1597,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 4
       - m_Name: negative
-        m_Id: 25be473d-1c9f-4e03-ac46-2ca170285269
+        m_Id: 89a01077-9c70-43f4-97fd-b044c24d42e1
         m_Path: <Keyboard>/s
         m_Interactions: 
         m_Processors: 
@@ -1605,7 +1605,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: positive
-        m_Id: cd28468e-c3c1-4451-a51c-aaa40dcb4a0b
+        m_Id: f500a17b-7aa5-45ce-b8d7-ce616cea823e
         m_Path: <Keyboard>/w
         m_Interactions: 
         m_Processors: 
@@ -1613,7 +1613,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: 1DAxis
-        m_Id: e9e00390-04f4-4ee4-8a8b-9a68ea12e8f5
+        m_Id: 69a5bdd0-3dc8-40c4-8c22-58a1b146d19e
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1621,7 +1621,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 4
       - m_Name: negative
-        m_Id: d9ea70ef-70f3-40a9-ad37-854e0918b832
+        m_Id: a63922d0-ddf1-4532-b540-5a78bc8b4b15
         m_Path: <Keyboard>/downArrow
         m_Interactions: 
         m_Processors: 
@@ -1629,7 +1629,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: positive
-        m_Id: c15b8c2d-13e1-4b61-8cc3-0b25b9dbbfcd
+        m_Id: 315ce7df-99fd-4791-ad8a-890ce6f10937
         m_Path: <Keyboard>/upArrow
         m_Interactions: 
         m_Processors: 
@@ -1637,7 +1637,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: 1DAxis
-        m_Id: 2c8ac41d-a810-464d-980a-461e088f6c3e
+        m_Id: c2304668-02ea-4656-b9ca-556236d8cb98
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1645,7 +1645,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 4
       - m_Name: negative
-        m_Id: 93d47f9c-da3c-4d44-b789-3335b33642a6
+        m_Id: 663e3a40-e2e8-4c55-bf0a-ce78bc23dbbe
         m_Path: <DualShockGamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
@@ -1653,7 +1653,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: positive
-        m_Id: 6879608d-8e42-4ece-b1ca-82289868e57c
+        m_Id: 92b1accc-db2f-4988-b6bd-f63037e1b9b7
         m_Path: <DualShockGamepad>/rightTrigger
         m_Interactions: 
         m_Processors: 
@@ -1661,7 +1661,7 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 8
       - m_Name: 1DAxis
-        m_Id: a4cf081f-c2c2-4e63-aa4a-614cb4f0c52e
+        m_Id: eb465d3f-28d9-4190-9a87-bf6d66bad85b
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1669,16 +1669,16 @@ MonoBehaviour:
         m_Action: Throttle
         m_Flags: 4
       - m_Name: negative
-        m_Id: 25337edb-52fd-4443-a4a3-4e6fcd35a159
-        m_Path: <Gamepad>/rightTrigger
+        m_Id: a4b68a52-c292-490a-b4d2-06697014c038
+        m_Path: <Gamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
         m_Groups: 
         m_Action: Throttle
         m_Flags: 8
       - m_Name: positive
-        m_Id: 77c66bf7-97e2-4727-8183-9f9b5696e71d
-        m_Path: <Gamepad>/leftTrigger
+        m_Id: 8af1abbc-3811-4ffd-beb8-437b3fbd6a24
+        m_Path: <Gamepad>/rightTrigger
         m_Interactions: 
         m_Processors: 
         m_Groups: 
@@ -1692,12 +1692,12 @@ MonoBehaviour:
       m_Name: Steer
       m_Type: 0
       m_ExpectedControlType: Axis
-      m_Id: 2fbab1b0-8195-4e29-b528-ff7fe48cd9e7
+      m_Id: 254bf328-6326-4cf7-a65b-cee695c78da7
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 1DAxis
-        m_Id: d726841f-ef2f-44f2-b04d-94e5527fb243
+        m_Id: 7873cf5c-9967-4256-8653-b19487a0e11c
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1705,7 +1705,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 4
       - m_Name: negative
-        m_Id: 454630ce-adeb-4496-b66a-d60fc7e65602
+        m_Id: 0dc3ffe4-4faf-4c9a-af9a-80d071e9ebe1
         m_Path: <Keyboard>/a
         m_Interactions: 
         m_Processors: 
@@ -1713,7 +1713,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 8
       - m_Name: positive
-        m_Id: 59b378a3-4988-4703-9228-3209aeed5600
+        m_Id: 7c9084a8-2db6-461f-a5fb-f09e70c81ef4
         m_Path: <Keyboard>/d
         m_Interactions: 
         m_Processors: 
@@ -1721,7 +1721,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 8
       - m_Name: 1DAxis
-        m_Id: 91055e16-18a5-4269-992c-4196cfe5fd79
+        m_Id: 576b0fa6-a339-4e16-a975-f4ce79269c91
         m_Path: 1DAxis
         m_Interactions: 
         m_Processors: 
@@ -1729,7 +1729,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 4
       - m_Name: negative
-        m_Id: 6df254e2-93d0-4f38-a6bd-fb2e35986d4a
+        m_Id: 3b7dfc11-11cb-4dd0-9945-11b203d3cf0f
         m_Path: <Keyboard>/leftArrow
         m_Interactions: 
         m_Processors: 
@@ -1737,7 +1737,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 8
       - m_Name: positive
-        m_Id: 2afcdc94-5ee3-44b2-b06f-fe465f27b457
+        m_Id: f15ebbbb-eeb0-49cd-93ce-2ebf4cbc7691
         m_Path: <Keyboard>/rightArrow
         m_Interactions: 
         m_Processors: 
@@ -1745,7 +1745,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 8
       - m_Name: 
-        m_Id: 76ee3839-71af-4d71-9fcf-3f09dd257a4a
+        m_Id: 11aeb135-9472-49c8-94c5-803012d59624
         m_Path: <DualShockGamepad>/leftStick/x
         m_Interactions: 
         m_Processors: stickDeadzone(min=0.1)
@@ -1753,7 +1753,7 @@ MonoBehaviour:
         m_Action: Steer
         m_Flags: 0
       - m_Name: 
-        m_Id: 688b1e6b-8c18-4da4-8353-fbe949c54450
+        m_Id: c07e722c-c26f-435f-a650-3579f339aa28
         m_Path: <Gamepad>/leftStick/x
         m_Interactions: 
         m_Processors: stickDeadzone(min=0.1)
@@ -1768,12 +1768,12 @@ MonoBehaviour:
       m_Name: Brake
       m_Type: 0
       m_ExpectedControlType: Button
-      m_Id: 46ba8b42-544f-4072-bfe4-f3d79ef4eb2b
+      m_Id: dd44ec37-e404-4311-b9f6-257bb3d4c6c1
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: 8197a7c9-aa87-4a94-bf6d-974ceba2d962
+        m_Id: 17cb1687-0aac-4ed5-8373-c25d4627e770
         m_Path: <Keyboard>/s
         m_Interactions: 
         m_Processors: 
@@ -1781,7 +1781,7 @@ MonoBehaviour:
         m_Action: Brake
         m_Flags: 0
       - m_Name: 
-        m_Id: ff7058ca-db88-4de6-be01-0a871fc1f15e
+        m_Id: 29c3995c-8e08-499d-947b-908a1f320a60
         m_Path: <Keyboard>/downArrow
         m_Interactions: 
         m_Processors: 
@@ -1789,7 +1789,7 @@ MonoBehaviour:
         m_Action: Brake
         m_Flags: 0
       - m_Name: 
-        m_Id: 97cd2fa1-1dd3-4342-a9aa-8d7d31c687aa
+        m_Id: 0d79b74d-b3b0-47dc-9534-9d80b6490e38
         m_Path: <DualShockGamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
@@ -1797,7 +1797,7 @@ MonoBehaviour:
         m_Action: Brake
         m_Flags: 0
       - m_Name: 
-        m_Id: ab10c590-9669-4759-80d5-dab27990e82e
+        m_Id: 3e31928f-de4c-4c40-ab47-84ed658988a7
         m_Path: <Gamepad>/leftTrigger
         m_Interactions: 
         m_Processors: 
@@ -1812,12 +1812,12 @@ MonoBehaviour:
       m_Name: Handbrake
       m_Type: 1
       m_ExpectedControlType: Button
-      m_Id: f739fc13-9e04-46c6-9fa4-31763cf1de23
+      m_Id: ad733d15-2b14-46e6-896d-47751c02bb54
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: 6e574ea9-a328-4754-a73d-1445877893b5
+        m_Id: a0a20ac9-7a90-4002-8072-0dd01bc05917
         m_Path: <Keyboard>/space
         m_Interactions: 
         m_Processors: 
@@ -1825,7 +1825,7 @@ MonoBehaviour:
         m_Action: Handbrake
         m_Flags: 0
       - m_Name: 
-        m_Id: 7cc714a8-c0e5-41cb-846b-1ae58e18f262
+        m_Id: 105a85a7-590e-4f95-acc7-4592d0a987cd
         m_Path: <DualShockGamepad>/crossButton
         m_Interactions: 
         m_Processors: 
@@ -1833,7 +1833,7 @@ MonoBehaviour:
         m_Action: Handbrake
         m_Flags: 0
       - m_Name: 
-        m_Id: 635ea18c-2d22-4cb5-b774-60c210cb8847
+        m_Id: a758e981-2cd8-45e8-a266-bf9c3ffaa02c
         m_Path: <Gamepad>/buttonSouth
         m_Interactions: 
         m_Processors: 
@@ -1848,12 +1848,12 @@ MonoBehaviour:
       m_Name: LightsToggle
       m_Type: 1
       m_ExpectedControlType: Button
-      m_Id: 80f6a0c9-0d1a-4a64-aa01-d6b55e4297fb
+      m_Id: 4c762080-1dd6-49cf-96f9-06fb5ffab8a7
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: 809a283b-3a26-4ae1-af70-ccdbe7e8943c
+        m_Id: f659028a-79fd-497f-b668-986c551ff21e
         m_Path: <Keyboard>/l
         m_Interactions: Press
         m_Processors: 
@@ -1861,7 +1861,7 @@ MonoBehaviour:
         m_Action: LightsToggle
         m_Flags: 0
       - m_Name: 
-        m_Id: 6f2eaa09-cf27-4486-8c82-018a13ef5a89
+        m_Id: f4bfbd61-f961-4abc-81fe-7b322cd0afd7
         m_Path: <DualShockGamepad>/dpad/up
         m_Interactions: Press
         m_Processors: 
@@ -1869,7 +1869,7 @@ MonoBehaviour:
         m_Action: LightsToggle
         m_Flags: 0
       - m_Name: 
-        m_Id: 03980ee6-e453-4ded-a87b-2cd0ccb050f6
+        m_Id: 23af7410-6baf-4dee-998e-839db93c6b17
         m_Path: <Gamepad>/dpad/up
         m_Interactions: Press
         m_Processors: 
@@ -1887,21 +1887,21 @@ MonoBehaviour:
   maxSteerAngle: 30
   steerSpeedDegPerSec: 125
   inputExponent: 2.5
-  maxMotorPower: 10000
-  maxBrakeTorque: 10000
-  handbrakeTorque: 10000
+  maxMotorPower: 8500
+  maxBrakeTorque: 8500
+  handbrakeTorque: 8500
   redlineFadeStart: 0.9
   forwardGears:
-  - 3.2
-  - 2.1
+  - 3
+  - 2.5
   - 1.5
   - 1
-  - 0.82
-  finalDrive: 3.42
+  - 0.75
+  finalDrive: 3.5
   idleRPM: 900
   redlineRPM: 8000
-  shiftUpRPM: 6000
-  shiftDownRPM: 1500
+  shiftUpRPM: 7000
+  shiftDownRPM: 1200
   shiftDuration: 0.2
   shiftSlipThreshold: 0.5
   antiRollToggle: 0
@@ -1911,8 +1911,8 @@ MonoBehaviour:
   tractionSlipLimit: 0.25
   absEnabled: 0
   absSlipLimit: 0.15
-  rearSidewaysGripHandbrakeMultiplier: 0.5
-  rearForwardGripHandbrakeMultiplier: 0.5
+  rearSidewaysGripHandbrakeMultiplier: 0.8
+  rearForwardGripHandbrakeMultiplier: 0.8
   forwardGripLockedMultiplier: 0.9
   sidewaysGripLockedMultiplier: 0.6
   lockForwardSlipThreshold: 0.8
@@ -1925,9 +1925,9 @@ MonoBehaviour:
   limitedSlipEnabled: 1
   limitedSlipStartRpmDifference: 120
   limitedSlipFullRpmDifference: 700
-  limitedSlipMaxTorqueCut: 0.65
-  limitedSlipGripWheelBoost: 1.25
-  limitedSlipBrakeTorque: 250
+  limitedSlipMaxTorqueCut: 0.6
+  limitedSlipGripWheelBoost: 1.4
+  limitedSlipBrakeTorque: 1000
   frontForwardFriction:
     stiffness: 2.1
     extremumSlip: 0.4
@@ -2110,9 +2110,9 @@ MonoBehaviour:
   maxSteerAngle: 30
   steerSpeedDegPerSec: 125
   inputExponent: 2.5
-  maxMotorPower: 10000
-  maxBrakeTorque: 10000
-  handbrakeTorque: 10000
+  maxMotorPower: 8500
+  maxBrakeTorque: 8500
+  handbrakeTorque: 8500
   redlineFadeStart: 0.9
   antiRollToggle: 0
   antiRollStiffnessFront: 0
@@ -2121,8 +2121,8 @@ MonoBehaviour:
   tractionSlipLimit: 0.25
   absEnabled: 0
   absSlipLimit: 0.15
-  rearSidewaysGripHandbrakeMultiplier: 0.5
-  rearForwardGripHandbrakeMultiplier: 0.5
+  rearSidewaysGripHandbrakeMultiplier: 0.8
+  rearForwardGripHandbrakeMultiplier: 0.8
   forwardGripLockedMultiplier: 0.9
   sidewaysGripLockedMultiplier: 0.6
   lockForwardSlipThreshold: 0.8
@@ -2159,9 +2159,9 @@ MonoBehaviour:
   limitedSlipEnabled: 1
   limitedSlipStartRpmDifference: 120
   limitedSlipFullRpmDifference: 700
-  limitedSlipMaxTorqueCut: 0.65
-  limitedSlipGripWheelBoost: 1.25
-  limitedSlipBrakeTorque: 250
+  limitedSlipMaxTorqueCut: 0.6
+  limitedSlipGripWheelBoost: 1.4
+  limitedSlipBrakeTorque: 1000
   coMPosition: {x: 0, y: 0, z: 0}
   ackermannFactor: 0.8
 --- !u!114 &8633431643041831171
@@ -2177,16 +2177,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardGears:
-  - 3.2
-  - 2.1
+  - 3
+  - 2.5
   - 1.5
   - 1
-  - 0.82
-  finalDrive: 3.42
+  - 0.75
+  finalDrive: 3.5
   idleRPM: 900
   redlineRPM: 8000
-  shiftUpRPM: 6000
-  shiftDownRPM: 1500
+  shiftUpRPM: 7000
+  shiftDownRPM: 1200
   shiftDuration: 0.2
   slipThreshold: 0.5
 --- !u!114 &4071285767021976057
@@ -2203,11 +2203,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   crashClips:
   - {fileID: 8300000, guid: b0a7cc32db8c7114db5cac17d1ac98b3, type: 3}
-  minimumVolume: 0
-  minImpactSpeed: 3
-  maxImpactSpeed: 300
+  minimumVolume: 0.3
+  minImpactSpeed: 1
+  maxImpactSpeed: 50
   minSeverityToPlay: 0
-  baseVolume: 0.6
+  baseVolume: 1
   volumeCurve:
     serializedVersion: 2
     m_Curve:

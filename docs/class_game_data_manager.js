@@ -22,6 +22,7 @@ var class_game_data_manager =
     [ "SelectingLevelMap", "class_game_data_manager.html#ab9f2993ef658383dc4a46fcaf0490f04", null ],
     [ "SetABS", "class_game_data_manager.html#a6b00c0e8c196fa8bc03c9ecbfd56e01f", null ],
     [ "SetTC", "class_game_data_manager.html#ae104ca69a2307465fc79b1d6c085976e", null ],
+    [ "UnselectLevelMap", "class_game_data_manager.html#a3a1f25a26dc714878142d348f3a36d3a", null ],
     [ "_instance", "class_game_data_manager.html#ad14b2970601459ddcbcb5f61b4f87d96", null ],
     [ "CurrentGameData", "class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078", null ],
     [ "CurrentLevelMap", "class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b", null ],

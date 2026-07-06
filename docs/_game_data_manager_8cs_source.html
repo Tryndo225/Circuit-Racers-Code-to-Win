@@ -1043,273 +1043,288 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_game_data_man
 <div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span>        <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = map;</div>
 <div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span>    }</div>
 </div>
-<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span> </div>
-<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span><span class="preprocessor">    #endregion</span></div>
-<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span> </div>
-<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span><span class="preprocessor">    #region Progression</span></div>
-<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span><span class="comment"></span> </div>
-<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span><span class="comment">    /// Records completion of the currently selected level and updates the best time if improved.</span></div>
-<div class="line"><a id="l00857" name="l00857"></a><span class="lineno">  857</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l00858" name="l00858"></a><span class="lineno">  858</span><span class="comment">    /// &lt;param name=&quot;time&quot;&gt;Completion time in seconds.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span><span class="comment">    /// &lt;param name=&quot;checkpointSplits&quot;&gt;Checkpoint splits for the completed run.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span><span class="comment">    /// &lt;param name=&quot;replay&quot;&gt;Replay for the completed run.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span><span class="comment">    /// &lt;remarks&gt;</span></div>
-<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span><span class="comment">    /// If no custom level is selected, the completion is stored as a practice/test-map result.</span></div>
-<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span><span class="comment">    /// The data set is saved after the result is recorded.</span></div>
-<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
-<div class="foldopen" id="foldopen00865" data-start="{" data-end="}">
-<div class="line"><a id="l00865" name="l00865"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a314420307ede09adca3a34a17438360b">  865</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a314420307ede09adca3a34a17438360b">CompleteLevel</a>(<span class="keywordtype">float</span> time, <span class="keywordtype">float</span>[] checkpointSplits, <a class="code hl_class" href="class_replay.html">Replay</a> replay)</div>
-<div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span>    {</div>
-<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span>        <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> == <span class="keyword">null</span>)</div>
-<div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span>        {</div>
-<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span>            Debug.Log(<span class="stringliteral">&quot;[GameDataManager] No level selected, assuming Test Track.&quot;</span>);</div>
-<div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span>            <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.UpdateTestLevelTime(time, checkpointSplits, replay);</div>
-<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span>            SaveGameData();</div>
-<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span>        }</div>
-<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span> </div>
-<div class="line"><a id="l00875" name="l00875"></a><span class="lineno">  875</span>        <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.UpdateLevelTime(<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a>, time, checkpointSplits, replay);</div>
-<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span>        PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
-<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span>        SaveGameData();</div>
-<div class="line"><a id="l00878" name="l00878"></a><span class="lineno">  878</span>    }</div>
+<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span><span class="comment"></span> </div>
+<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span><span class="comment">    /// Clears the currently selected level map.</span></div>
+<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span><span class="comment">    /// &lt;remarks&gt;</span></div>
+<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span><span class="comment">    /// This removes the current level selection by setting &lt;see cref=&quot;CurrentLevelMap&quot;/&gt;</span></div>
+<div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span><span class="comment">    /// to &lt;c&gt;null&lt;/c&gt;. It is useful when leaving generated-track flow or starting a</span></div>
+<div class="line"><a id="l00857" name="l00857"></a><span class="lineno">  857</span><span class="comment">    /// scene-defined race where no saved level map should be active.</span></div>
+<div class="line"><a id="l00858" name="l00858"></a><span class="lineno">  858</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
+<div class="foldopen" id="foldopen00859" data-start="{" data-end="}">
+<div class="line"><a id="l00859" name="l00859"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a3a1f25a26dc714878142d348f3a36d3a">  859</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a3a1f25a26dc714878142d348f3a36d3a">UnselectLevelMap</a>()</div>
+<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span>    {</div>
+<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span>        <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = <span class="keyword">null</span>;</div>
+<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span>    }</div>
 </div>
-<div class="line"><a id="l00879" name="l00879"></a><span class="lineno">  879</span><span class="comment"></span> </div>
-<div class="line"><a id="l00880" name="l00880"></a><span class="lineno">  880</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l00881" name="l00881"></a><span class="lineno">  881</span><span class="comment">    /// Adds a level to the data set if it does not already exist.</span></div>
-<div class="line"><a id="l00882" name="l00882"></a><span class="lineno">  882</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l00883" name="l00883"></a><span class="lineno">  883</span><span class="comment">    /// &lt;param name=&quot;map&quot;&gt;Level to add.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00884" name="l00884"></a><span class="lineno">  884</span><span class="comment">    /// &lt;remarks&gt;</span></div>
-<div class="line"><a id="l00885" name="l00885"></a><span class="lineno">  885</span><span class="comment">    /// Triggers hash-change detection and saves game data when a level is added.</span></div>
-<div class="line"><a id="l00886" name="l00886"></a><span class="lineno">  886</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
-<div class="foldopen" id="foldopen00887" data-start="{" data-end="}">
-<div class="line"><a id="l00887" name="l00887"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a2d38e5e8a14ae8e9ab28be10ce78e31e">  887</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a2d38e5e8a14ae8e9ab28be10ce78e31e">AddLevel</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> map)</div>
-<div class="line"><a id="l00888" name="l00888"></a><span class="lineno">  888</span>    {</div>
-<div class="line"><a id="l00889" name="l00889"></a><span class="lineno">  889</span>        <span class="keywordflow">if</span> (map == <span class="keyword">null</span>)</div>
-<div class="line"><a id="l00890" name="l00890"></a><span class="lineno">  890</span>        {</div>
-<div class="line"><a id="l00891" name="l00891"></a><span class="lineno">  891</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] AddLevel called with null map.&quot;</span>);</div>
-<div class="line"><a id="l00892" name="l00892"></a><span class="lineno">  892</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00893" name="l00893"></a><span class="lineno">  893</span>        }</div>
-<div class="line"><a id="l00894" name="l00894"></a><span class="lineno">  894</span> </div>
-<div class="line"><a id="l00895" name="l00895"></a><span class="lineno">  895</span>        <span class="keywordflow">if</span> (!<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.ContainsLevel(map))</div>
-<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span>        {</div>
-<div class="line"><a id="l00897" name="l00897"></a><span class="lineno">  897</span>            <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.Add(<span class="keyword">new</span> <a class="code hl_class" href="class_game_data_manager_1_1_level_data.html">LevelData</a>(map));</div>
-<div class="line"><a id="l00898" name="l00898"></a><span class="lineno">  898</span>            PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
-<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span>            SaveGameData();</div>
-<div class="line"><a id="l00900" name="l00900"></a><span class="lineno">  900</span>        }</div>
-<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span>        {</div>
-<div class="line"><a id="l00903" name="l00903"></a><span class="lineno">  903</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Level already exists; not adding duplicate.&quot;</span>);</div>
-<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span>        }</div>
-<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span>    }</div>
+<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span> </div>
+<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span><span class="preprocessor">    #endregion</span></div>
+<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span> </div>
+<div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span><span class="preprocessor">    #region Progression</span></div>
+<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span><span class="comment"></span> </div>
+<div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span><span class="comment">    /// Records completion of the currently selected level and updates the best time if improved.</span></div>
+<div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span><span class="comment">    /// &lt;param name=&quot;time&quot;&gt;Completion time in seconds.&lt;/param&gt;</span></div>
+<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span><span class="comment">    /// &lt;param name=&quot;checkpointSplits&quot;&gt;Checkpoint splits for the completed run.&lt;/param&gt;</span></div>
+<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span><span class="comment">    /// &lt;param name=&quot;replay&quot;&gt;Replay for the completed run.&lt;/param&gt;</span></div>
+<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span><span class="comment">    /// &lt;remarks&gt;</span></div>
+<div class="line"><a id="l00875" name="l00875"></a><span class="lineno">  875</span><span class="comment">    /// If no custom level is selected, the completion is stored as a practice/test-map result.</span></div>
+<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span><span class="comment">    /// The data set is saved after the result is recorded.</span></div>
+<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
+<div class="foldopen" id="foldopen00878" data-start="{" data-end="}">
+<div class="line"><a id="l00878" name="l00878"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a314420307ede09adca3a34a17438360b">  878</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a314420307ede09adca3a34a17438360b">CompleteLevel</a>(<span class="keywordtype">float</span> time, <span class="keywordtype">float</span>[] checkpointSplits, <a class="code hl_class" href="class_replay.html">Replay</a> replay)</div>
+<div class="line"><a id="l00879" name="l00879"></a><span class="lineno">  879</span>    {</div>
+<div class="line"><a id="l00880" name="l00880"></a><span class="lineno">  880</span>        <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> == <span class="keyword">null</span>)</div>
+<div class="line"><a id="l00881" name="l00881"></a><span class="lineno">  881</span>        {</div>
+<div class="line"><a id="l00882" name="l00882"></a><span class="lineno">  882</span>            Debug.Log(<span class="stringliteral">&quot;[GameDataManager] No level selected, assuming Test Track.&quot;</span>);</div>
+<div class="line"><a id="l00883" name="l00883"></a><span class="lineno">  883</span>            <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.UpdateTestLevelTime(time, checkpointSplits, replay);</div>
+<div class="line"><a id="l00884" name="l00884"></a><span class="lineno">  884</span>            SaveGameData();</div>
+<div class="line"><a id="l00885" name="l00885"></a><span class="lineno">  885</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00886" name="l00886"></a><span class="lineno">  886</span>        }</div>
+<div class="line"><a id="l00887" name="l00887"></a><span class="lineno">  887</span> </div>
+<div class="line"><a id="l00888" name="l00888"></a><span class="lineno">  888</span>        <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.UpdateLevelTime(<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a>, time, checkpointSplits, replay);</div>
+<div class="line"><a id="l00889" name="l00889"></a><span class="lineno">  889</span>        PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
+<div class="line"><a id="l00890" name="l00890"></a><span class="lineno">  890</span>        SaveGameData();</div>
+<div class="line"><a id="l00891" name="l00891"></a><span class="lineno">  891</span>    }</div>
 </div>
-<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span><span class="comment"></span> </div>
-<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span><span class="comment">    /// Removes a level from the data set if present.</span></div>
-<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span><span class="comment">    /// &lt;param name=&quot;levelMap&quot;&gt;Level to remove.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span><span class="comment">    /// &lt;remarks&gt;</span></div>
-<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span><span class="comment">    /// Triggers hash-change detection and saves game data when a level is removed.</span></div>
-<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
-<div class="foldopen" id="foldopen00914" data-start="{" data-end="}">
-<div class="line"><a id="l00914" name="l00914"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a5be821bacd3d739de21db848aaccb9ef">  914</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a5be821bacd3d739de21db848aaccb9ef">RemoveLevel</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> levelMap)</div>
-<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span>    {</div>
-<div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span>        <span class="keywordflow">if</span> (levelMap == <span class="keyword">null</span>)</div>
-<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>        {</div>
-<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] RemoveLevel called with null map.&quot;</span>);</div>
-<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span>        }</div>
-<div class="line"><a id="l00921" name="l00921"></a><span class="lineno">  921</span> </div>
-<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.Count; i++)</div>
-<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>        {</div>
-<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span>            <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels[i].LevelMap == levelMap)</div>
-<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span>            {</div>
-<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span>                <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.RemoveAt(i);</div>
-<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span> </div>
-<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span>                <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> == levelMap)</div>
-<div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span>                    <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = <span class="keyword">null</span>;</div>
-<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span> </div>
-<div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span>                PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
-<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span>                SaveGameData();</div>
-<div class="line"><a id="l00933" name="l00933"></a><span class="lineno">  933</span> </div>
-<div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span>                <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00935" name="l00935"></a><span class="lineno">  935</span>            }</div>
-<div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span>        }</div>
-<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span> </div>
-<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span>        Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Level not found; nothing removed.&quot;</span>);</div>
-<div class="line"><a id="l00939" name="l00939"></a><span class="lineno">  939</span>    }</div>
+<div class="line"><a id="l00892" name="l00892"></a><span class="lineno">  892</span><span class="comment"></span> </div>
+<div class="line"><a id="l00893" name="l00893"></a><span class="lineno">  893</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l00894" name="l00894"></a><span class="lineno">  894</span><span class="comment">    /// Adds a level to the data set if it does not already exist.</span></div>
+<div class="line"><a id="l00895" name="l00895"></a><span class="lineno">  895</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span><span class="comment">    /// &lt;param name=&quot;map&quot;&gt;Level to add.&lt;/param&gt;</span></div>
+<div class="line"><a id="l00897" name="l00897"></a><span class="lineno">  897</span><span class="comment">    /// &lt;remarks&gt;</span></div>
+<div class="line"><a id="l00898" name="l00898"></a><span class="lineno">  898</span><span class="comment">    /// Triggers hash-change detection and saves game data when a level is added.</span></div>
+<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
+<div class="foldopen" id="foldopen00900" data-start="{" data-end="}">
+<div class="line"><a id="l00900" name="l00900"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a2d38e5e8a14ae8e9ab28be10ce78e31e">  900</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a2d38e5e8a14ae8e9ab28be10ce78e31e">AddLevel</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> map)</div>
+<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span>    {</div>
+<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span>        <span class="keywordflow">if</span> (map == <span class="keyword">null</span>)</div>
+<div class="line"><a id="l00903" name="l00903"></a><span class="lineno">  903</span>        {</div>
+<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] AddLevel called with null map.&quot;</span>);</div>
+<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span>        }</div>
+<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span> </div>
+<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span>        <span class="keywordflow">if</span> (!<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.ContainsLevel(map))</div>
+<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span>        {</div>
+<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span>            <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.Add(<span class="keyword">new</span> <a class="code hl_class" href="class_game_data_manager_1_1_level_data.html">LevelData</a>(map));</div>
+<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span>            PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
+<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span>            SaveGameData();</div>
+<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span>        }</div>
+<div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span>        <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span>        {</div>
+<div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Level already exists; not adding duplicate.&quot;</span>);</div>
+<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>        }</div>
+<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>    }</div>
 </div>
-<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span><span class="comment"></span> </div>
-<div class="line"><a id="l00941" name="l00941"></a><span class="lineno">  941</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l00942" name="l00942"></a><span class="lineno">  942</span><span class="comment">    /// Clears all custom levels from the data set.</span></div>
-<div class="line"><a id="l00943" name="l00943"></a><span class="lineno">  943</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l00944" name="l00944"></a><span class="lineno">  944</span><span class="comment">    /// &lt;remarks&gt;</span></div>
-<div class="line"><a id="l00945" name="l00945"></a><span class="lineno">  945</span><span class="comment">    /// Also clears the current custom-level selection, triggers hash-change detection, and saves game data.</span></div>
-<div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
-<div class="foldopen" id="foldopen00947" data-start="{" data-end="}">
-<div class="line"><a id="l00947" name="l00947"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a01ccd95b645ee5190eb06a7d79ff8376">  947</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a01ccd95b645ee5190eb06a7d79ff8376">ClearLevels</a>()</div>
-<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>    {</div>
-<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>        <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.Clear();</div>
-<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span>        <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = <span class="keyword">null</span>;</div>
-<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span> </div>
-<div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span>        PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
-<div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span>        SaveGameData();</div>
-<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span>    }</div>
+<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span><span class="comment"></span> </div>
+<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l00921" name="l00921"></a><span class="lineno">  921</span><span class="comment">    /// Removes a level from the data set if present.</span></div>
+<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span><span class="comment">    /// &lt;param name=&quot;levelMap&quot;&gt;Level to remove.&lt;/param&gt;</span></div>
+<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span><span class="comment">    /// &lt;remarks&gt;</span></div>
+<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span><span class="comment">    /// Triggers hash-change detection and saves game data when a level is removed.</span></div>
+<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
+<div class="foldopen" id="foldopen00927" data-start="{" data-end="}">
+<div class="line"><a id="l00927" name="l00927"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a5be821bacd3d739de21db848aaccb9ef">  927</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a5be821bacd3d739de21db848aaccb9ef">RemoveLevel</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> levelMap)</div>
+<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span>    {</div>
+<div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span>        <span class="keywordflow">if</span> (levelMap == <span class="keyword">null</span>)</div>
+<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span>        {</div>
+<div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] RemoveLevel called with null map.&quot;</span>);</div>
+<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00933" name="l00933"></a><span class="lineno">  933</span>        }</div>
+<div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span> </div>
+<div class="line"><a id="l00935" name="l00935"></a><span class="lineno">  935</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.Count; i++)</div>
+<div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span>        {</div>
+<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span>            <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels[i].LevelMap == levelMap)</div>
+<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span>            {</div>
+<div class="line"><a id="l00939" name="l00939"></a><span class="lineno">  939</span>                <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.RemoveAt(i);</div>
+<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span> </div>
+<div class="line"><a id="l00941" name="l00941"></a><span class="lineno">  941</span>                <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> == levelMap)</div>
+<div class="line"><a id="l00942" name="l00942"></a><span class="lineno">  942</span>                    <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = <span class="keyword">null</span>;</div>
+<div class="line"><a id="l00943" name="l00943"></a><span class="lineno">  943</span> </div>
+<div class="line"><a id="l00944" name="l00944"></a><span class="lineno">  944</span>                PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
+<div class="line"><a id="l00945" name="l00945"></a><span class="lineno">  945</span>                SaveGameData();</div>
+<div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span> </div>
+<div class="line"><a id="l00947" name="l00947"></a><span class="lineno">  947</span>                <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>            }</div>
+<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>        }</div>
+<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span> </div>
+<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span>        Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Level not found; nothing removed.&quot;</span>);</div>
+<div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span>    }</div>
 </div>
-<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span> </div>
-<div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span><span class="preprocessor">    #endregion</span></div>
-<div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span> </div>
-<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span><span class="preprocessor">    #region Level Editing</span></div>
-<div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span><span class="comment"></span> </div>
-<div class="line"><a id="l00960" name="l00960"></a><span class="lineno">  960</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span><span class="comment">    /// Creates an editable copy of a stored level map.</span></div>
-<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span><span class="comment">    /// &lt;param name=&quot;sourceMap&quot;&gt;Stored level map to copy for editing.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span><span class="comment">    /// &lt;returns&gt;Editable copy of the level map, or &lt;c&gt;null&lt;/c&gt; if the source map is invalid or not stored.&lt;/returns&gt;</span></div>
-<div class="foldopen" id="foldopen00965" data-start="{" data-end="}">
-<div class="line"><a id="l00965" name="l00965"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a34650071138f10d015599b46bf3aaaa9">  965</a></span>    <span class="keyword">public</span> <a class="code hl_class" href="class_level_map.html">LevelMap</a> <a class="code hl_function" href="class_game_data_manager.html#a34650071138f10d015599b46bf3aaaa9">CreateEditableCopy</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> sourceMap)</div>
-<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>    {</div>
-<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>        <span class="keywordflow">if</span> (sourceMap == <span class="keyword">null</span>)</div>
-<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span>        {</div>
-<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] CreateEditableCopy called with null map.&quot;</span>);</div>
-<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span>            <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
-<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span>        }</div>
-<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span> </div>
-<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span>        <span class="keywordtype">int</span> index = <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.FindIndex(ld =&gt; ld.LevelMap == sourceMap);</div>
-<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span> </div>
-<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>        <span class="keywordflow">if</span> (index &lt; 0)</div>
-<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span>        {</div>
-<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Cannot edit level; map is not present in CurrentGameData.&quot;</span>);</div>
-<div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span>            <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
-<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span>        }</div>
-<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span> </div>
-<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span>        <span class="keywordflow">return</span> <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels[index].LevelMap.Copy();</div>
-<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span>    }</div>
+<div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span><span class="comment"></span> </div>
+<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span><span class="comment">    /// Clears all custom levels from the data set.</span></div>
+<div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span><span class="comment">    /// &lt;remarks&gt;</span></div>
+<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span><span class="comment">    /// Also clears the current custom-level selection, triggers hash-change detection, and saves game data.</span></div>
+<div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
+<div class="foldopen" id="foldopen00960" data-start="{" data-end="}">
+<div class="line"><a id="l00960" name="l00960"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a01ccd95b645ee5190eb06a7d79ff8376">  960</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#a01ccd95b645ee5190eb06a7d79ff8376">ClearLevels</a>()</div>
+<div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span>    {</div>
+<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>        <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.Clear();</div>
+<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>        <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = <span class="keyword">null</span>;</div>
+<div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span> </div>
+<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span>        PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
+<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>        SaveGameData();</div>
+<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>    }</div>
 </div>
-<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span><span class="comment"></span> </div>
-<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span><span class="comment">    /// Replaces a stored level with an edited version.</span></div>
-<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span><span class="comment">    /// &lt;param name=&quot;originalMap&quot;&gt;Original stored level map to replace.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span><span class="comment">    /// &lt;param name=&quot;editedMap&quot;&gt;Edited level map to save in its place.&lt;/param&gt;</span></div>
-<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span><span class="comment">    /// &lt;returns&gt;&lt;c&gt;true&lt;/c&gt; if the stored level was replaced; otherwise &lt;c&gt;false&lt;/c&gt;.&lt;/returns&gt;</span></div>
-<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span><span class="comment">    /// &lt;remarks&gt;</span></div>
-<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span><span class="comment">    /// Replacing a level resets its associated best time, splits, and replay by creating a new</span></div>
-<div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span><span class="comment">    /// &lt;see cref=&quot;LevelData&quot;/&gt; record for the edited map.</span></div>
-<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
-<div class="foldopen" id="foldopen00994" data-start="{" data-end="}">
-<div class="line"><a id="l00994" name="l00994"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9">  994</a></span>    <span class="keyword">public</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9">ReplaceLevel</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> originalMap, <a class="code hl_class" href="class_level_map.html">LevelMap</a> editedMap)</div>
-<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>    {</div>
-<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>        <span class="keywordflow">if</span> (originalMap == <span class="keyword">null</span>)</div>
-<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>        {</div>
-<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] ReplaceLevel called with null original map.&quot;</span>);</div>
-<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span>        }</div>
-<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span> </div>
-<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span>        <span class="keywordflow">if</span> (editedMap == <span class="keyword">null</span>)</div>
-<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span>        {</div>
-<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] ReplaceLevel called with null edited map.&quot;</span>);</div>
-<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span>        }</div>
-<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span> </div>
-<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span>        <span class="keywordtype">int</span> index = <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.FindIndex(ld =&gt; ld.LevelMap == originalMap);</div>
-<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span> </div>
-<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span>        <span class="keywordflow">if</span> (index &lt; 0)</div>
-<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span>        {</div>
-<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Cannot replace level; original map was not found.&quot;</span>);</div>
-<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span>        }</div>
-<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span> </div>
-<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span>        <a class="code hl_class" href="class_level_map.html">LevelMap</a> savedMap = editedMap.<a class="code hl_function" href="class_level_map.html#a0cc6441f610383baba061b75d97635f5">Copy</a>();</div>
-<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span> </div>
-<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span>        <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels[index] = <span class="keyword">new</span> <a class="code hl_class" href="class_game_data_manager_1_1_level_data.html">LevelData</a>(savedMap);</div>
-<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span> </div>
-<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span>        <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> == originalMap)</div>
-<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span>            <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = savedMap;</div>
+<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span> </div>
+<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span><span class="preprocessor">    #endregion</span></div>
+<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span> </div>
+<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span><span class="preprocessor">    #region Level Editing</span></div>
+<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span><span class="comment"></span> </div>
+<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span><span class="comment">    /// Creates an editable copy of a stored level map.</span></div>
+<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span><span class="comment">    /// &lt;param name=&quot;sourceMap&quot;&gt;Stored level map to copy for editing.&lt;/param&gt;</span></div>
+<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span><span class="comment">    /// &lt;returns&gt;Editable copy of the level map, or &lt;c&gt;null&lt;/c&gt; if the source map is invalid or not stored.&lt;/returns&gt;</span></div>
+<div class="foldopen" id="foldopen00978" data-start="{" data-end="}">
+<div class="line"><a id="l00978" name="l00978"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a34650071138f10d015599b46bf3aaaa9">  978</a></span>    <span class="keyword">public</span> <a class="code hl_class" href="class_level_map.html">LevelMap</a> <a class="code hl_function" href="class_game_data_manager.html#a34650071138f10d015599b46bf3aaaa9">CreateEditableCopy</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> sourceMap)</div>
+<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span>    {</div>
+<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span>        <span class="keywordflow">if</span> (sourceMap == <span class="keyword">null</span>)</div>
+<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span>        {</div>
+<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] CreateEditableCopy called with null map.&quot;</span>);</div>
+<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span>            <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span>        }</div>
+<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span> </div>
+<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span>        <span class="keywordtype">int</span> index = <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.FindIndex(ld =&gt; ld.LevelMap == sourceMap);</div>
+<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span> </div>
+<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>        <span class="keywordflow">if</span> (index &lt; 0)</div>
+<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span>        {</div>
+<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Cannot edit level; map is not present in CurrentGameData.&quot;</span>);</div>
+<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span>            <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span>        }</div>
+<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span> </div>
+<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>        <span class="keywordflow">return</span> <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels[index].LevelMap.Copy();</div>
+<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>    }</div>
+</div>
+<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span><span class="comment"></span> </div>
+<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span><span class="comment">    /// Replaces a stored level with an edited version.</span></div>
+<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span><span class="comment">    /// &lt;param name=&quot;originalMap&quot;&gt;Original stored level map to replace.&lt;/param&gt;</span></div>
+<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span><span class="comment">    /// &lt;param name=&quot;editedMap&quot;&gt;Edited level map to save in its place.&lt;/param&gt;</span></div>
+<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span><span class="comment">    /// &lt;returns&gt;&lt;c&gt;true&lt;/c&gt; if the stored level was replaced; otherwise &lt;c&gt;false&lt;/c&gt;.&lt;/returns&gt;</span></div>
+<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span><span class="comment">    /// &lt;remarks&gt;</span></div>
+<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span><span class="comment">    /// Replacing a level resets its associated best time, splits, and replay by creating a new</span></div>
+<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span><span class="comment">    /// &lt;see cref=&quot;LevelData&quot;/&gt; record for the edited map.</span></div>
+<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span><span class="comment">    /// &lt;/remarks&gt;</span></div>
+<div class="foldopen" id="foldopen01007" data-start="{" data-end="}">
+<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9"> 1007</a></span>    <span class="keyword">public</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9">ReplaceLevel</a>(<a class="code hl_class" href="class_level_map.html">LevelMap</a> originalMap, <a class="code hl_class" href="class_level_map.html">LevelMap</a> editedMap)</div>
+<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span>    {</div>
+<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span>        <span class="keywordflow">if</span> (originalMap == <span class="keyword">null</span>)</div>
+<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span>        {</div>
+<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] ReplaceLevel called with null original map.&quot;</span>);</div>
+<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>        }</div>
+<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span> </div>
+<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span>        <span class="keywordflow">if</span> (editedMap == <span class="keyword">null</span>)</div>
+<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span>        {</div>
+<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span>            Debug.LogError(<span class="stringliteral">&quot;[GameDataManager] ReplaceLevel called with null edited map.&quot;</span>);</div>
+<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>        }</div>
+<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span> </div>
+<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span>        <span class="keywordtype">int</span> index = <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.FindIndex(ld =&gt; ld.LevelMap == originalMap);</div>
 <div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span> </div>
-<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>        PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
-<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span>        SaveGameData();</div>
-<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span> </div>
-<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>    }</div>
-</div>
+<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>        <span class="keywordflow">if</span> (index &lt; 0)</div>
+<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span>        {</div>
+<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] Cannot replace level; original map was not found.&quot;</span>);</div>
+<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>        }</div>
 <div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span> </div>
-<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span><span class="preprocessor">    #endregion</span></div>
+<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span>        <a class="code hl_class" href="class_level_map.html">LevelMap</a> savedMap = editedMap.<a class="code hl_function" href="class_level_map.html#a0cc6441f610383baba061b75d97635f5">Copy</a>();</div>
 <div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span> </div>
-<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span><span class="preprocessor">    #region Internals</span></div>
-<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span><span class="comment"></span> </div>
-<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span><span class="comment">    /// Updates the stored hash and notifies listeners when the content hash changes.</span></div>
-<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span><span class="comment">    /// &lt;param name=&quot;hash&quot;&gt;Newly computed content hash.&lt;/param&gt;</span></div>
-<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>    <span class="keyword">private</span> <span class="keywordtype">void</span> PotentialHashChange(<span class="keywordtype">int</span> hash)</div>
-<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>    {</div>
-<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>        <span class="keywordflow">if</span> (hash == <a class="code hl_property" href="class_game_data_manager.html#a35418732f84ead447d77f9a1d7444f85">Hash</a>)</div>
-<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>        <a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels[index] = <span class="keyword">new</span> <a class="code hl_class" href="class_game_data_manager_1_1_level_data.html">LevelData</a>(savedMap);</div>
+<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span> </div>
+<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>        <span class="keywordflow">if</span> (<a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> == originalMap)</div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>            <a class="code hl_property" href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">CurrentLevelMap</a> = savedMap;</div>
+<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span> </div>
+<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>        PotentialHashChange(<a class="code hl_property" href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">CurrentGameData</a>.Levels.GetContentHash());</div>
+<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>        SaveGameData();</div>
+<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span> </div>
+<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>    }</div>
+</div>
 <div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span> </div>
-<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>        <a class="code hl_property" href="class_game_data_manager.html#a35418732f84ead447d77f9a1d7444f85">Hash</a> = hash;</div>
+<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span><span class="preprocessor">    #endregion</span></div>
 <div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span> </div>
-<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>        Action[] listeners = onGameDataChanged.ToArray();</div>
-<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span> </div>
-<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; listeners.Length; i++)</div>
-<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span>        {</div>
-<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span>            <span class="keywordflow">try</span></div>
-<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span>            {</div>
-<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span>                listeners[i]?.Invoke();</div>
-<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>            }</div>
-<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span>            <span class="keywordflow">catch</span> (Exception e)</div>
-<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>            {</div>
-<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>                Debug.LogException(e);</div>
-<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span>            }</div>
-<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>        }</div>
-<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>    }</div>
+<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span><span class="preprocessor">    #region Internals</span></div>
+<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span><span class="comment"></span> </div>
+<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span><span class="comment">    /// Updates the stored hash and notifies listeners when the content hash changes.</span></div>
+<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span><span class="comment">    /// &lt;param name=&quot;hash&quot;&gt;Newly computed content hash.&lt;/param&gt;</span></div>
+<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span>    <span class="keyword">private</span> <span class="keywordtype">void</span> PotentialHashChange(<span class="keywordtype">int</span> hash)</div>
+<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>    {</div>
+<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span>        <span class="keywordflow">if</span> (hash == <a class="code hl_property" href="class_game_data_manager.html#a35418732f84ead447d77f9a1d7444f85">Hash</a>)</div>
+<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span> </div>
+<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span>        <a class="code hl_property" href="class_game_data_manager.html#a35418732f84ead447d77f9a1d7444f85">Hash</a> = hash;</div>
+<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span> </div>
+<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>        Action[] listeners = onGameDataChanged.ToArray();</div>
 <div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span> </div>
-<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span><span class="preprocessor">    #endregion</span></div>
-<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span> </div>
-<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span><span class="preprocessor">    #region Context Menu</span></div>
-<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span><span class="comment"></span> </div>
-<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span><span class="comment">    /// Copies the raw saved game-data JSON from PlayerPrefs to the system clipboard.</span></div>
-<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>    [ContextMenu(<span class="stringliteral">&quot;Copy Saved GameData To Clipboard&quot;</span>)]</div>
-<div class="foldopen" id="foldopen01067" data-start="{" data-end="}">
-<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#abf6113ed9bd4ca5283ddd704e41971e2"> 1067</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#abf6113ed9bd4ca5283ddd704e41971e2">CopySavedGameDataToClipboard</a>()</div>
-<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>    {</div>
-<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>        <span class="keywordtype">string</span> json = PlayerPrefs.GetString(<span class="stringliteral">&quot;GameData&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span> </div>
-<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>        <span class="keywordflow">if</span> (<span class="keywordtype">string</span>.IsNullOrEmpty(json))</div>
-<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>        {</div>
-<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] No saved GameData found.&quot;</span>);</div>
-<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>        }</div>
-<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span> </div>
-<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>        GUIUtility.systemCopyBuffer = json;</div>
-<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>        Debug.Log(<span class="stringliteral">&quot;[GameDataManager] Saved GameData copied to clipboard.&quot;</span>);</div>
-<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>    }</div>
+<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; listeners.Length; i++)</div>
+<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span>        {</div>
+<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span>            <span class="keywordflow">try</span></div>
+<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span>            {</div>
+<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span>                listeners[i]?.Invoke();</div>
+<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>            }</div>
+<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span>            <span class="keywordflow">catch</span> (Exception e)</div>
+<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>            {</div>
+<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>                Debug.LogException(e);</div>
+<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>            }</div>
+<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>        }</div>
+<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>    }</div>
+<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span> </div>
+<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span><span class="preprocessor">    #endregion</span></div>
+<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span> </div>
+<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span><span class="preprocessor">    #region Context Menu</span></div>
+<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span><span class="comment"></span> </div>
+<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span><span class="comment">    /// Copies the raw saved game-data JSON from PlayerPrefs to the system clipboard.</span></div>
+<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>    [ContextMenu(<span class="stringliteral">&quot;Copy Saved GameData To Clipboard&quot;</span>)]</div>
+<div class="foldopen" id="foldopen01080" data-start="{" data-end="}">
+<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#abf6113ed9bd4ca5283ddd704e41971e2"> 1080</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#abf6113ed9bd4ca5283ddd704e41971e2">CopySavedGameDataToClipboard</a>()</div>
+<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>    {</div>
+<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>        <span class="keywordtype">string</span> json = PlayerPrefs.GetString(<span class="stringliteral">&quot;GameData&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span> </div>
+<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>        <span class="keywordflow">if</span> (<span class="keywordtype">string</span>.IsNullOrEmpty(json))</div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>        {</div>
+<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] No saved GameData found.&quot;</span>);</div>
+<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>        }</div>
+<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span> </div>
+<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>        GUIUtility.systemCopyBuffer = json;</div>
+<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>        Debug.Log(<span class="stringliteral">&quot;[GameDataManager] Saved GameData copied to clipboard.&quot;</span>);</div>
+<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>    }</div>
 </div>
-<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span><span class="comment"></span> </div>
-<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span><span class="comment">    /// &lt;summary&gt;</span></div>
-<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span><span class="comment">    /// Deletes the saved game-data JSON from PlayerPrefs.</span></div>
-<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span><span class="comment">    /// &lt;/summary&gt;</span></div>
-<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>    [ContextMenu(<span class="stringliteral">&quot;Delete Saved GameData&quot;</span>)]</div>
-<div class="foldopen" id="foldopen01085" data-start="{" data-end="}">
-<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#ac0c4f201961842f4740d65d7f4a6afd6"> 1085</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#ac0c4f201961842f4740d65d7f4a6afd6">DeleteSavedGameData</a>()</div>
-<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>    {</div>
-<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>        <span class="keywordflow">if</span> (!PlayerPrefs.HasKey(<span class="stringliteral">&quot;GameData&quot;</span>))</div>
-<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>        {</div>
-<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] No saved GameData found to delete.&quot;</span>);</div>
-<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>        }</div>
-<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span> </div>
-<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>        PlayerPrefs.DeleteKey(<span class="stringliteral">&quot;GameData&quot;</span>);</div>
-<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>        PlayerPrefs.Save();</div>
-<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span> </div>
-<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span>        Debug.Log(<span class="stringliteral">&quot;[GameDataManager] Saved GameData deleted.&quot;</span>);</div>
-<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>    }</div>
+<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span><span class="comment"></span> </div>
+<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span><span class="comment">    /// &lt;summary&gt;</span></div>
+<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span><span class="comment">    /// Deletes the saved game-data JSON from PlayerPrefs.</span></div>
+<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span><span class="comment">    /// &lt;/summary&gt;</span></div>
+<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>    [ContextMenu(<span class="stringliteral">&quot;Delete Saved GameData&quot;</span>)]</div>
+<div class="foldopen" id="foldopen01098" data-start="{" data-end="}">
+<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"><a class="line" href="class_game_data_manager.html#ac0c4f201961842f4740d65d7f4a6afd6"> 1098</a></span>    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="class_game_data_manager.html#ac0c4f201961842f4740d65d7f4a6afd6">DeleteSavedGameData</a>()</div>
+<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>    {</div>
+<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>        <span class="keywordflow">if</span> (!PlayerPrefs.HasKey(<span class="stringliteral">&quot;GameData&quot;</span>))</div>
+<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span>        {</div>
+<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>            Debug.LogWarning(<span class="stringliteral">&quot;[GameDataManager] No saved GameData found to delete.&quot;</span>);</div>
+<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>        }</div>
+<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span> </div>
+<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>        PlayerPrefs.DeleteKey(<span class="stringliteral">&quot;GameData&quot;</span>);</div>
+<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>        PlayerPrefs.Save();</div>
+<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span> </div>
+<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>        Debug.Log(<span class="stringliteral">&quot;[GameDataManager] Saved GameData deleted.&quot;</span>);</div>
+<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>    }</div>
 </div>
-<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span> </div>
-<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span><span class="preprocessor">    #endregion Context Menu</span></div>
-<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>}</div>
+<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span> </div>
+<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span><span class="preprocessor">    #endregion Context Menu</span></div>
+<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span>}</div>
 </div>
 <div class="ttc" id="aclass_game_data_manager_1_1_assists_settings_html_a423bfd7101840b071cc8d64035e62c55"><div class="ttname"><a href="class_game_data_manager_1_1_assists_settings.html#a423bfd7101840b071cc8d64035e62c55">GameDataManager.AssistsSettings.TC</a></div><div class="ttdeci">bool TC</div><div class="ttdoc">Whether traction-control assist is enabled.</div><div class="ttdef"><b>Definition</b> <a href="#l00259">GameDataManager.cs:259</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_1_1_assists_settings_html_a7cb00be58b3938cd7d1201f20763c22c"><div class="ttname"><a href="class_game_data_manager_1_1_assists_settings.html#a7cb00be58b3938cd7d1201f20763c22c">GameDataManager.AssistsSettings.AssistsSettings</a></div><div class="ttdeci">AssistsSettings(SerializationInfo info, StreamingContext context)</div><div class="ttdoc">Deserialization constructor for assist settings.</div><div class="ttdef"><b>Definition</b> <a href="#l00275">GameDataManager.cs:275</a></div></div>
@@ -1351,25 +1366,26 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_game_data_man
 <div class="ttc" id="aclass_game_data_manager_1_1_level_data_html_aea46aca7945848055d97cc5f1a2604e6"><div class="ttname"><a href="class_game_data_manager_1_1_level_data.html#aea46aca7945848055d97cc5f1a2604e6">GameDataManager.LevelData.CheckpointTimeSplits</a></div><div class="ttdeci">float[] CheckpointTimeSplits</div><div class="ttdoc">Best checkpoint split times for this level.</div><div class="ttdef"><b>Definition</b> <a href="#l00057">GameDataManager.cs:57</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_1_1_level_data_html_af180ed9cd6c018b851b8d5c92d15aead"><div class="ttname"><a href="class_game_data_manager_1_1_level_data.html#af180ed9cd6c018b851b8d5c92d15aead">GameDataManager.LevelData.Equals</a></div><div class="ttdeci">override bool Equals(object obj)</div><div class="ttdoc">Checks whether this level-data record equals another object.</div><div class="ttdef"><b>Definition</b> <a href="#l00160">GameDataManager.cs:160</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html"><div class="ttname"><a href="class_game_data_manager.html">GameDataManager</a></div><div class="ttdoc">Runtime manager for persistent game progression data.</div><div class="ttdef"><b>Definition</b> <a href="#l00027">GameDataManager.cs:28</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_a01ccd95b645ee5190eb06a7d79ff8376"><div class="ttname"><a href="class_game_data_manager.html#a01ccd95b645ee5190eb06a7d79ff8376">GameDataManager.ClearLevels</a></div><div class="ttdeci">void ClearLevels()</div><div class="ttdoc">Clears all custom levels from the data set.</div><div class="ttdef"><b>Definition</b> <a href="#l00947">GameDataManager.cs:947</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_a01ccd95b645ee5190eb06a7d79ff8376"><div class="ttname"><a href="class_game_data_manager.html#a01ccd95b645ee5190eb06a7d79ff8376">GameDataManager.ClearLevels</a></div><div class="ttdeci">void ClearLevels()</div><div class="ttdoc">Clears all custom levels from the data set.</div><div class="ttdef"><b>Definition</b> <a href="#l00960">GameDataManager.cs:960</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a033a3349038fe95e19abd61963e376c0"><div class="ttname"><a href="class_game_data_manager.html#a033a3349038fe95e19abd61963e376c0">GameDataManager.RemoveListener</a></div><div class="ttdeci">void RemoveListener(Action action)</div><div class="ttdoc">Unsubscribes a previously registered listener.</div><div class="ttdef"><b>Definition</b> <a href="#l00675">GameDataManager.cs:675</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a0bf15b012246f84800bab2b48866ad16"><div class="ttname"><a href="class_game_data_manager.html#a0bf15b012246f84800bab2b48866ad16">GameDataManager.GetABS</a></div><div class="ttdeci">bool GetABS()</div><div class="ttdoc">Gets whether ABS assist is enabled in saved settings.</div><div class="ttdef"><b>Definition</b> <a href="#l00610">GameDataManager.cs:610</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a0f3e99cc2a236449683c335cb57c7078"><div class="ttname"><a href="class_game_data_manager.html#a0f3e99cc2a236449683c335cb57c7078">GameDataManager.CurrentGameData</a></div><div class="ttdeci">GameData CurrentGameData</div><div class="ttdoc">Active saved game-data set.</div><div class="ttdef"><b>Definition</b> <a href="#l00588">GameDataManager.cs:588</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a2120f5e731bfe98149cb8d89a299343b"><div class="ttname"><a href="class_game_data_manager.html#a2120f5e731bfe98149cb8d89a299343b">GameDataManager.CurrentLevelMap</a></div><div class="ttdeci">LevelMap CurrentLevelMap</div><div class="ttdoc">Currently selected level to be played.</div><div class="ttdef"><b>Definition</b> <a href="#l00596">GameDataManager.cs:596</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_a2d38e5e8a14ae8e9ab28be10ce78e31e"><div class="ttname"><a href="class_game_data_manager.html#a2d38e5e8a14ae8e9ab28be10ce78e31e">GameDataManager.AddLevel</a></div><div class="ttdeci">void AddLevel(LevelMap map)</div><div class="ttdoc">Adds a level to the data set if it does not already exist.</div><div class="ttdef"><b>Definition</b> <a href="#l00887">GameDataManager.cs:887</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_a314420307ede09adca3a34a17438360b"><div class="ttname"><a href="class_game_data_manager.html#a314420307ede09adca3a34a17438360b">GameDataManager.CompleteLevel</a></div><div class="ttdeci">void CompleteLevel(float time, float[] checkpointSplits, Replay replay)</div><div class="ttdoc">Records completion of the currently selected level and updates the best time if improved.</div><div class="ttdef"><b>Definition</b> <a href="#l00865">GameDataManager.cs:865</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_a34650071138f10d015599b46bf3aaaa9"><div class="ttname"><a href="class_game_data_manager.html#a34650071138f10d015599b46bf3aaaa9">GameDataManager.CreateEditableCopy</a></div><div class="ttdeci">LevelMap CreateEditableCopy(LevelMap sourceMap)</div><div class="ttdoc">Creates an editable copy of a stored level map.</div><div class="ttdef"><b>Definition</b> <a href="#l00965">GameDataManager.cs:965</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_a2d38e5e8a14ae8e9ab28be10ce78e31e"><div class="ttname"><a href="class_game_data_manager.html#a2d38e5e8a14ae8e9ab28be10ce78e31e">GameDataManager.AddLevel</a></div><div class="ttdeci">void AddLevel(LevelMap map)</div><div class="ttdoc">Adds a level to the data set if it does not already exist.</div><div class="ttdef"><b>Definition</b> <a href="#l00900">GameDataManager.cs:900</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_a314420307ede09adca3a34a17438360b"><div class="ttname"><a href="class_game_data_manager.html#a314420307ede09adca3a34a17438360b">GameDataManager.CompleteLevel</a></div><div class="ttdeci">void CompleteLevel(float time, float[] checkpointSplits, Replay replay)</div><div class="ttdoc">Records completion of the currently selected level and updates the best time if improved.</div><div class="ttdef"><b>Definition</b> <a href="#l00878">GameDataManager.cs:878</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_a34650071138f10d015599b46bf3aaaa9"><div class="ttname"><a href="class_game_data_manager.html#a34650071138f10d015599b46bf3aaaa9">GameDataManager.CreateEditableCopy</a></div><div class="ttdeci">LevelMap CreateEditableCopy(LevelMap sourceMap)</div><div class="ttdoc">Creates an editable copy of a stored level map.</div><div class="ttdef"><b>Definition</b> <a href="#l00978">GameDataManager.cs:978</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a35418732f84ead447d77f9a1d7444f85"><div class="ttname"><a href="class_game_data_manager.html#a35418732f84ead447d77f9a1d7444f85">GameDataManager.Hash</a></div><div class="ttdeci">int Hash</div><div class="ttdoc">Hash of the current level-list content.</div><div class="ttdef"><b>Definition</b> <a href="#l00650">GameDataManager.cs:650</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_a3a1f25a26dc714878142d348f3a36d3a"><div class="ttname"><a href="class_game_data_manager.html#a3a1f25a26dc714878142d348f3a36d3a">GameDataManager.UnselectLevelMap</a></div><div class="ttdeci">void UnselectLevelMap()</div><div class="ttdoc">Clears the currently selected level map.</div><div class="ttdef"><b>Definition</b> <a href="#l00859">GameDataManager.cs:859</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a3c43b7da0c3b3e27591267789663b1e2"><div class="ttname"><a href="class_game_data_manager.html#a3c43b7da0c3b3e27591267789663b1e2">GameDataManager.Awake</a></div><div class="ttdeci">override void Awake()</div><div class="ttdoc">Loads saved game data from PlayerPrefs if present.</div><div class="ttdef"><b>Definition</b> <a href="#l00688">GameDataManager.cs:688</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_a5be821bacd3d739de21db848aaccb9ef"><div class="ttname"><a href="class_game_data_manager.html#a5be821bacd3d739de21db848aaccb9ef">GameDataManager.RemoveLevel</a></div><div class="ttdeci">void RemoveLevel(LevelMap levelMap)</div><div class="ttdoc">Removes a level from the data set if present.</div><div class="ttdef"><b>Definition</b> <a href="#l00914">GameDataManager.cs:914</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_a5be821bacd3d739de21db848aaccb9ef"><div class="ttname"><a href="class_game_data_manager.html#a5be821bacd3d739de21db848aaccb9ef">GameDataManager.RemoveLevel</a></div><div class="ttdeci">void RemoveLevel(LevelMap levelMap)</div><div class="ttdoc">Removes a level from the data set if present.</div><div class="ttdef"><b>Definition</b> <a href="#l00927">GameDataManager.cs:927</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a6b00c0e8c196fa8bc03c9ecbfd56e01f"><div class="ttname"><a href="class_game_data_manager.html#a6b00c0e8c196fa8bc03c9ecbfd56e01f">GameDataManager.SetABS</a></div><div class="ttdeci">void SetABS(bool enabled)</div><div class="ttdoc">Sets the saved ABS assist state and persists game data.</div><div class="ttdef"><b>Definition</b> <a href="#l00619">GameDataManager.cs:619</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a747df21347aa2f702507a966a4d7334f"><div class="ttname"><a href="class_game_data_manager.html#a747df21347aa2f702507a966a4d7334f">GameDataManager.GetCurrentMapReplay</a></div><div class="ttdeci">Replay GetCurrentMapReplay()</div><div class="ttdoc">Gets the best replay for the currently selected map.</div><div class="ttdef"><b>Definition</b> <a href="#l00822">GameDataManager.cs:822</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a88d2285857dac8a20ad0b06d31c94008"><div class="ttname"><a href="class_game_data_manager.html#a88d2285857dac8a20ad0b06d31c94008">GameDataManager.CurrentLevelReplay</a></div><div class="ttdeci">Replay CurrentLevelReplay</div><div class="ttdoc">Best replay for the currently selected map.</div><div class="ttdef"><b>Definition</b> <a href="#l00604">GameDataManager.cs:604</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_a88f6e5689f09e80d2127a4ac6f5576c9"><div class="ttname"><a href="class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9">GameDataManager.ReplaceLevel</a></div><div class="ttdeci">bool ReplaceLevel(LevelMap originalMap, LevelMap editedMap)</div><div class="ttdoc">Replaces a stored level with an edited version.</div><div class="ttdef"><b>Definition</b> <a href="#l00994">GameDataManager.cs:994</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_a88f6e5689f09e80d2127a4ac6f5576c9"><div class="ttname"><a href="class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9">GameDataManager.ReplaceLevel</a></div><div class="ttdeci">bool ReplaceLevel(LevelMap originalMap, LevelMap editedMap)</div><div class="ttdoc">Replaces a stored level with an edited version.</div><div class="ttdef"><b>Definition</b> <a href="#l01007">GameDataManager.cs:1007</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_a8e9650842f1d9c746be23560a7bab3a0"><div class="ttname"><a href="class_game_data_manager.html#a8e9650842f1d9c746be23560a7bab3a0">GameDataManager.GoToSelectedLevel</a></div><div class="ttdeci">void GoToSelectedLevel()</div><div class="ttdoc">Attempts to start gameplay by loading the level scene.</div><div class="ttdef"><b>Definition</b> <a href="#l00787">GameDataManager.cs:787</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_ab9f2993ef658383dc4a46fcaf0490f04"><div class="ttname"><a href="class_game_data_manager.html#ab9f2993ef658383dc4a46fcaf0490f04">GameDataManager.SelectingLevelMap</a></div><div class="ttdeci">void SelectingLevelMap(LevelMap map)</div><div class="ttdoc">Selects a level for play, provided it exists in CurrentGameData.</div><div class="ttdef"><b>Definition</b> <a href="#l00834">GameDataManager.cs:834</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_abf6113ed9bd4ca5283ddd704e41971e2"><div class="ttname"><a href="class_game_data_manager.html#abf6113ed9bd4ca5283ddd704e41971e2">GameDataManager.CopySavedGameDataToClipboard</a></div><div class="ttdeci">void CopySavedGameDataToClipboard()</div><div class="ttdoc">Copies the raw saved game-data JSON from PlayerPrefs to the system clipboard.</div><div class="ttdef"><b>Definition</b> <a href="#l01067">GameDataManager.cs:1067</a></div></div>
-<div class="ttc" id="aclass_game_data_manager_html_ac0c4f201961842f4740d65d7f4a6afd6"><div class="ttname"><a href="class_game_data_manager.html#ac0c4f201961842f4740d65d7f4a6afd6">GameDataManager.DeleteSavedGameData</a></div><div class="ttdeci">void DeleteSavedGameData()</div><div class="ttdoc">Deletes the saved game-data JSON from PlayerPrefs.</div><div class="ttdef"><b>Definition</b> <a href="#l01085">GameDataManager.cs:1085</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_abf6113ed9bd4ca5283ddd704e41971e2"><div class="ttname"><a href="class_game_data_manager.html#abf6113ed9bd4ca5283ddd704e41971e2">GameDataManager.CopySavedGameDataToClipboard</a></div><div class="ttdeci">void CopySavedGameDataToClipboard()</div><div class="ttdoc">Copies the raw saved game-data JSON from PlayerPrefs to the system clipboard.</div><div class="ttdef"><b>Definition</b> <a href="#l01080">GameDataManager.cs:1080</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html_ac0c4f201961842f4740d65d7f4a6afd6"><div class="ttname"><a href="class_game_data_manager.html#ac0c4f201961842f4740d65d7f4a6afd6">GameDataManager.DeleteSavedGameData</a></div><div class="ttdeci">void DeleteSavedGameData()</div><div class="ttdoc">Deletes the saved game-data JSON from PlayerPrefs.</div><div class="ttdef"><b>Definition</b> <a href="#l01098">GameDataManager.cs:1098</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_ae104ca69a2307465fc79b1d6c085976e"><div class="ttname"><a href="class_game_data_manager.html#ae104ca69a2307465fc79b1d6c085976e">GameDataManager.SetTC</a></div><div class="ttdeci">void SetTC(bool enabled)</div><div class="ttdoc">Sets the saved traction control assist state and persists game data.</div><div class="ttdef"><b>Definition</b> <a href="#l00638">GameDataManager.cs:638</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_aecd885c90ac8954781447bd685aacd41"><div class="ttname"><a href="class_game_data_manager.html#aecd885c90ac8954781447bd685aacd41">GameDataManager.AddListener</a></div><div class="ttdeci">void AddListener(Action action)</div><div class="ttdoc">Subscribes a listener to game-data hash-change notifications.</div><div class="ttdef"><b>Definition</b> <a href="#l00665">GameDataManager.cs:665</a></div></div>
 <div class="ttc" id="aclass_game_data_manager_html_afcd73ab82a67e8ac5dd4ffcf1955d2d0"><div class="ttname"><a href="class_game_data_manager.html#afcd73ab82a67e8ac5dd4ffcf1955d2d0">GameDataManager.GetCurrentMapSplit</a></div><div class="ttdeci">float GetCurrentMapSplit(int splitIndex)</div><div class="ttdoc">Gets the saved checkpoint split for the currently selected map.</div><div class="ttdef"><b>Definition</b> <a href="#l00805">GameDataManager.cs:805</a></div></div>

@@ -73,3 +73,7 @@ MonoBehaviour:
     scenePath: Assets/Scenes/Level Replay.unity
     sceneAsset: {fileID: 102900000, guid: ef8c864e9603e1141bf2d39867121505, type: 3}
     audioClip: {fileID: 8300000, guid: 97676b2ac6761d444ab17b374613e3b6, type: 3}
+  - sceneName: Level - Night
+    scenePath: Assets/Scenes/Level - Night.unity
+    sceneAsset: {fileID: 102900000, guid: 6d0bc5837e5bcaa44a4855518b3f67e1, type: 3}
+    audioClip: {fileID: 8300000, guid: 97676b2ac6761d444ab17b374613e3b6, type: 3}

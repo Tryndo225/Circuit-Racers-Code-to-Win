@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('group__track__
 </div><!--header-->
 <div class="contents">
 
-<p>Race flow control (start/restart, laps, checkpoints, respawn) and player car spawning.  
+<p>Race flow control, checkpoint progression, restart/respawn handling, and player car spawning.  
 <a href="#details">More...</a></p>
 <div class="dynheader">
 Collaboration diagram for Track Manager:</div>
@@ -140,207 +140,253 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manages race flow for a track with sequential checkpoints.  <a href="class_track_manager.html#details">More...</a><br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Race flow control (start/restart, laps, checkpoints, respawn) and player car spawning. </p>
-<p>The Track Manager is implemented by <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> (a MonoBehaviour placed in the race scene). It owns race lifecycle (start/restart/finish), lap counting (for circuit mode), checkpoint progression, respawn logic with a short freeze/teleport, and player car instantiation + camera target assignment.</p>
-<p>It also exposes timing properties (current lap time, last lap time, total time) and forwards completion to <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a> for persistence.</p>
+<div class="textblock"><p>Race flow control, checkpoint progression, restart/respawn handling, and player car spawning. </p>
+<p>The Track Manager is implemented by <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a>, a MonoBehaviour placed in the race scene. It coordinates the runtime race lifecycle: spawning/restarting the player car, checkpoint activation, lap progression, point-to-point completion, circuit completion, respawn handling, and camera target assignment.</p>
+<p>The subsystem exposes race-progress properties such as the current lap, next required checkpoint, finish state, and respawn countdown. Race timing itself is coordinated through <a class="el" href="class_race_time_manager.html" title="Manages race timing, lap timing, checkpoint splits, and race completion.">RaceTimeManager</a>.</p>
 <p>Contents:</p><ul>
-<li>see track_mng_overview</li>
-<li>see track_mng_inspector</li>
-<li>see track_mng_lifecycle</li>
-<li>see track_mng_checkpoints</li>
-<li>see track_mng_respawn</li>
-<li>see track_mng_usage</li>
-<li>see track_mng_api</li>
-<li>see track_mng_integration</li>
-<li>see track_mng_troubleshooting</li>
-<li>see track_mng_versions</li>
+<li><a class="el" href="#track_mng_overview" title="Overview">Overview</a></li>
+<li><a class="el" href="#track_mng_inspector" title="Inspector (TrackManager)">Inspector (TrackManager)</a></li>
+<li><a class="el" href="#track_mng_lifecycle" title="Lifecycle">Lifecycle</a></li>
+<li><a class="el" href="#track_mng_checkpoints" title="Checkpoints &amp; Laps">Checkpoints &amp; Laps</a></li>
+<li><a class="el" href="#track_mng_respawn" title="Respawn &amp; Restart">Respawn &amp; Restart</a></li>
+<li><a class="el" href="#track_mng_usage" title="Usage">Usage</a></li>
+<li><a class="el" href="#track_mng_api" title="Public API Reference">Public API Reference</a></li>
+<li><a class="el" href="#track_mng_integration" title="Integration Notes">Integration Notes</a></li>
+<li><a class="el" href="#track_mng_troubleshooting" title="Troubleshooting">Troubleshooting</a></li>
+<li><a class="el" href="#track_mng_versions" title="Version History">Version History</a></li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_overview"></a>
 Overview</h1>
 <p>Responsibilities:</p><ul>
-<li>Spawning the player car at a designated Start/Finish transform (or self as fallback).</li>
-<li>Wiring the <a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> target to the spawned car and syncing it on respawns.</li>
-<li>Managing race flow for circuit or point-to-point tracks.</li>
+<li>Spawning the player car at a designated spawn transform, with a fallback to the <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform.</li>
+<li>Wiring the <a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> target to the spawned car and syncing it after respawns.</li>
+<li>Managing race flow for circuit and point-to-point tracks.</li>
 <li>Tracking checkpoint order and enabling only the next required checkpoint.</li>
-<li>Handling player-initiated respawn and full restart actions (Input System).</li>
-<li>Computing lap and total timers; finalizing results and notifying <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
+<li>Handling player-initiated respawn and full restart actions through the Unity Input System.</li>
+<li>Starting and ending race timing through <a class="el" href="class_race_time_manager.html" title="Manages race timing, lap timing, checkpoint splits, and race completion.">RaceTimeManager</a>.</li>
+<li>Clearing stale selected level data when a scene-defined track is started without a generated-track placer.</li>
 </ul>
 <p>Dependencies:</p><ul>
-<li>UnityEngine.InputSystem (InputActionProperty).</li>
-<li><a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> components placed in the scene by the track builder.</li>
-<li><a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> for target and SyncCamera() calls.</li>
-<li><a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a> for persistence and level completion submission.</li>
+<li>UnityEngine.InputSystem for InputActionProperty-based respawn and restart actions.</li>
+<li><a class="el" href="class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene.">CheckPointManager</a> for checkpoint registration, activation, deactivation, and lookup.</li>
+<li><a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> components placed in the scene or generated by the track builder.</li>
+<li><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> for generated-track setup.</li>
+<li><a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> for target assignment and SyncCamera() calls.</li>
+<li><a class="el" href="class_race_time_manager.html" title="Manages race timing, lap timing, checkpoint splits, and race completion.">RaceTimeManager</a> for race start, lap pass, and race end timing.</li>
+<li><a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a> for clearing selected level-map state when using scene-defined tracks.</li>
 </ul>
 <p>Threading:</p><ul>
-<li>Unity main thread (MonoBehaviour lifecycle + coroutines).</li>
+<li>Unity main thread only.</li>
+<li>Uses MonoBehaviour lifecycle methods, input callbacks, Rigidbody state, and coroutines.</li>
 </ul>
 <p>Invariants:</p><ul>
-<li>Checkpoints are visited in the configured order; only the next checkpoint is active.</li>
-<li>In circuit mode, finishing occurs after the configured lap count with index 0 checkpoint as gate.</li>
-<li>Respawn places the car at the last valid checkpoint claim (position/rotation/velocities).</li>
+<li>Checkpoints are visited in configured order.</li>
+<li>Only the next expected checkpoint is active.</li>
+<li>In circuit mode, checkpoint 0 acts as the lap gate.</li>
+<li>In point-to-point mode, the final checkpoint ends the race.</li>
+<li>Respawn places the car at the last valid checkpoint claim, including position, rotation, and velocities.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_inspector"></a>
 Inspector (TrackManager)</h1>
-<p>Fields:</p><ul>
-<li>CheckPoints (List&lt;CheckPointListener&gt;): ordered checkpoint sensors making up the course.</li>
-<li>CarSpawn (Transform): preferred spawn transform; falls back to <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform if null.</li>
+<p>Spawn:</p><ul>
+<li>CarSpawn (Transform): preferred spawn transform for the player car. If null, the <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform is used as a fallback.</li>
 </ul>
 <p>Input Settings:</p><ul>
-<li>respawnLastCheckPoint (InputActionProperty): user input to respawn at previous checkpoint.</li>
-<li>restartRace (InputActionProperty): user input to restart the whole race.</li>
-<li>defaultBindings (bool): if true, default actions/bindings are created in OnValidate().</li>
+<li>respawnLastCheckPoint (InputActionProperty): input action used to respawn at the previous checkpoint.</li>
+<li>restartRace (InputActionProperty): input action used to restart the whole race.</li>
+<li>defaultBindings (bool): if true, default actions and bindings are created in OnValidate().</li>
 </ul>
 <p>Car Prefab Reference:</p><ul>
-<li>carPrefab (GameObject): the player car prefab to instantiate.</li>
-<li>carSpawnVerticalOffset (float): vertical offset applied on spawn.</li>
-<li>carSpawnHorizontalOffset (float): forward offset from spawn rotation.</li>
+<li>carPrefab (GameObject): player car prefab instantiated when the race starts or restarts.</li>
+<li>carSpawnVerticalOffset (float): vertical offset applied when spawning the car.</li>
+<li>carSpawnHorizontalOffset (float): forward/backward offset applied relative to the spawn rotation.</li>
 </ul>
 <p>Track Settings:</p><ul>
-<li>isCircuit (bool): true for lap-based circuit; false for point-to-point.</li>
-<li>laps (int, ShowIf(isCircuit)): number of laps required to finish.</li>
+<li>levelMap (<a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>): runtime level map used when the race is started from generated or saved track data.</li>
+<li>isCircuit (bool): true for lap-based circuit races; false for point-to-point races.</li>
+<li>laps (int, ShowIf(isCircuit)): number of laps required to finish a circuit race.</li>
 </ul>
 <p>Respawn Delay:</p><ul>
-<li>respawnDelay (float, 0..5): freeze timer (real-time) before resuming after a respawn.</li>
+<li>respawnDelay (float, 0..5): real-time freeze duration used during respawn.</li>
 </ul>
 <p>Runtime Properties (read-only):</p><ul>
-<li>LastLapTime (float): duration of the last completed lap (seconds).</li>
-<li>CurrentLapTime (float): duration since current lap start (seconds).</li>
-<li>TotalTrackTime (float): elapsed since race start or final total when finished.</li>
-<li>CurrentLap (int), TotalLaps (int): lap progress.</li>
-<li>CurrentCheckPointIndex (int), TotalCheckPoints (int): checkpoint progress.</li>
+<li>CurrentLap (int): current lap number.</li>
+<li>TotalLaps (int): configured lap count for circuit races.</li>
+<li>CurrentCheckPointIndex (int): index of the next checkpoint that must be claimed.</li>
 <li>IsRaceFinished (bool): whether the race has ended.</li>
-<li>RespawnTimer (float): remaining freeze time during respawn/restart countdowns.</li>
+<li>RespawnTimer (float): visible countdown value during respawn or restart countdowns.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_lifecycle"></a>
 Lifecycle</h1>
 <p>OnValidate:</p><ul>
-<li>Optionally creates default input actions/bindings (Backspace/Triangle/ButtonNorth for respawn; Delete/Start for restart).</li>
+<li>Optionally creates default input actions and bindings.</li>
+<li>Default respawn bindings: Backspace, Triangle, ButtonNorth.</li>
+<li>Default restart bindings: Delete, Start.</li>
 </ul>
 <p>OnEnable:</p><ul>
-<li>Enables actions; subscribes performed callbacks for respawn/restart.</li>
+<li>Enables respawn and restart actions.</li>
+<li>Subscribes performed callbacks for respawn and restart input.</li>
 </ul>
 <p>OnDisable:</p><ul>
-<li>Unsubscribes callbacks; disables actions.</li>
+<li>Unsubscribes input callbacks.</li>
+<li>Disables respawn and restart actions.</li>
 </ul>
 <p>Start:</p><ul>
-<li>If checkpoints exist, calls StartRace() to wire listeners and enter ready state (with a restart countdown).</li>
+<li>If a <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> exists, generated-track setup is expected and this method returns early.</li>
+<li>Otherwise, clears the currently selected level map through <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
+<li>Clears and auto-collects scene checkpoints through <a class="el" href="class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene.">CheckPointManager</a>.</li>
+<li>Starts the race using the scene-defined checkpoint layout.</li>
 </ul>
 <p>FixedUpdate:</p><ul>
-<li>Services pending respawn (kicks off RespawnDelayCoroutine).</li>
+<li>Starts the respawn coroutine when a respawn request is pending.</li>
 </ul>
-<p>OnApplication Flow:</p><ul>
-<li>Race can be restarted at any time via restart input (RestartCoroutine).</li>
+<p>Restart flow:</p><ul>
+<li>Restart input starts or restarts the restart countdown coroutine.</li>
+<li>The restart coroutine replaces the car, resets race state, pauses time briefly, and then resumes gameplay.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_checkpoints"></a>
 Checkpoints &amp; Laps</h1>
 <ul>
-<li>Each <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> toggles active state; only the next expected checkpoint is active.</li>
-<li>Upon trigger, <a class="el" href="class_track_manager.html#a148e1831d0184528f4f0835c074e813a" title="Handles the currently active checkpoint being claimed.">TrackManager.CheckPointTaken()</a> advances the index and manages lap logic.</li>
-<li>Circuit mode:<ul>
-<li>Checkpoint 0 acts as lap gate.</li>
-<li>When _currentLap == laps on reaching gate, race is finished.</li>
-<li>lapStartTime is updated at each gate pass; LastLapTime recorded.</li>
+<li>Checkpoints are owned and activated through <a class="el" href="class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene.">CheckPointManager</a>.</li>
+<li><a class="el" href="class_track_manager.html#a148e1831d0184528f4f0835c074e813a" title="Handles the currently active checkpoint being claimed.">TrackManager.CheckPointTaken()</a> is registered as the checkpoint listener callback.</li>
+<li>Only the next expected checkpoint is active.</li>
+<li>When the active checkpoint is claimed, the manager advances the checkpoint index and activates the next one.</li>
 </ul>
-</li>
-<li>Point-to-point mode:<ul>
-<li>Finishes when the last checkpoint (Count-1) is taken.</li>
+<p>Circuit mode:</p><ul>
+<li>Checkpoint 0 acts as the lap gate.</li>
+<li>The first pass initializes lap progress.</li>
+<li>Later passes call <a class="el" href="class_race_time_manager.html#a00ef603dbff16336be5c9e7d109f2b5f" title="Records the current lap duration and starts timing the next lap.">RaceTimeManager.LapPassed()</a>.</li>
+<li>When the configured lap count has been reached and checkpoint 0 is claimed again, the race finishes.</li>
 </ul>
-</li>
+<p>Point-to-point mode:</p><ul>
+<li>The race finishes when the final checkpoint is claimed.</li>
+<li>On finish, all checkpoints are deactivated and <a class="el" href="class_race_time_manager.html#aadcc0120aff836e6c87bd1fec3b23e79" title="Finishes the race, saves race results, and returns the final race time.">RaceTimeManager.RaceEnd()</a> is called.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_respawn"></a>
 Respawn &amp; Restart</h1>
-<p>Respawn (player initiated):</p><ul>
-<li>If finished: triggers restart countdown.</li>
-<li>Else if at first checkpoint:<ul>
-<li>Circuit and later laps: respawn to last checkpoint (Count-1).</li>
-<li>Otherwise: full restart countdown.</li>
-</ul>
-</li>
-<li>Else: respawn to previous checkpoint (index-1).</li>
+<p>Respawn:</p><ul>
+<li>If the race is finished, respawn input starts a full restart countdown.</li>
+<li>If the player is before the first checkpoint, respawn becomes a full restart.</li>
+<li>In circuit mode, when the checkpoint index has wrapped to zero after at least one lap, respawn targets the final checkpoint from the previous lap.</li>
+<li>Otherwise, respawn targets the previous checkpoint.</li>
 </ul>
 <p>Respawn mechanics:</p><ul>
-<li>Temporarily sets Rigidbody interpolation/kinematic to ensure a clean teleport.</li>
-<li>Teleports car to saved pose &amp; velocities captured by <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a>.</li>
-<li>Syncs transforms and <a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a>, then applies a short real-time freeze (respawnDelay).</li>
+<li>The pending respawn flag is consumed in FixedUpdate.</li>
+<li>The car Rigidbody interpolation state is temporarily adjusted for a clean teleport.</li>
+<li>The car is moved to the saved checkpoint pose.</li>
+<li>Linear and angular velocities saved by the checkpoint are restored.</li>
+<li>Physics transforms are synchronized.</li>
+<li>The follow camera is synchronized.</li>
+<li>Gameplay is paused for a short real-time countdown using Time.timeScale = 0.</li>
 </ul>
 <p>Restart:</p><ul>
-<li>Destroys existing car (if any) and respawns near CarSpawn (with offsets).</li>
-<li>Wires <a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> target, resets times/lap/checkpoint counters, and reactivates the first checkpoint.</li>
-<li>Runs a fixed 3-second real-time countdown (timeScale = 0 during countdown).</li>
+<li>Destroys the existing car instance if one exists.</li>
+<li>Spawns a new car near CarSpawn, or near the <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform as fallback.</li>
+<li>Tags the spawned car as Player.</li>
+<li>Assigns the spawned car as the follow-camera target.</li>
+<li>Resets lap, checkpoint, and finish state.</li>
+<li>Calls <a class="el" href="class_race_time_manager.html#a6e82eb4400597fab81c75e82b260af46" title="Starts a new race timer and prepares race-related timing state.">RaceTimeManager.RaceStart()</a>.</li>
+<li>Deactivates all checkpoints and activates checkpoint 0.</li>
+<li>Runs a fixed restart countdown while gameplay time is paused.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_usage"></a>
 Usage</h1>
-<p>Quick start:</p><ul>
-<li>Place <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> in the scene.</li>
-<li>Ensure <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> objects exist and are ordered in the CheckPoints list.</li>
-<li>Optionally assign CarSpawn; otherwise <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform is used.</li>
-<li>Assign carPrefab and <a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> in the scene.</li>
-<li>Press the restart key to begin the countdown and spawn the car.</li>
+<p>Scene-defined track:</p><ul>
+<li>Place a <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> in the race scene.</li>
+<li>Add <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> objects to the scene.</li>
+<li>Ensure <a class="el" href="class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene.">CheckPointManager</a> can auto-collect the checkpoints in the intended order.</li>
+<li>Optionally assign CarSpawn; otherwise the <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform is used.</li>
+<li>Assign the player car prefab.</li>
+<li>Ensure the main camera has a <a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> component.</li>
+<li>Start the scene. If no <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> exists, <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> starts from the scene-defined checkpoints.</li>
+</ul>
+<p>Generated or saved track:</p><ul>
+<li>A <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> is responsible for generated-track setup.</li>
+<li>When a <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> exists, TrackManager.Start() returns early.</li>
+<li>The generated-track flow should provide the track layout and call <a class="el" href="class_track_manager.html#af254c6684dd7c1ef39a7e6def5feb3a1" title="Starts race setup from a provided level map or from existing scene checkpoint data.">TrackManager.StartRace(LevelMap)</a>.</li>
 </ul>
 <p>Custom inputs:</p><ul>
-<li>Turn off defaultBindings and assign respawnLastCheckPoint / restartRace via your Input Actions asset.</li>
+<li>Disable defaultBindings.</li>
+<li>Assign respawnLastCheckPoint and restartRace through an Input Actions asset.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_api"></a>
 Public API Reference</h1>
 <p>Race control:</p><ul>
-<li>void StartRace(Vector3? carPosition = null): wires checkpoint listeners and starts the restart countdown.</li>
-<li>void CheckPointTaken(): advances checkpoint/lap, records times, finishes when appropriate.</li>
-<li>void <a class="el" href="class_go_to_selected_level.html" title="Button strategy that starts gameplay using the level currently selected in GameDataManager.">GoToSelectedLevel()</a>: (via <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>) loads the gameplay scene for the selected level.</li>
+<li>void StartRace(LevelMap lvlMap): configures race settings from an optional level map, wires checkpoint listeners, and starts the restart countdown.</li>
+<li>void CheckPointTaken(): advances checkpoint and lap progression, records lap transitions, and finishes the race when the required final condition is met.</li>
 </ul>
-<p>Respawn/restart:</p><ul>
-<li>void Respawn(): schedules a respawn to the previous checkpoint per race state rules.</li>
-<li>IEnumerator RespawnDelayCoroutine(float delay): performs teleport + freeze, then resumes.</li>
-<li>IEnumerator RestartCoroutine(): restarts race with a 3-second countdown pause.</li>
+<p>Runtime progress:</p><ul>
+<li>int CurrentLap: current lap number.</li>
+<li>int TotalLaps: required lap count for circuit races.</li>
+<li>int CurrentCheckPointIndex: next checkpoint that must be claimed.</li>
+<li>bool IsRaceFinished: whether the race has ended.</li>
+<li>float RespawnTimer: visible countdown value during restart or respawn.</li>
 </ul>
-<p>Level management helpers:</p><ul>
-<li>(Internal) Add/Remove listeners on <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a>; ResetCheckPoints() re-arms the first checkpoint.</li>
-</ul>
-<p>Timing properties:</p><ul>
-<li>float LastLapTime, CurrentLapTime, TotalTrackTime; bool IsRaceFinished.</li>
+<p>Internal restart and respawn helpers:</p><ul>
+<li>Respawn(): selects the previous checkpoint or starts a full restart according to race state.</li>
+<li>RespawnCar(int index): restores the car pose and velocities stored by a checkpoint.</li>
+<li>Restart(): replaces the car, resets progress, starts timing, and re-arms checkpoints.</li>
+<li>RestartCoroutine(): performs restart and pauses gameplay during the restart countdown.</li>
+<li>RespawnDelayCoroutine(float delay): performs respawn teleport and pauses gameplay during the respawn countdown.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_integration"></a>
 Integration Notes</h1>
 <ul>
-<li><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> builds the course and populates TrackManager.CheckPoints and CarSpawn.</li>
-<li><a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> captures respawn pose/velocities; <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> consumes these during respawn.</li>
-<li><a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> must exist and expose target + SyncCamera().</li>
-<li>::GameDataManager.CompleteLevel(totalTime) is called on finish for persistence/best time tracking.</li>
+<li><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> handles generated-track setup. When it exists, TrackManager.Start() returns early.</li>
+<li><a class="el" href="class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene.">CheckPointManager</a> owns the runtime checkpoint list and checkpoint activation/deactivation operations.</li>
+<li><a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> captures respawn position, rotation, linear velocity, and angular velocity.</li>
+<li><a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> consumes saved checkpoint data during respawn.</li>
+<li><a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> must exist on the main camera and support target assignment plus SyncCamera().</li>
+<li><a class="el" href="class_race_time_manager.html" title="Manages race timing, lap timing, checkpoint splits, and race completion.">RaceTimeManager</a> is responsible for race start, lap pass, and race end timing.</li>
+<li><a class="el" href="class_game_data_manager.html#a3a1f25a26dc714878142d348f3a36d3a" title="Clears the currently selected level map.">GameDataManager.UnselectLevelMap()</a> is used when starting a scene-defined race so stale selected level data does not remain active.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_troubleshooting"></a>
 Troubleshooting</h1>
-<ul>
-<li>Car not spawning:<ul>
-<li>Ensure carPrefab is assigned; verify CarSpawn exists or <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform is sensible.</li>
+<p>Car not spawning:</p><ul>
+<li>Ensure carPrefab is assigned.</li>
+<li>Verify CarSpawn exists or that the <a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> transform is a sensible fallback spawn point.</li>
+<li>Check that the spawned prefab has a Rigidbody.</li>
 </ul>
-</li>
-<li>Checkpoints not advancing:<ul>
-<li>Confirm CheckPoints list order; ensure only one is active and player GameObject is tagged "Player".</li>
+<p>Checkpoints not advancing:</p><ul>
+<li>Confirm checkpoints were registered in <a class="el" href="class_check_point_manager.html" title="Central registry and activation controller for checkpoints in the current track scene.">CheckPointManager</a>.</li>
+<li>Confirm only the next required checkpoint is active.</li>
+<li>Ensure the player car is tagged "Player".</li>
+<li>Verify each checkpoint listener calls <a class="el" href="class_track_manager.html#a148e1831d0184528f4f0835c074e813a" title="Handles the currently active checkpoint being claimed.">TrackManager.CheckPointTaken()</a>.</li>
 </ul>
-</li>
-<li>Respawn puts car in the wrong place:<ul>
-<li>Verify each <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> is placed on the track and claims data when triggered.</li>
+<p>Respawn puts the car in the wrong place:</p><ul>
+<li>Verify each <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> captures the claim position and rotation correctly.</li>
+<li>Check that checkpoint ordering matches the intended driving order.</li>
+<li>Confirm saved linear and angular velocities are valid.</li>
 </ul>
-</li>
-<li>Timer not moving:<ul>
-<li>Race is paused during countdown/respawn (timeScale=0). Ensure countdown completes.</li>
+<p>Restart behaves like a scene reset but old selected level data remains:</p><ul>
+<li>For scene-defined races, TrackManager.Start() clears the selected level map through <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
+<li>For generated-track races, setup should be handled by <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a>.</li>
 </ul>
-</li>
+<p>Timer not moving:</p><ul>
+<li>Race time is paused during respawn and restart countdowns with Time.timeScale = 0.</li>
+<li>Ensure the countdown reaches zero and gameplay time is restored.</li>
+</ul>
+<p>Camera not following after restart or respawn:</p><ul>
+<li>Ensure Camera.main exists.</li>
+<li>Ensure the main camera has a <a class="el" href="class_follow_camera.html" title="Third-person follow camera for a racing vehicle.">FollowCamera</a> component.</li>
+<li>Check that the spawned car is assigned as the camera target after restart.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="track_mng_versions"></a>
 Version History</h1>
 <ul>
-<li>v1.1: Respawn freeze timer &amp; countdown UI-ready timer, circuit/point-to-point flows unified.</li>
-<li>v1.0: Basic checkpoints, lap counting, restart/respawn, and timing. </li>
+<li>v1.2: Scene-defined race startup clears selected level-map state and auto-collects checkpoints when no <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> is present.</li>
+<li>v1.1: Respawn freeze timer and countdown-ready timer added; circuit and point-to-point flows unified.</li>
+<li>v1.0: Basic checkpoints, lap counting, restart, respawn, car spawning, and race flow. </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->

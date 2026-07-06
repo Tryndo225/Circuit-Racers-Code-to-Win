@@ -1,5 +1,6 @@
 var NAVTREEINDEX6 =
 {
+"classsc_1_1terrain_1_1proceduralpainter_1_1_direction.html#afd4f52ce092ac3587d88d65dec8a6f20":[6,0,3,0,0,2,9],
 "classsc_1_1terrain_1_1proceduralpainter_1_1_heatmap_preview.html":[5,0,3,0,0,3],
 "classsc_1_1terrain_1_1proceduralpainter_1_1_heatmap_preview.html":[6,0,3,0,0,3],
 "classsc_1_1terrain_1_1proceduralpainter_1_1_heatmap_preview.html#a5089fd3e95f8420d85d3e88083f858da":[5,0,3,0,0,3,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX6 =
 "classsc_1_1terrain_1_1proceduralpainter_1_1_slope.html#a8c17fea0e188f7d526f78684e49d616b":[6,0,3,0,0,11,7],
 "classsc_1_1terrain_1_1proceduralpainter_1_1_slope.html#ae6553fbc4d68033d89f5cb5d8119b95c":[5,0,3,0,0,11,10],
 "classsc_1_1terrain_1_1proceduralpainter_1_1_slope.html#ae6553fbc4d68033d89f5cb5d8119b95c":[6,0,3,0,0,11,10],
-"classsc_1_1terrain_1_1proceduralpainter_1_1_slope.html#ae6a7bb669d6f735921e5d614189c9822":[5,0,3,0,0,11,0],
-"classsc_1_1terrain_1_1proceduralpainter_1_1_slope.html#ae6a7bb669d6f735921e5d614189c9822":[6,0,3,0,0,11,0]
+"classsc_1_1terrain_1_1proceduralpainter_1_1_slope.html#ae6a7bb669d6f735921e5d614189c9822":[5,0,3,0,0,11,0]
 };

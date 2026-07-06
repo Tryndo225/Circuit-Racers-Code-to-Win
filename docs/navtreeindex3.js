@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"class_race_time_manager.html#a5818bbf868a02bb90b1d8b5cddc27e96":[4,0,7,2,16],
 "class_race_time_manager.html#a5f40d530bbeab160905a3312f7daf178":[4,0,7,2,12],
 "class_race_time_manager.html#a68ad50328c95545e35347e85da432a52":[4,0,7,2,4],
 "class_race_time_manager.html#a6e82eb4400597fab81c75e82b260af46":[4,0,7,2,9],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "class_t_m_pro_1_1_examples_1_1_benchmark01___u_g_u_i.html#a76855aada34fa968c4a26cbe7be9d180":[5,0,4,0,1,2],
 "class_t_m_pro_1_1_examples_1_1_benchmark01___u_g_u_i.html#a76855aada34fa968c4a26cbe7be9d180":[6,0,4,0,1,2],
 "class_t_m_pro_1_1_examples_1_1_benchmark02.html":[5,0,4,0,2],
-"class_t_m_pro_1_1_examples_1_1_benchmark02.html":[6,0,4,0,2],
-"class_t_m_pro_1_1_examples_1_1_benchmark02.html#a2a32f6a6d5ecd16e70c8174957234158":[5,0,4,0,2,2]
+"class_t_m_pro_1_1_examples_1_1_benchmark02.html":[6,0,4,0,2]
 };
