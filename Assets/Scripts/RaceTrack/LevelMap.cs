@@ -53,6 +53,8 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 
 	public int RoadTileCount;
 
+	public bool IsDayTrack;
+
 	/// <summary>
 	/// 2D tile grid:
 	/// <list type="bullet">
@@ -92,6 +94,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		Laps = 3;
 		CheckpointCountPerLap = 0;
 		RoadTileCount = 0;
+		IsDayTrack = true;
 	}
 
 	/// <summary>
@@ -105,8 +108,10 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		Circuit = info.GetBoolean("circular");
 		StartPoint = (Coordinates)info.GetValue("startPoint", typeof(Coordinates));
 		FinishPoint = (Coordinates)info.GetValue("finishPoint", typeof(Coordinates));
+		IsDayTrack = info.GetBoolean("isDayTrack");
 		tilesFlat = (int[])info.GetValue("tilesFlat", typeof(int[]));
 		UnflattenTiles();
+		IsDayTrack = info.GetBoolean("isDayTrack");
 	}
 
 	/// <summary>
@@ -120,6 +125,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		info.AddValue("circular", Circuit);
 		info.AddValue("startPoint", StartPoint);
 		info.AddValue("finishPoint", FinishPoint);
+		info.AddValue("isDayTrack", IsDayTrack);
 		FlattenTiles();
 		info.AddValue("tilesFlat", tilesFlat);
 	}
@@ -199,6 +205,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		newMap.Laps = this.Laps;
 		newMap.CheckpointCountPerLap = this.CheckpointCountPerLap;
 		newMap.RoadTileCount = this.RoadTileCount;
+		newMap.IsDayTrack = this.IsDayTrack;
 		newMap.Tiles = this.Tiles.Copy();
 
 		return newMap;
@@ -245,15 +252,8 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 			return false;
 		}
 
-		if (Name != other.Name ||
-			Width != other.Width ||
-			Height != other.Height ||
-			Circuit != other.Circuit ||
-			StartPoint != other.StartPoint ||
-			FinishPoint != other.FinishPoint ||
-			Laps != other.Laps ||
-			CheckpointCountPerLap != other.CheckpointCountPerLap ||
-			RoadTileCount != other.RoadTileCount)
+		if (Name != other.Name || Width != other.Width || Height != other.Height || Circuit != other.Circuit || StartPoint != other.StartPoint || FinishPoint != other.FinishPoint ||
+			Laps != other.Laps || CheckpointCountPerLap != other.CheckpointCountPerLap || RoadTileCount != other.RoadTileCount || IsDayTrack != other.IsDayTrack)
 		{
 			return false;
 		}
@@ -306,6 +306,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		hash.Add(Laps);
 		hash.Add(CheckpointCountPerLap);
 		hash.Add(RoadTileCount);
+		hash.Add(IsDayTrack);
 
 		if (Tiles != null)
 		{

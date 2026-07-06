@@ -48,24 +48,28 @@ MonoBehaviour:
   - sceneName: Main Menu
     scenePath: Assets/Scenes/Main Menu.unity
     sceneAsset: {fileID: 102900000, guid: 22a9354abb524b34481a9fb8a9a29726, type: 3}
-    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+    audioClip: {fileID: 8300000, guid: af9f4ed2970699a46b32ecafd3bb3697, type: 3}
   - sceneName: Test Track - Day
     scenePath: Assets/Scenes/Test Track - Day.unity
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
-    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+    audioClip: {fileID: 8300000, guid: 97676b2ac6761d444ab17b374613e3b6, type: 3}
+  - sceneName: Test Track - Night
+    scenePath: Assets/Scenes/Test Track - Night.unity
+    sceneAsset: {fileID: 102900000, guid: 228bbbe3a85a32749b1a26b0345c1026, type: 3}
+    audioClip: {fileID: 8300000, guid: 97676b2ac6761d444ab17b374613e3b6, type: 3}
   - sceneName: Level Select
     scenePath: Assets/Scenes/Level Select.unity
     sceneAsset: {fileID: 102900000, guid: c7fdf1cedc477da47b13655d28b5f2fa, type: 3}
-    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
-  - sceneName: Level
-    scenePath: Assets/Scenes/Level.unity
+    audioClip: {fileID: 8300000, guid: af9f4ed2970699a46b32ecafd3bb3697, type: 3}
+  - sceneName: Level - Day
+    scenePath: Assets/Scenes/Level - Day.unity
     sceneAsset: {fileID: 102900000, guid: d5c2cae3d201b1546bfbddc0f1a01656, type: 3}
-    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+    audioClip: {fileID: 8300000, guid: 97676b2ac6761d444ab17b374613e3b6, type: 3}
   - sceneName: Level Editor
     scenePath: Assets/Scenes/Level Editor.unity
     sceneAsset: {fileID: 102900000, guid: 4e013c97c16cf254e8c58ce652e1acc0, type: 3}
-    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+    audioClip: {fileID: 8300000, guid: af9f4ed2970699a46b32ecafd3bb3697, type: 3}
   - sceneName: Level Replay
     scenePath: Assets/Scenes/Level Replay.unity
     sceneAsset: {fileID: 102900000, guid: ef8c864e9603e1141bf2d39867121505, type: 3}
-    audioClip: {fileID: 8300000, guid: 23d2a4424854f0845842d6879487d228, type: 3}
+    audioClip: {fileID: 8300000, guid: 97676b2ac6761d444ab17b374613e3b6, type: 3}

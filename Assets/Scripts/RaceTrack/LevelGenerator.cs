@@ -174,6 +174,7 @@ public static class LevelGenerator
 		levelMap.Height = height;
 		levelMap.Circuit = isCircuit;
 		levelMap.Tiles = new int[width, height];
+		levelMap.IsDayTrack = rng.Next(0, 2) == 0;
 
 		for (int x = 0; x < width; ++x)
 		{

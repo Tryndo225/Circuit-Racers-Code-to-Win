@@ -194,6 +194,7 @@ public class RaceOverLay : SceneSingleton<RaceOverLay>
 	{
 		if (state.RespawnTimer > 0f)
 		{
+			_toggled = false;
 			startFilter.SetActive(true);
 			startTimer.text = $"{state.RespawnTimer:0}";
 		}
@@ -221,12 +222,14 @@ public class RaceOverLay : SceneSingleton<RaceOverLay>
 		if (state.IsFinished)
 		{
 			finishScreen.SetActive(true);
+			CheckPointManager.Instance.DeactivateAllCheckpoints();
 			finalTime.text = state.FinalText;
 			_toggled = true;
 		}
 		else if (Input.GetKeyDown(KeyCode.Escape) && !finishScreen.activeSelf)
 		{
 			finishScreen.SetActive(true);
+			CheckPointManager.Instance.DeactivateAllCheckpoints();
 			finalTime.text = "Unfinished";
 			_toggled = true;
 		}

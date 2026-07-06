@@ -71,12 +71,12 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// <summary>
 	/// True for lap-based circuit; false for point-to-point (finish at last checkpoint).
 	/// </summary>
-	[SerializeField, ReadOnly] private bool isCircuit = false;
+	[SerializeField] private bool isCircuit = false;
 
 	/// <summary>
 	/// Number of laps to complete (circuit mode only).
 	/// </summary>
-	[SerializeField, ReadOnly, ShowIf(nameof(isCircuit))] private int laps = 3;
+	[SerializeField, ShowIf(nameof(isCircuit))] private int laps = 3;
 
 
 	#endregion
@@ -113,6 +113,8 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 
 	/// <summary>Countdown (unscaled seconds) shown during restart/respawn.</summary>
 	private float _respawnTimer = 0f;
+
+	private Coroutine _restartCoroutine;
 
 	#endregion Private Fields
 
@@ -157,8 +159,8 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		respawnLastCheckPoint.action.Enable();
 		restartRace.action.Enable();
 
-		respawnLastCheckPoint.action.performed += ctx => Respawn();
-		restartRace.action.performed += ctx => StartCoroutine(RestartCoroutine());
+		respawnLastCheckPoint.action.performed += OnRespawnPerformed;
+		restartRace.action.performed += OnRestartPerformed;
 	}
 
 	/// <summary>
@@ -166,11 +168,37 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// </summary>
 	private void OnDisable()
 	{
-		respawnLastCheckPoint.action.performed -= ctx => Respawn();
-		restartRace.action.performed -= ctx => StartCoroutine(RestartCoroutine());
+		respawnLastCheckPoint.action.performed -= OnRespawnPerformed;
+		restartRace.action.performed -= OnRestartPerformed;
 
 		respawnLastCheckPoint.action.Disable();
 		restartRace.action.Disable();
+	}
+
+	private void OnRespawnPerformed(InputAction.CallbackContext context)
+	{
+		Respawn();
+	}
+
+	private void OnRestartPerformed(InputAction.CallbackContext context)
+	{
+		StartRestartCountdown();
+	}
+
+	/// <summary>
+	/// Starts the race automatically if at least one checkpoint is assigned.
+	/// </summary>
+	private void Start()
+	{
+		if (FindFirstObjectByType<RaceTrackPlacer>() != null)
+		{
+			return;
+		}
+
+		CheckPointManager.Instance.ClearCheckPoints();
+		CheckPointManager.Instance.AutoAddCheckpoints();
+
+		StartRace(null);
 	}
 
 	/// <summary>
@@ -228,7 +256,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		while (Time.unscaledTime - startTime < 3f)
 		{
 			_respawnTimer = 3f - (Time.unscaledTime - startTime);
-			Debug.Log($"Restarting in {_respawnTimer:0.0} seconds...");
+			Debug.Log($"[TrackManager] Restarting in {_respawnTimer:0.0} seconds...");
 			yield return new WaitForSecondsRealtime(0.5f);
 		}
 
@@ -242,6 +270,13 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// <param name="delay">Unscaled seconds to wait.</param>
 	private IEnumerator RespawnDelayCoroutine(float delay)
 	{
+		if (_carInstance == null)
+		{
+			Debug.LogError("[TrackManager] Cannot respawn; car instance is missing.");
+			_pendingRespawn = false;
+			yield break;
+		}
+
 		_pendingRespawn = false;
 
 		var carRb = _carInstance.GetComponent<Rigidbody>();
@@ -257,7 +292,13 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		Physics.SyncTransforms();
 		carRb.isKinematic = oldKinematic;
 		carRb.interpolation = oldInterpolation;
-		Camera.main.GetComponent<FollowCamera>().SyncCamera();
+
+		FollowCamera followCamera = GetFollowCamera();
+
+		if (followCamera != null)
+		{
+			followCamera.SyncCamera();
+		}
 
 		Time.timeScale = 0f;
 
@@ -272,6 +313,16 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		_respawnTimer = 0f;
 
 		Time.timeScale = 1f;
+	}
+
+	private void StartRestartCountdown()
+	{
+		if (_restartCoroutine != null)
+		{
+			StopCoroutine(_restartCoroutine);
+		}
+
+		_restartCoroutine = StartCoroutine(RestartCoroutine());
 	}
 
 	#endregion Coroutines
@@ -297,13 +348,19 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		}
 		else
 		{
-			Debug.LogWarning("Car spawn point not assigned, using TrackManager position.");
+			Debug.LogWarning("[TrackManager] Car spawn point not assigned, using TrackManager position.");
 			_carStartPosition = transform.position;
 			_carStartRotation = transform.rotation;
 		}
 		_carInstance = Instantiate(carPrefab, _carStartPosition + (_carStartRotation * Vector3.forward * carSpawnHorizontalOffset) + (Vector3.up * carSpawnVerticalOffset), _carStartRotation);
 		_carInstance.tag = "Player";
-		Camera.main.GetComponent<FollowCamera>().SetTarget(_carInstance.transform);
+
+		FollowCamera followCamera = GetFollowCamera();
+
+		if (followCamera != null)
+		{
+			followCamera.SetTarget(_carInstance.transform);
+		}
 
 		_currentLap = 0;
 		_currentCheckPointIndex = 0;
@@ -322,7 +379,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	{
 		if (_isRaceFinished)
 		{
-			StartCoroutine(RestartCoroutine());
+			StartRestartCountdown();
 			return;
 		}
 		if (_currentCheckPointIndex == 0)
@@ -334,7 +391,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 			}
 			else
 			{
-				StartCoroutine(RestartCoroutine());
+				StartRestartCountdown();
 			}
 		}
 		else
@@ -353,7 +410,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		var carRb = _carInstance.GetComponent<Rigidbody>();
 		if (carRb == null)
 		{
-			Debug.LogError("Car prefab must have a valid Rigidbody component for Respawning.");
+			Debug.LogError("[TrackManager] Car prefab must have a valid Rigidbody component for Respawning.");
 			return;
 		}
 
@@ -370,22 +427,25 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// </summary>
 	public void StartRace(LevelMap lvlMap)
 	{
-		levelMap = lvlMap;
+		if (lvlMap != null)
+		{
+			levelMap = lvlMap;
 
-		laps = levelMap.Laps;
+			laps = levelMap.Laps;
 
-		isCircuit = levelMap.Circuit;
+			isCircuit = levelMap.Circuit;
+		}
 
 		if (CheckPointManager.Instance.TotalCheckpoints == 0)
 		{
-			Debug.LogError("No checkpoints assigned to TrackManager.");
+			Debug.LogError("[TrackManager] No checkpoints assigned to TrackManager.");
 			return;
 		}
 
 		CheckPointManager.Instance.AddListenerToCheckpoints(CheckPointTaken);
 
 		var checkpointParent = CheckPointManager.Instance.CheckPoints[0].GetComponentInParent<Transform>();
-		StartCoroutine(RestartCoroutine());
+		StartRestartCountdown();
 	}
 
 	/// <summary>
@@ -403,7 +463,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// </summary>
 	public void CheckPointTaken()
 	{
-		Debug.Log($"CheckPoint {_currentCheckPointIndex} taken at {RaceTimeManager.Instance.GetCurrentRaceTime()} seconds.");
+		Debug.Log($"[TrackManager] CheckPoint {_currentCheckPointIndex} taken at {RaceTimeManager.Instance.GetCurrentRaceTime()} seconds.");
 		if (isCircuit && _currentCheckPointIndex == 0)
 		{
 			if (_currentLap == laps)
@@ -429,5 +489,24 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		CheckPointManager.Instance.DeactivateCheckpoint(_currentCheckPointIndex);
 		_currentCheckPointIndex = (_currentCheckPointIndex + 1) % CheckPointManager.Instance.TotalCheckpoints;
 		CheckPointManager.Instance.ActivateCheckpoint(_currentCheckPointIndex);
+	}
+
+	private FollowCamera GetFollowCamera()
+	{
+		Camera mainCamera = Camera.main;
+
+		if (mainCamera == null)
+		{
+			Debug.LogError("[TrackManager] No MainCamera found.");
+			return null;
+		}
+
+		if (!mainCamera.TryGetComponent(out FollowCamera followCamera))
+		{
+			Debug.LogError("[TrackManager] MainCamera has no FollowCamera component.");
+			return null;
+		}
+
+		return followCamera;
 	}
 }

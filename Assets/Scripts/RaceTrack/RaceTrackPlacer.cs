@@ -143,6 +143,10 @@ public class RaceTrackPlacer : MonoBehaviour
 	/// <summary>Prefab for start/finish cells (placed on <see cref="LevelMap.StartPoint"/> and <see cref="LevelMap.FinishPoint"/>).</summary>
 	[SerializeField] private GameObject raceTrackStartFinishPrefab;
 
+	/// <summary>Prefab for start/finish cells (placed on <see cref="LevelMap.StartPoint"/> and <see cref="LevelMap.FinishPoint"/>) on Point-to-Point Maps.</summary>
+	[SerializeField] private GameObject raceTrackStartFinishP2pPrefab;
+
+
 	/// <summary>Prefab for intermediate checkpoint cells (non-start/finish with special value).</summary>
 	[SerializeField] private GameObject checkpointPrefab;
 
@@ -224,15 +228,22 @@ public class RaceTrackPlacer : MonoBehaviour
 			{
 				var newGameObject = Instantiate(piecesToPlace[position.Value.X, position.Value.Y].Prefab, piecesToPlace[position.Value.X, position.Value.Y].Position, piecesToPlace[position.Value.X, position.Value.Y].Rotation, this.transform);
 
-				if (piecesToPlace[position.Value.X, position.Value.Y].Prefab == raceTrackStartFinishPrefab || piecesToPlace[position.Value.X, position.Value.Y].Prefab == checkpointPrefab)
+				if (IsCheckpointTile(position.Value))
 				{
-					newGameObject.GetComponentInChildren<CheckPointListener>().CheckpointOrder = checkpointAmount;
-					++checkpointAmount;
+					CheckPointListener checkpoint = newGameObject.GetComponentInChildren<CheckPointListener>();
 
-					if (position.Value == levelMap.StartPoint && !isBuildForReplay)
+					if (checkpoint == null)
 					{
-						TrackManager.Instance.CarSpawn = newGameObject.transform;
+						Debug.LogError($"[RaceTrackPlacer] Checkpoint tile at {position.Value} was placed, but prefab has no CheckPointListener.");
 					}
+					else
+					{
+						checkpoint.CheckpointOrder = checkpointAmount;
+						++checkpointAmount;
+					}
+
+					if (IsStartTile(position.Value) && !isBuildForReplay)
+						TrackManager.Instance.CarSpawn = newGameObject.transform;
 				}
 			}
 
@@ -244,15 +255,15 @@ public class RaceTrackPlacer : MonoBehaviour
 		CheckPointManager.Instance.AutoAddCheckpoints();
 
 		if (!isBuildForReplay)
+		{
 			TrackManager.Instance.StartRace(levelMap);
+		}
 		else
 		{
 			Debug.Log("Building finished setting Replay");
 			ReplayPreviewer.Instance.SetReplay(GameDataManager.Instance.CurrentGameData.GetBestReplay(GameDataManager.Instance.CurrentLevelMap));
 			Debug.Log("Replay Set.");
 		}
-
-
 	}
 
 	private void StopOverlaying(TrackPiece[,] pieces)
@@ -350,7 +361,8 @@ public class RaceTrackPlacer : MonoBehaviour
 
 			if (coordinates == levelMap.StartPoint || coordinates == levelMap.FinishPoint)
 			{
-				trackPiece.Prefab = raceTrackStartFinishPrefab;
+				Debug.Log($"[RaceTrackPlacer] Assigning start/finish prefab at {coordinates}");
+				trackPiece.Prefab = levelMap.Circuit ? raceTrackStartFinishPrefab : raceTrackStartFinishP2pPrefab;
 			}
 			else if (levelMap.Tiles.At(coordinates) == -2)
 			{
@@ -456,41 +468,6 @@ public class RaceTrackPlacer : MonoBehaviour
 		return true;
 	}
 
-	/// <summary>
-	/// Checks whether any 4-way neighbor of <paramref name="position"/> in <paramref name="pieces"/>
-	/// belongs to <paramref name="types"/> or matches a specific long-curve key in the legend.
-	/// If true, placement at <paramref name="position"/> may be suppressed to avoid clashes.
-	/// </summary>
-	private bool NextToTypes(Coordinates position, TrackPiece[,] pieces, List<GameObject> types)
-	{
-		bool nextToType = false;
-		foreach (var offset in offsets)
-		{
-			var neighbor = position + offset;
-			if (pieces.InBounds(neighbor.X, neighbor.Y) && types.Contains(pieces[neighbor.X, neighbor.Y].Prefab))
-			{
-				nextToType = true;
-				break;
-			}
-		}
-		return nextToType;
-	}
-
-	private void RemoveBlankPieces(TrackPiece[,] pieces)
-	{
-		for (var i = 0; i < pieces.GetLength(0); i++)
-		{
-			for (var j = 0; j < pieces.GetLength(1); j++)
-			{
-				var piece = pieces[i, j];
-				if (piece.Prefab == traversalPrefab)
-				{
-					piece.Prefab = null;
-				}
-			}
-		}
-	}
-
 	private void RemoveAllSurrounding(Coordinates position, TrackPiece[,] pieces, int halfSize)
 	{
 		for (int dx = -halfSize; dx <= halfSize; dx++)
@@ -523,10 +500,16 @@ public class RaceTrackPlacer : MonoBehaviour
 					continue;
 
 				coords = new Coordinates(position.X + dx, position.Y + dy);
-				if (levelMap.Tiles.InBounds(coords.X, coords.Y) && levelMap.Tiles.At(coords) == 1)
-				{
+
+				if (!levelMap.Tiles.InBounds(coords.X, coords.Y))
+					continue;
+
+				if (coords == levelMap.StartPoint || coords == levelMap.FinishPoint || levelMap.Tiles.At(coords) == -2)
+					continue;
+
+				if (levelMap.Tiles.At(coords) == 1)
 					levelMap.Tiles.At(coords) = usedTileValue;
-				}
+
 			}
 		}
 	}
@@ -552,6 +535,24 @@ public class RaceTrackPlacer : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Returns true if the coordinate represents the start, finish, or an intermediate checkpoint.
+	/// </summary>
+	private bool IsCheckpointTile(Coordinates coordinates)
+	{
+		return coordinates == levelMap.StartPoint ||
+			   coordinates == levelMap.FinishPoint ||
+			   levelMap.Tiles.At(coordinates) == -2;
+	}
+
+	/// <summary>
+	/// Returns true if the coordinate represents the race start.
+	/// </summary>
+	private bool IsStartTile(Coordinates coordinates)
+	{
+		return coordinates == levelMap.StartPoint;
 	}
 
 	#endregion Helper Methods

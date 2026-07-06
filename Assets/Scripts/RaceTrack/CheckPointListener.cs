@@ -58,6 +58,11 @@ public class CheckPointListener : MonoBehaviour
 	/// <summary>Captured player rigidbody angular velocity at the moment of trigger entry.</summary>
 	public Vector3 CPClaimedRbAngularVelocity { get; private set; }
 
+	/// <summary>
+	/// Scratch array used to safely invoke listeners even if the listener set changes during callbacks.
+	/// </summary>
+	private Action[] _listenerBuffer;
+
 	#region Unity Methods
 
 	/// <summary>
@@ -118,25 +123,53 @@ public class CheckPointListener : MonoBehaviour
 	/// <param name="other">Incoming collider.</param>
 	private void OnTriggerEnter(Collider other)
 	{
-		if (_isActive && other.CompareTag("Player"))
+		if (!_isActive)
 		{
-			other.GetComponent<Rigidbody>();
+			return;
+		}
 
-			CPClaimedPosition = other.transform.position;
-			CPClaimedRotation = other.transform.rotation;
+		Rigidbody playerRigidbody = other.attachedRigidbody;
 
-			var playerRigidbody = other.GetComponent<Rigidbody>();
+		if (playerRigidbody == null || !playerRigidbody.CompareTag("Player"))
+		{
+			return;
+		}
 
-			CPClaimedRbLinearVelocity = playerRigidbody.linearVelocity;
-			CPClaimedRbAngularVelocity = playerRigidbody.angularVelocity;
+		Transform playerTransform = playerRigidbody.transform;
 
-			if (_listeners != null)
-			{
-				foreach (var listener in _listeners)
-				{
-					listener?.Invoke();
-				}
-			}
+		CPClaimedPosition = playerTransform.position;
+		CPClaimedRotation = playerTransform.rotation;
+		CPClaimedRbLinearVelocity = playerRigidbody.linearVelocity;
+		CPClaimedRbAngularVelocity = playerRigidbody.angularVelocity;
+
+		NotifyListeners();
+	}
+
+	/// <summary>
+	/// Invokes all registered listeners safely.
+	/// A snapshot is used so callbacks may add or remove listeners without modifying
+	/// the collection being enumerated.
+	/// </summary>
+	private void NotifyListeners()
+	{
+		if (_listeners == null || _listeners.Count == 0)
+		{
+			return;
+		}
+
+		if (_listenerBuffer == null || _listenerBuffer.Length < _listeners.Count)
+		{
+			_listenerBuffer = new Action[_listeners.Count];
+		}
+
+		_listeners.CopyTo(_listenerBuffer);
+
+		int listenerCount = _listeners.Count;
+
+		for (int i = 0; i < listenerCount; i++)
+		{
+			_listenerBuffer[i]?.Invoke();
+			_listenerBuffer[i] = null;
 		}
 	}
 

@@ -202,8 +202,8 @@ public class VehicleController : MonoBehaviour
 	[Header("Dynamic Grip")]
 	[SerializeField] private float rearSidewaysGripHandbrakeMultiplier = 0.35f;
 	[SerializeField] private float rearForwardGripHandbrakeMultiplier = 0.85f;
-	[SerializeField] private float frontGripLockedMultiplier = 0.45f;
-	[SerializeField] private float rearGripLockedMultiplier = 0.60f;
+	[SerializeField] private float forwardGripLockedMultiplier = 1f;
+	[SerializeField] private float sidewaysGripLockedMultiplier = 0.60f;
 	[SerializeField] private float lockForwardSlipThreshold = 0.35f;
 	[SerializeField, Range(0f, 1f)] private float lockBrakeTorqueThreshold = 0.90f;
 
@@ -544,8 +544,14 @@ public class VehicleController : MonoBehaviour
 	/// </summary>
 	private void SetUp()
 	{
-		if (!carRigidbody) carRigidbody = GetComponent<Rigidbody>();
-		if (!carRigidbody) Debug.LogError("VehicleController requires a Rigidbody component on the same GameObject.");
+		tractionControlEnabled = GameDataManager.Instance != null ? GameDataManager.Instance.GetTC() : tractionControlEnabled;
+		absEnabled = GameDataManager.Instance != null ? GameDataManager.Instance.GetABS() : absEnabled;
+
+		if (!carRigidbody)
+			carRigidbody = GetComponent<Rigidbody>();
+
+		if (!carRigidbody)
+			Debug.LogError("VehicleController requires a Rigidbody component on the same GameObject.");
 
 		if (_engineSound == null)
 			_engineSound = GetOrAddComponent<EngineSound>();
@@ -704,8 +710,8 @@ public class VehicleController : MonoBehaviour
 		_driveTrainController.rearSidewaysGripHandbrakeMultiplier = rearSidewaysGripHandbrakeMultiplier;
 		_driveTrainController.rearForwardGripHandbrakeMultiplier = rearForwardGripHandbrakeMultiplier;
 
-		_driveTrainController.frontGripLockedMultiplier = frontGripLockedMultiplier;
-		_driveTrainController.rearGripLockedMultiplier = rearGripLockedMultiplier;
+		_driveTrainController.forwardGripLockedMultiplier = forwardGripLockedMultiplier;
+		_driveTrainController.forwardGripLockedMultiplier = forwardGripLockedMultiplier;
 		_driveTrainController.lockForwardSlipThreshold = lockForwardSlipThreshold;
 		_driveTrainController.lockBrakeTorqueThreshold = lockBrakeTorqueThreshold;
 

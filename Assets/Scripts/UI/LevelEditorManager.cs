@@ -10,6 +10,7 @@ public class LevelEditorManager : MonoBehaviour
 	[SerializeField] private RectTransform levelGridRect;
 	[SerializeField] private TMP_InputField levelNameField;
 	[SerializeField] private Toggle circuitToggle;
+	[SerializeField] private Toggle nightToggle;
 	[SerializeField] private Slider lapSlider;
 	[SerializeField] private GameObject lapSliderParent;
 
@@ -32,6 +33,7 @@ public class LevelEditorManager : MonoBehaviour
 		circuitToggle.isOn = editedLevel_.Circuit;
 		lapSlider.value = editedLevel_.Laps;
 		lapSliderParent.SetActive(editedLevel_.Circuit);
+		nightToggle.isOn = (editedLevel_.IsDayTrack == false);
 	}
 
 	public void OnLevelGridClick(BaseEventData eventData)
@@ -143,6 +145,11 @@ public class LevelEditorManager : MonoBehaviour
 		editedLevel_.Circuit = isCircuit;
 		lapSliderParent.SetActive(isCircuit);
 
+	}
+
+	public void SetDayNight(bool isNight)
+	{
+		editedLevel_.IsDayTrack = !isNight;
 	}
 
 	public void SetLaps(float laps)

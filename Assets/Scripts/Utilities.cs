@@ -180,6 +180,8 @@ namespace Generic
 
 	#region SceneSingleton
 
+	[DisallowMultipleComponent]
+	[DefaultExecutionOrder(-50)]
 	public class SceneSingleton<T> : Singleton<T> where T : SceneSingleton<T>
 	{
 		protected override void Persist()

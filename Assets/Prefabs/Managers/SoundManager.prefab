@@ -48,3 +48,4 @@ MonoBehaviour:
   sfxVolume: 1
   musicMixerGroup: {fileID: 4122688653635888191, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
   sfxMixerGroup: {fileID: 3728765882040959052, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
+  continueThreshold: 0.1

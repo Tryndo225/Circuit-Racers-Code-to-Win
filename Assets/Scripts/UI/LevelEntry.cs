@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// UI entry representing a single saved level row. Displays the best time,
@@ -21,6 +22,9 @@ public class LevelEntry : MonoBehaviour
 	/// </summary>
 	[SerializeField] private TMP_Text levelTime;
 	[SerializeField] private TMP_InputField levelName;
+	[SerializeField] private RawImage dayNightIconImage;
+	[SerializeField] private Texture dayIcon;
+	[SerializeField] private Texture nightIcon;
 
 	#endregion
 
@@ -104,6 +108,11 @@ public class LevelEntry : MonoBehaviour
 		}
 
 		levelName.text = levelData.LevelMap.Name;
+
+		if (levelData.LevelMap.IsDayTrack)
+			dayNightIconImage.texture = dayIcon;
+		else
+			dayNightIconImage.texture = nightIcon;
 	}
 
 	#endregion

@@ -131,11 +131,11 @@ public class DriveTrainController : MonoBehaviour
 	[Tooltip("Rear forward grip multiplier while handbrake is held.")]
 	public float rearForwardGripHandbrakeMultiplier = 0.85f;
 
-	[Tooltip("Grip multiplier for front wheels when they are near lock.")]
-	public float frontGripLockedMultiplier = 0.45f;
+	[Tooltip("Forward grip multiplier when a wheel is near lock. Lower = less braking grip while sliding.")]
+	public float forwardGripLockedMultiplier = 1f;
 
-	[Tooltip("Grip multiplier for rear wheels when they are near lock.")]
-	public float rearGripLockedMultiplier = 0.60f;
+	[Tooltip("Sideways grip multiplier when a wheel is near lock. Lower = less steering/cornering grip while sliding.")]
+	public float sidewaysGripLockedMultiplier = 0.5f;
 
 	[Tooltip("Forward slip above this counts as near-lock when braking hard.")]
 	public float lockForwardSlipThreshold = 0.35f;
@@ -690,7 +690,10 @@ public class DriveTrainController : MonoBehaviour
 	/// </summary>
 	private bool ShouldCutDriveTorque()
 	{
-		return CalculateSpeed() > maxSpeed || (_isReversing && CalculateSpeed() > maxReverseSpeed) || _transmissionController.HandleShifting(AverageGroundedDrivenWheelAbsRPM(), AverageDrivenWheelSlip());
+		bool maxForewardsCheck = CalculateSpeed() > maxSpeed;
+		bool maxBackwardsCheck = (_isReversing && CalculateSpeed() > maxReverseSpeed);
+		bool isShiftingCheck = _transmissionController.HandleShifting(AverageGroundedDrivenWheelAbsRPM(), AverageDrivenWheelSlip());
+		return maxForewardsCheck || maxBackwardsCheck || isShiftingCheck;
 	}
 
 	/// <summary>
@@ -840,17 +843,11 @@ public class DriveTrainController : MonoBehaviour
 
 			if (rpmDifference > limitedSlipStartRpmDifference)
 			{
-				float correction = Mathf.InverseLerp(
-					limitedSlipStartRpmDifference,
-					limitedSlipFullRpmDifference,
-					rpmDifference);
+				float correction = Mathf.InverseLerp(limitedSlipStartRpmDifference, limitedSlipFullRpmDifference, rpmDifference);
 
 				correction = Mathf.Clamp01(correction);
 
-				float torqueMultiplier = Mathf.Lerp(
-					1f,
-					1f - limitedSlipMaxTorqueCut,
-					correction);
+				float torqueMultiplier = Mathf.Lerp(1f, 1f - limitedSlipMaxTorqueCut, correction);
 
 				wheel.motorTorque *= torqueMultiplier;
 
@@ -859,17 +856,11 @@ public class DriveTrainController : MonoBehaviour
 			}
 			else if (rpmDifference < -limitedSlipStartRpmDifference)
 			{
-				float correction = Mathf.InverseLerp(
-					limitedSlipStartRpmDifference,
-					limitedSlipFullRpmDifference,
-					-rpmDifference);
+				float correction = Mathf.InverseLerp(limitedSlipStartRpmDifference, limitedSlipFullRpmDifference, -rpmDifference);
 
 				correction = Mathf.Clamp01(correction);
 
-				float torqueMultiplier = Mathf.Lerp(
-					1f,
-					limitedSlipGripWheelBoost,
-					correction);
+				float torqueMultiplier = Mathf.Lerp(1f, limitedSlipGripWheelBoost, correction);
 
 				wheel.motorTorque *= torqueMultiplier;
 			}
@@ -916,7 +907,7 @@ public class DriveTrainController : MonoBehaviour
 			brake = ApplyHandbrakeToWheel(wheel, brake);
 
 		if (IsWheelNearLock(wheel, brake))
-			ApplyLockedWheelFriction(wheel, isFront);
+			ApplyLockedWheelFriction(wheel);
 
 		ApplyGripCircleFriction(wheel);
 
@@ -1129,21 +1120,18 @@ public class DriveTrainController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Reduces both forward and sideways grip for a wheel that is near lock-up.
+	/// Reduces forward and sideways grip for a wheel that is near lock-up.
 	/// </summary>
 	/// <param name="wheel">Wheel whose grip should be reduced.</param>
-	/// <param name="isFront">Whether the wheel belongs to the front axle.</param>
-	private void ApplyLockedWheelFriction(WheelCollider wheel, bool isFront)
+	private void ApplyLockedWheelFriction(WheelCollider wheel)
 	{
-		float multiplier = isFront ? frontGripLockedMultiplier : rearGripLockedMultiplier;
+		WheelFrictionCurve forward = wheel.forwardFriction;
+		forward.stiffness *= forwardGripLockedMultiplier;
+		wheel.forwardFriction = forward;
 
 		WheelFrictionCurve sideways = wheel.sidewaysFriction;
-		sideways.stiffness *= multiplier;
+		sideways.stiffness *= sidewaysGripLockedMultiplier;
 		wheel.sidewaysFriction = sideways;
-
-		WheelFrictionCurve forward = wheel.forwardFriction;
-		forward.stiffness *= multiplier;
-		wheel.forwardFriction = forward;
 	}
 
 	/// <summary>
@@ -1198,20 +1186,12 @@ public class DriveTrainController : MonoBehaviour
 		float sidewaysSlip = Mathf.Abs(hit.sidewaysSlip);
 
 		float forwardUsage = Mathf.InverseLerp(0f, gripCircleFullSlip, forwardSlip);
+
 		float sidewaysUsage = Mathf.InverseLerp(0f, gripCircleFullSlip, sidewaysSlip);
 
-		float combinedSlip = forwardSlip + sidewaysSlip;
-		float combinedOverload = Mathf.InverseLerp(gripCircleStartSlip, gripCircleFullSlip, combinedSlip);
+		float sidewaysMultiplier = Mathf.Lerp(1f, minSidewaysGripCircleMultiplier, Mathf.Clamp01(forwardUsage));
 
-		float sidewaysMultiplier = Mathf.Lerp(
-			1f,
-			minSidewaysGripCircleMultiplier,
-			Mathf.Clamp01(forwardUsage + combinedOverload));
-
-		float forwardMultiplier = Mathf.Lerp(
-			1f,
-			minForwardGripCircleMultiplier,
-			Mathf.Clamp01(sidewaysUsage + combinedOverload));
+		float forwardMultiplier = Mathf.Lerp(1f, minForwardGripCircleMultiplier, Mathf.Clamp01(sidewaysUsage));
 
 		WheelFrictionCurve forward = wheel.forwardFriction;
 		forward.stiffness *= forwardMultiplier;

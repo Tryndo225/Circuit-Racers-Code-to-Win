@@ -261,7 +261,7 @@ public class GenerateLevelButton : ButtonType
 			UpdateValues();
 
 			stepCount = size;
-			stepSize = size / 5;
+			stepSize = Mathf.Max(1, size / 5);
 
 			Debug.Log("Starting level generation...");
 			var map = await Task.Run(() =>
@@ -447,6 +447,40 @@ public class NotificationButton : ButtonType
 	public override void Action()
 	{
 		NotificationManager.Instance.Show(notificationText, notificationColor);
+	}
+}
+
+[Serializable]
+public class GoPlayButtom : ButtonType
+{
+	[SerializeField] private SceneAssetHelper _sceneToLoadDay;
+	[SerializeField] private SceneAssetHelper _sceneToLoadNight;
+
+	public override void Action()
+	{
+		LevelMap levelMap = GameDataManager.Instance.CurrentLevelMap;
+		if (levelMap == null)
+		{
+			NotificationManager.Instance.Show("No level selected.");
+		}
+		else if (levelMap.IsDayTrack)
+		{
+			if (_sceneToLoadDay == null)
+			{
+				Debug.LogError("Day scene to load is not assigned.");
+				return;
+			}
+			SceneManagement.Instance.ChangeScene(_sceneToLoadDay);
+		}
+		else if (levelMap.IsDayTrack == false)
+		{
+			if (_sceneToLoadNight == null)
+			{
+				Debug.LogError("Night scene to load is not assigned.");
+				return;
+			}
+			SceneManagement.Instance.ChangeScene(_sceneToLoadNight);
+		}
 	}
 }
 

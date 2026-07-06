@@ -37,6 +37,9 @@ public class RaceTimeManager : SceneSingleton<RaceTimeManager>
 
 	public void CheckpointPassed()
 	{
+		if (IsRaceFinished)
+			return;
+
 		float currentCpSplit = GetCurrentRaceTime();
 		CheckPointSplitsTimes.Add(currentCpSplit);
 
@@ -62,13 +65,14 @@ public class RaceTimeManager : SceneSingleton<RaceTimeManager>
 
 	public float RaceEnd()
 	{
-		LapPassed();
+		if (LapStartTime > 0)
+		{
+			LapTimes.Add(Time.time - LapStartTime);
+		}
 		float totalRaceTime = Time.time - RaceStartTime;
 		Debug.Log($"Race finished! Total time: {totalRaceTime} seconds");
 		Replay replay = ReplayManager.Instance.SaveReplay();
 		GameDataManager.Instance.CompleteLevel(totalRaceTime, CheckPointSplitsTimes.ToArray(), replay);
-		RaceStartTime = 0f;
-		LapStartTime = 0f;
 		RaceEndTime = totalRaceTime;
 		return totalRaceTime;
 	}

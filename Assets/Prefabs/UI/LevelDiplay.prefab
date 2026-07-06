@@ -161,7 +161,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -542,6 +542,78 @@ MonoBehaviour:
           sceneName: Level Replay
           scenePath: Assets/Scenes/Level Replay.unity
           sceneAsset: {fileID: 102900000, guid: ef8c864e9603e1141bf2d39867121505, type: 3}
+--- !u!1 &2521300735486958920
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2711997257557990191}
+  - component: {fileID: 6416139260362701085}
+  - component: {fileID: 8165854874862749208}
+  m_Layer: 5
+  m_Name: DayNightIcon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2711997257557990191
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521300735486958920}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6062736031006320167}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -10, y: -10}
+  m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: 1, y: 1}
+--- !u!222 &6416139260362701085
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521300735486958920}
+  m_CullTransparentMesh: 1
+--- !u!114 &8165854874862749208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521300735486958920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 0.8235294}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 2800000, guid: a036603ad4d6e6544bcd75228e53ab77, type: 3}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!1 &3937599789319658590
 GameObject:
   m_ObjectHideFlags: 0
@@ -745,6 +817,7 @@ RectTransform:
   - {fileID: 3567547005113747238}
   - {fileID: 7169929190885786981}
   - {fileID: 6925228698064927740}
+  - {fileID: 2711997257557990191}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
@@ -794,6 +867,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelTime: {fileID: 6798325262819491533}
   levelName: {fileID: 1555224133646064912}
+  dayNightIconImage: {fileID: 8165854874862749208}
+  dayIcon: {fileID: 2800000, guid: a036603ad4d6e6544bcd75228e53ab77, type: 3}
+  nightIcon: {fileID: 2800000, guid: 9d4c3ac80b156414aa06580ee4a5b0b2, type: 3}
   levelData:
     LevelMap:
       Name: Unnamed
@@ -809,6 +885,7 @@ MonoBehaviour:
       Laps: 3
       CheckpointCountPerLap: 0
       RoadTileCount: 0
+      IsDayTrack: 0
       tilesFlat: 
     Time: 0
     CheckpointTimeSplits: []

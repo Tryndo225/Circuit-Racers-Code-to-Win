@@ -1,6 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -10,128 +10,209 @@ using UnityEngine.SceneManagement;
 /// </summary>
 /// <remarks>
 /// @ingroup scene_mgmt
-/// @thread Unity main thread only (Start, scene loads).
-/// @invariant SoundManager.Instance may be used to play music if available.
-/// @invariant Each configured pair maps one scene (by name) to one AudioClip.
+/// @thread Unity main thread only.
+/// @invariant Scene music is matched by scene name first, then scene path as fallback.
+/// @invariant Each configured pair maps one scene to one AudioClip.
 /// </remarks>
 public class SceneManagement : Generic.Singleton<SceneManagement>
 {
-    #region Inspector
+	#region Inspector
 
-    [Header("Scene -> Music Mapping")]
-    /// <summary>
-    /// List of mappings from scene to music clip. When a scene loads, the first
-    /// matching pair (by scene name) will have its AudioClip played via SoundManager.
-    /// </summary>
-    [Tooltip("List of scene and corresponding audio clip pairs. The audio clip will be played when the scene is loaded.")]
-    [SerializeField] private List<SceneAssetHelperAudioClipPair> sceneAudioClipPairs = new List<SceneAssetHelperAudioClipPair>();
+	[Header("Scene -> Music Mapping")]
+	/// <summary>
+	/// List of mappings from scene to music clip.
+	/// When a scene loads, the first pair with a matching scene name or path is played.
+	/// </summary>
+	[Tooltip("List of scene and corresponding audio clip pairs. The audio clip will be played when the scene is loaded.")]
+	[SerializeField] private List<SceneAssetHelperAudioClipPair> sceneAudioClipPairs = new List<SceneAssetHelperAudioClipPair>();
 
-    #endregion
+	#endregion
 
-    #region Unity methods
+	#region Unity methods
 
-    /// <summary>
-    /// On startup, plays music for the currently active scene if a mapping exists.
-    /// </summary>
-    private void Start()
-    {
-        MatchMusicClip(SceneManager.GetActiveScene());
-    }
+	/// <summary>
+	/// On startup, waits for SoundManager and plays music for the currently active scene.
+	/// </summary>
+	private IEnumerator Start()
+	{
+		yield return WaitForSoundManager();
 
-    #endregion
+		Scene currentScene = SceneManager.GetActiveScene();
 
-    #region Public API
+		Debug.Log($"[SceneManagement] Matching music to starting scene: {currentScene.name} ({currentScene.path})");
 
-    /// <summary>
-    /// Loads a scene by a SceneAssetHelper (name-based), unpauses time,
-    /// and plays the mapped music clip if configured.
-    /// </summary>
-    /// <param name="scene">Helper carrying the scene name and optional display name.</param>
-    /// <remarks>
-    /// If the helper's name equals "Quit Game", the application will quit instead of loading.
-    /// </remarks>
-    public void ChangeScene(SceneAssetHelper scene)
-    {
-        Debug.Log($"Changing scene to: {scene.Name}");
+		MatchMusicClip(currentScene.name, currentScene.path);
+	}
 
-        if (scene.Name == "Quit Game")
-        {
-            Debug.Log("Quitting game...");
-            QuitGame();
-            return;
-        }
+	#endregion
 
-        SceneManager.LoadScene(scene.Name);
-        Time.timeScale = 1f;
+	#region Public API
 
-        MatchMusicClip(scene);
-    }
+	/// <summary>
+	/// Loads a scene by a SceneAssetHelper, unpauses time,
+	/// and plays the mapped music clip if configured.
+	/// </summary>
+	/// <param name="scene">Helper carrying the scene name and path.</param>
+	/// <remarks>
+	/// If the helper's name equals "Quit Game", the application will quit instead of loading.
+	/// </remarks>
+	public void ChangeScene(SceneAssetHelper scene)
+	{
+		if (scene == null)
+		{
+			Debug.LogError("[SceneManagement] ChangeScene called with null scene.");
+			return;
+		}
 
-    /// <summary>
-    /// Loads a scene by string name, unpauses time, and plays the mapped music clip if configured.
-    /// </summary>
-    /// <param name="sceneName">Scene name as added in Build Settings.</param>
-    public void ChangeScene(string sceneName)
-    {
-        SceneManager.LoadScene(sceneName);
-        Time.timeScale = 1f;
+		Debug.Log($"[SceneManagement] Changing scene to: {scene.Name}");
 
-        // Create a lightweight helper to reuse the same music matching path.
-        MatchMusicClip(new SceneAssetHelper(sceneName, sceneName));
-    }
+		if (scene.Name == "Quit Game")
+		{
+			Debug.Log("[SceneManagement] Quitting game...");
+			QuitGame();
+			return;
+		}
 
-    #endregion
+		string sceneToLoad = !string.IsNullOrWhiteSpace(scene.Name) ? scene.Name : scene.Path;
 
-    #region Internals
+		if (string.IsNullOrWhiteSpace(sceneToLoad))
+		{
+			Debug.LogError("[SceneManagement] Cannot change scene; scene name and path are empty.");
+			return;
+		}
 
-    /// <summary>
-    /// Attempts to find and play a music clip for the given scene using the configured list.
-    /// </summary>
-    /// <param name="scene">Scene helper used for name matching.</param>
-    /// <remarks>
-    /// A match is determined by equality against the pair's scene. Only the first match triggers music.
-    /// Requires SoundManager.Instance to be present in the scene.
-    /// </remarks>
-    private void MatchMusicClip(SceneAssetHelper scene)
-    {
-        for (int i = 0; i < sceneAudioClipPairs.Count; i++)
-        {
-            if (scene == sceneAudioClipPairs[i])
-            {
-                // Defensive: SoundManager may not yet have initialized in edge cases.
-                if (SoundManager.Instance != null)
-                {
-                    SoundManager.Instance.PlayMusic(sceneAudioClipPairs[i].AudioClip);
-                }
-                else
-                {
-                    Debug.LogWarning("SoundManager.Instance is null; cannot play scene music.");
-                }
+		SceneManager.LoadScene(sceneToLoad);
+		Time.timeScale = 1f;
 
-                // Stop after first match to avoid overlapping PlayMusic calls.
-                return;
-            }
-        }
-    }
+		StartCoroutine(MatchMusicWhenReady(scene.Name, scene.Path));
+	}
 
-    /// <summary>
-    /// Attempts to find and play a music clip for the given Scene.
-    /// </summary>
-    /// <param name="scene">UnityEngine.SceneManagement.Scene to match by name.</param>
-    private void MatchMusicClip(Scene scene)
-    {
-        // Reuse the helper-based path for consistency.
-        MatchMusicClip(new SceneAssetHelper(scene.name, scene.name));
-    }
+	/// <summary>
+	/// Loads a scene by string name, unpauses time, and plays the mapped music clip if configured.
+	/// </summary>
+	/// <param name="sceneName">Scene name as added in Build Settings.</param>
+	public void ChangeScene(string sceneName)
+	{
+		if (string.IsNullOrWhiteSpace(sceneName))
+		{
+			Debug.LogError("[SceneManagement] ChangeScene called with empty scene name.");
+			return;
+		}
 
-    /// <summary>
-    /// Quits the application. In the editor this has no effect at runtime builds only.
-    /// </summary>
-    private void QuitGame()
-    {
-        Debug.Log("Quitting game...");
-        Application.Quit();
-    }
+		Debug.Log($"[SceneManagement] Changing scene to: {sceneName}");
 
-    #endregion
+		SceneManager.LoadScene(sceneName);
+		Time.timeScale = 1f;
+
+		// The string may be either a scene name or a scene path, so pass it as both.
+		StartCoroutine(MatchMusicWhenReady(sceneName, sceneName));
+	}
+
+	#endregion
+
+	#region Internals
+
+	/// <summary>
+	/// Waits until SoundManager exists.
+	/// </summary>
+	private IEnumerator WaitForSoundManager()
+	{
+		while (SoundManager.Instance == null)
+		{
+			yield return null;
+		}
+	}
+
+	/// <summary>
+	/// Waits until SoundManager is ready, then plays music for the scene.
+	/// </summary>
+	/// <param name="sceneName">Scene name to match.</param>
+	/// <param name="scenePath">Scene path to use as fallback.</param>
+	private IEnumerator MatchMusicWhenReady(string sceneName, string scenePath)
+	{
+		yield return WaitForSoundManager();
+
+		MatchMusicClip(sceneName, scenePath);
+	}
+
+	/// <summary>
+	/// Attempts to find and play a music clip for the given scene name or path.
+	/// Matching prefers scene name and falls back to scene path.
+	/// </summary>
+	/// <param name="sceneName">Scene name to match first.</param>
+	/// <param name="scenePath">Scene path to match as fallback.</param>
+	private void MatchMusicClip(string sceneName, string scenePath)
+	{
+		if (SoundManager.Instance == null)
+		{
+			Debug.LogWarning("[SceneManagement] SoundManager.Instance is null; cannot play scene music.");
+			return;
+		}
+
+		for (int i = 0; i < sceneAudioClipPairs.Count; i++)
+		{
+			SceneAssetHelperAudioClipPair pair = sceneAudioClipPairs[i];
+
+			if (pair == null)
+			{
+				continue;
+			}
+
+			if (!SceneMatches(pair, sceneName, scenePath))
+			{
+				continue;
+			}
+
+			if (pair.AudioClip == null)
+			{
+				Debug.LogWarning($"[SceneManagement] Matched scene '{sceneName}', but its music clip is null.");
+				return;
+			}
+
+			Debug.Log($"[SceneManagement] Playing music for scene: {pair.Name}");
+			SoundManager.Instance.PlayMusic(pair.AudioClip);
+			return;
+		}
+
+		Debug.LogWarning($"[SceneManagement] No matched music pair for scene: {sceneName} ({scenePath})");
+	}
+
+	/// <summary>
+	/// Returns true if the pair matches the supplied scene name or scene path.
+	/// Name matching is preferred; path matching is used as a fallback.
+	/// </summary>
+	/// <param name="pair">Configured scene/audio pair.</param>
+	/// <param name="sceneName">Runtime scene name.</param>
+	/// <param name="scenePath">Runtime scene path.</param>
+	private bool SceneMatches(SceneAssetHelperAudioClipPair pair, string sceneName, string scenePath)
+	{
+		if (!string.IsNullOrEmpty(sceneName) && pair.Name == sceneName)
+		{
+			return true;
+		}
+
+		if (!string.IsNullOrEmpty(scenePath) && pair.Path == scenePath)
+		{
+			return true;
+		}
+
+		// Extra fallback: useful when a scene was passed as a string path.
+		if (!string.IsNullOrEmpty(sceneName) && pair.Path == sceneName)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// Quits the application.
+	/// </summary>
+	private void QuitGame()
+	{
+		Debug.Log("Quitting game...");
+		Application.Quit();
+	}
+
+	#endregion
 }

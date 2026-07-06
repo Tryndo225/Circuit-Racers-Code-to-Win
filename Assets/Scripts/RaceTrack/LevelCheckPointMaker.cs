@@ -87,7 +87,7 @@ public static class LevelCheckPointMaker
 			if (checkpoint != levelMap.StartPoint && checkpoint != levelMap.FinishPoint && levelMap.Tiles.InBounds(checkpoint.X, checkpoint.Y))
 			{
 				levelMap.Tiles.At(checkpoint) = -2;
-				levelMap.CheckpointCountPerLap++;
+				++levelMap.CheckpointCountPerLap;
 			}
 		}
 	}
