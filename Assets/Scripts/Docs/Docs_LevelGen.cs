@@ -18,6 +18,8 @@
  *   backtracking roads, and applying spacer tiles.
  * - ::LevelCheckPointMaker converts suitable intermediate straight road segments into checkpoint tiles.
  * - ::LevelMapValidator verifies structural correctness before a map is used or saved.
+ * - ::TrackPiece, ::TrackPieceRule, and ::StringTrackPieceDictionary describe prefab-selection rules.
+ * - ::RaceTrackPlacer converts the validated grid layout into drivable scene prefabs.
  * - ::Array2DExtensions provides coordinate-based helpers for rectangular 2D arrays.
  *
  * Tile values are defined by ::LevelMap::LevelTileTypes:
@@ -34,6 +36,7 @@
  * - @ref level_gen_generation
  * - @ref level_gen_validation
  * - @ref level_gen_checkpoints
+ * - @ref level_gen_placement
  * - @ref level_gen_api
  * - @ref level_gen_integration
  * - @ref level_gen_performance
@@ -51,6 +54,7 @@
  * - Keep generated roads separated with spacer tiles.
  * - Add intermediate checkpoint tiles on long straight segments.
  * - Validate generated or imported maps before use.
+ * - Convert validated grid layouts into drivable prefab-based track pieces.
  *
  * Threading:
  * - ::SeedFactory::Next is thread-safe.
@@ -118,7 +122,8 @@
  * Tile meanings:
  * - ::LevelMap::LevelTileTypes::Grass marks empty cells.
  * - ::LevelMap::LevelTileTypes::Track marks normal road cells.
- * - ::LevelMap::LevelTileTypes::CP marks checkpoint cells.
+ * - ::LevelMap::LevelTileTypes::CP marks checkpoint cells; during placement they are matched
+ *   through track-piece rules rather than through a separate checkpoint-prefab override.
  * - ::LevelMap::LevelTileTypes::Spacer marks keep-out cells used to discourage cramped roads.
  * - ::LevelMap::LevelTileTypes::PlaceHolder and higher values are temporary flood-fill values.
  *
@@ -241,6 +246,8 @@
  * - This utility is intended for intermediate checkpoints.
  * - The start and finish blocks already provide their own checkpoint trigger in the placed track scene.
  * - Therefore the generator does not need to create extra checkpoint tiles on the start or finish cells.
+ * - Intermediate checkpoint prefabs are selected during track placement through checkpoint-specific
+ *   ::TrackPieceRule entries, not through a separate checkpointPrefab field.
  *
  * Public entry point:
  * - ::LevelCheckPointMaker::GenerateCheckPoints(LevelMap levelMap,
@@ -254,6 +261,41 @@
  * Effects:
  * - Some Track cells may become CP cells.
  * - CheckpointCountPerLap increases for each generated checkpoint.
+ *
+ * ----------------------------------------------------------------------
+ * @section level_gen_placement Prefab Track Placement
+ *
+ * ::RaceTrackPlacer converts a generated or loaded ::LevelMap into the visible drivable track scene.
+ * It scans the 2D tile grid, extracts local square patterns around each track-compatible cell,
+ * matches those patterns against a generated legend, and instantiates the selected prefab with
+ * its configured position offset and rotation.
+ *
+ * Rule data:
+ * - ::TrackPiece stores the prefab, placement position or offset, rotation, and pattern size.
+ * - ::TrackPatternCell represents one editable cell in the visual rule editor.
+ * - ::TrackPieceRule stores the inspector-editable visual pattern and placement data.
+ * - ::StringTrackPieceDictionary stores the generated compact string-keyed legend.
+ *
+ * Pattern symbols:
+ * - <c>1</c> marks a normal track-compatible cell.
+ * - <c>X</c> marks an empty or ignored cell.
+ * - <c>C</c> marks a checkpoint, start, or finish cell only when it is the center cell currently
+ *   being matched.
+ *
+ * Checkpoint matching:
+ * - Checkpoint, start, and finish cells are represented as <c>C</c> only for the center of the
+ *   current pattern.
+ * - Checkpoint, start, and finish cells that appear as neighboring cells are treated as <c>1</c>.
+ * - This avoids needing separate rule variants for normal pieces that are merely next to a checkpoint,
+ *   such as horizontal straights with a checkpoint on the left or right.
+ * - Checkpoint-specific prefabs can be assigned directly to rules whose center cell is <c>C</c>.
+ *
+ * Generated legend workflow:
+ * - The editable ::TrackPieceRule list is the source of truth.
+ * - ::RaceTrackPlacer::OnValidate() rebuilds the serialized read-only ::StringTrackPieceDictionary
+ *   so developers can inspect the resulting pattern strings in the Inspector.
+ * - ::RaceTrackPlacer::Start() rebuilds the legend again before placement as a safety step.
+ * - Larger pattern sizes are tried before smaller fallback patterns.
  *
  * ----------------------------------------------------------------------
  * @section level_gen_api Public API Reference
@@ -315,6 +357,27 @@
  * - string ToString()
  *   Returns a multiline representation of the tile grid.
  *
+ * ::TrackPiece:
+ * - TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation, int size = 3)
+ *   Stores prefab, placement offset or position, rotation, and pattern size.
+ *
+ * ::TrackPieceRule:
+ * - TrackPieceRule(string name, string patternKey, GameObject prefab, Vector3 positionOffset,
+ *                  Vector3 rotationEuler, int size = 3)
+ *   Creates an editable visual rule from a compact pattern string.
+ * - string ToPatternKey()
+ *   Converts the visual rule pattern into the generated string-keyed legend format.
+ * - TrackPiece ToTrackPiece()
+ *   Converts the rule into a runtime placement descriptor.
+ * - void NormalizePatternLength()
+ *   Ensures odd square pattern sizes and matching array lengths.
+ *
+ * ::RaceTrackPlacer:
+ * - OnValidate()
+ *   Rebuilds the generated read-only pattern legend in the editor.
+ * - Start()
+ *   Loads the current map, refreshes the generated legend, collects pattern sizes, and places the track.
+ *
  * ::LevelGenerator:
  * - static LevelMap GenerateLevel(int width, int height, bool isCircuit,
  *                                 int steps, int stepLength, int maxAttempts, int seed)
@@ -350,7 +413,12 @@
  *
  * Track placement:
  * - ::RaceTrackPlacer consumes a ::LevelMap and instantiates visible track-piece prefabs.
- * - CP tiles are converted into checkpoint prefabs with ::CheckPointListener components.
+ * - Track, checkpoint, start, and finish cells are matched through ::TrackPieceRule entries and
+ *   the generated ::StringTrackPieceDictionary legend.
+ * - During pattern extraction, CP/start/finish cells become <c>C</c> only when they are the center
+ *   tile currently being matched; neighboring CP/start/finish cells are treated as normal track <c>1</c>.
+ * - Checkpoint-specific prefabs are therefore selected by rules with a center <c>C</c>, instead of
+ *   by a separate checkpointPrefab override.
  * - The placed start/finish object is used as the car spawn reference.
  *
  * Race flow:
@@ -413,6 +481,7 @@
  * - Lower minStraightLengthForCheckPoint.
  * - Ensure the generated road contains long enough straight segments.
  * - Remember that start and finish checkpoint triggers are provided by placed start/finish prefabs.
+ * - Ensure checkpoint-specific ::TrackPieceRule entries exist for the required center-<c>C</c> patterns.
  *
  * Checkpoint validation fails:
  * - Checkpoint tiles must sit on straight sections.
@@ -432,6 +501,7 @@
  * ----------------------------------------------------------------------
  * @section level_gen_versions Version History
  *
+ * - v1.5: Added rule-based prefab placement documentation, generated legend workflow, and center-only checkpoint pattern matching.
  * - v1.4: Added LevelMapValidator documentation and clarified endpoint, neighbor-count, and checkpoint rules.
  * - v1.3: Added IsDayTrack, checkpoint count, road count, copy/equality, and flattened serialization details.
  * - v1.2: Added straight-segment checkpoint stamping for intermediate checkpoints.

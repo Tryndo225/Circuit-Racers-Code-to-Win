@@ -33,7 +33,8 @@
  * - Show or hide Inspector fields based on boolean conditions through ::ShowIfDrawer.
  * - Render selected fields as disabled/read-only through ::ReadOnlyDrawer.
  * - Provide a type-selection UI for managed-reference polymorphic fields through ::ButtonTypeDrawer.
- * - Edit ::StringTrackPieceDictionary data with a reorderable key/value list.
+ * - Edit visual ::TrackPieceRule entries with a Rule-Tile-like pattern grid.
+ * - Display generated ::StringTrackPieceDictionary data for inspection through a reorderable key/value list.
  *
  * Scope:
  * - Editor-only quality-of-life.
@@ -44,8 +45,8 @@
  * - UnityEditor.
  * - UnityEditorInternal.ReorderableList for the track-piece dictionary drawer.
  * - UnityEditor.TypeCache for discovering concrete ::ButtonType subclasses.
- * - Runtime data types such as ::ButtonType, ::WheelSpec, ::StringTrackPieceDictionary,
- *   ::ReadOnlyAttribute, and ::ShowIfAttribute.
+ * - Runtime data types such as ::ButtonType, ::WheelSpec, ::TrackPieceRule,
+ *   ::StringTrackPieceDictionary, ::ReadOnlyAttribute, and ::ShowIfAttribute.
  *
  * Threading:
  * - Unity Editor thread only.
@@ -68,9 +69,15 @@
  *   Drawer for fields marked with ::ShowIfAttribute. It looks up a boolean condition field and only
  *   draws the decorated property when the condition matches the required state.
  *
+ * - ::TrackPieceRuleDrawer
+ *   Rule-Tile-like drawer for ::TrackPieceRule. It draws regular rule fields on the left and
+ *   a clickable square pattern grid on the right, allowing track-piece patterns to be edited visually.
+ *
  * - ::StringTrackPieceDictionaryDrawer
  *   ReorderableList-based drawer for ::StringTrackPieceDictionary, which stores string keys mapped
- *   to ::TrackPiece values. It keeps the hidden serialized key and value arrays synchronized.
+ *   to ::TrackPiece values. It keeps the hidden serialized key and value arrays synchronized. In the
+ *   track-placement workflow this dictionary is normally generated from ::TrackPieceRule entries and
+ *   shown read-only for inspection.
  *
  * - ::WheelSpecDrawer
  *   Compact one-row drawer for ::WheelSpec. It displays the fields in four equal columns:
@@ -103,14 +110,25 @@
  *   ShowIfAttribute.RequiredState.
  * - Hidden fields return height 0, so no empty spacing remains in the Inspector.
  *
+ * TrackPieceRuleDrawer:
+ * - Targets ::TrackPieceRule.
+ * - Shows a foldout header using the rule name when available.
+ * - Draws name, prefab, position offset, rotation, and pattern size fields on the left.
+ * - Draws a clickable square pattern grid on the right.
+ * - Cycles each grid cell through empty, track, and checkpoint states.
+ * - Automatically resizes the flattened pattern array when the selected pattern size changes.
+ * - Supports 3x3 and larger odd-sized patterns such as 5x5.
+ *
  * StringTrackPieceDictionaryDrawer:
  * - Targets ::StringTrackPieceDictionary.
  * - Uses ReorderableList for add, remove, reorder, header drawing, element drawing, and element height.
  * - Reads the hidden serialized backing arrays named keys and values.
  * - Keeps keys and values synchronized by size and order.
  * - Shows an error help box if the expected backing arrays cannot be found.
- * - Draws each entry as a foldout with an editable key and the serialized TrackPiece value.
+ * - Draws each entry as a foldout with a key and the serialized TrackPiece value.
  * - Prevents duplicate keys at edit time.
+ * - Can be combined with ::ReadOnlyAttribute when the dictionary is generated from visual rules and
+ *   should be inspected rather than edited directly.
  *
  * WheelSpecDrawer:
  * - Targets ::WheelSpec.
@@ -168,11 +186,14 @@
  * }
  * @endcode
  *
- * String-to-track-piece dictionary:
+ * Visual track-piece rule with generated legend:
  * @code{.cs}
  * public class TrackLegend : MonoBehaviour
  * {
- *     [SerializeField] private StringTrackPieceDictionary legend;
+ *     [SerializeField] private List<TrackPieceRule> rules;
+ *
+ *     [SerializeField, ReadOnly]
+ *     private StringTrackPieceDictionary generatedLegend;
  * }
  * @endcode
  *
@@ -200,10 +221,19 @@
  * - If assembly definitions are used, the editor assembly containing the drawer must be able to reference
  *   the runtime assembly containing ButtonType and its subclasses.
  *
+ * Track-piece rule editing:
+ * - ::TrackPieceRuleDrawer depends on the field names Name, Prefab, PositionOffset, RotationEuler,
+ *   Size, and Pattern.
+ * - Renaming these fields requires updating the drawer.
+ * - The drawer only changes the Inspector presentation. Runtime pattern matching still uses the
+ *   generated string-keyed legend.
+ *
  * Serializable dictionaries:
  * - ::StringTrackPieceDictionaryDrawer expects the backing field names from ::SerializableDictionary:
  *   keys and values.
  * - Renaming those backing fields requires updating the drawer.
+ * - In ::RaceTrackPlacer, the dictionary is generated from visual ::TrackPieceRule entries and can
+ *   be shown with ::ReadOnlyAttribute so developers can verify compact pattern strings.
  *
  * Vehicle setup:
  * - ::WheelSpecDrawer assumes the field names collider, visual, powered, and steering.
@@ -242,13 +272,25 @@
  * - Changing to a different concrete type creates a fresh instance.
  * - This is expected because different strategies have different serialized fields.
  *
+ * Track-piece rule grid does not draw correctly:
+ * - Confirm the field type is exactly ::TrackPieceRule or a list/array of that type.
+ * - Confirm the drawer script is compiled as editor-only code.
+ * - Confirm the Pattern array exists and that Size is an odd value of at least 3.
+ *
+ * Generated pattern legend is empty:
+ * - Confirm ::RaceTrackPlacer::OnValidate() is rebuilding the dictionary from the visual rule list.
+ * - Check that the rule list is not empty and that each rule has a valid pattern size.
+ * - Reopen or reselect the object if Unity has not refreshed serialized generated values yet.
+ *
  * Dictionary drawer shows backing-field error:
  * - Confirm ::SerializableDictionary still uses serialized fields named keys and values.
  * - Confirm the field type is exactly ::StringTrackPieceDictionary.
  *
  * Duplicate dictionary keys:
  * - Use unique pattern keys.
- * - The drawer prevents duplicate keys in the editor, but existing serialized duplicates may still need manual cleanup.
+ * - When the dictionary is generated from ::TrackPieceRule entries, duplicate visual patterns will overwrite
+ *   earlier generated entries during rebuild.
+ * - Check the generated legend to verify that each intended pattern appears only once.
  *
  * WheelSpec columns are unclear:
  * - Add a tooltip or header on the parent wheel array, for example:
@@ -257,6 +299,7 @@
  * ----------------------------------------------------------------------
  * @section editor_util_versions Version History
  *
+ * - v1.3: Added TrackPieceRuleDrawer and documented the generated read-only pattern legend workflow.
  * - v1.2: Added managed-reference ButtonType drawer and compact WheelSpec drawer.
  * - v1.1: Added ShowIf and ReadOnly drawers.
  * - v1.0: Added StringTrackPieceDictionary ReorderableList drawer.

@@ -244,7 +244,8 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// <param name="context">Input callback context.</param>
 	private void OnRespawnPerformed(InputAction.CallbackContext context)
 	{
-		Respawn();
+		if (!_isRaceFinished)
+			Respawn();
 	}
 
 	/// <summary>
@@ -253,7 +254,8 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 	/// <param name="context">Input callback context.</param>
 	private void OnRestartPerformed(InputAction.CallbackContext context)
 	{
-		StartRestartCountdown();
+		if (!_isRaceFinished)
+			StartRestartCountdown();
 	}
 
 	/// <summary>

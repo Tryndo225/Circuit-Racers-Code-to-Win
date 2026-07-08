@@ -307,7 +307,7 @@
  * - Longer races create more snapshots and larger save data.
  * - Replay objects are copied when saved and when assigned for playback.
  * - ReplayPreviewer interpolation is linear in normal playback and uses cached snapshot indices.
- * - Large replay objects increase PlayerPrefs JSON size when saved through ::GameDataManager.
+ * - Large replay objects increase decoded JSON size and compressed PlayerPrefs payload size when saved through ::GameDataManager.
  *
  * ----------------------------------------------------------------------
  * @section replay_system_troubleshooting Troubleshooting

@@ -1,7 +1,10 @@
 using IEnumerableExtensions;       // For GetContentHash()
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Runtime.Serialization;
+using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -13,7 +16,7 @@ using UnityEngine;
 /// <see cref="LevelMap"/>, and notifying listeners about changes.
 ///
 /// Responsibilities:
-/// - Load and save <see cref="GameData"/> to PlayerPrefs as JSON under the key <c>GameData</c>.
+/// - Load and save <see cref="GameData"/> to PlayerPrefs as compressed Base64-encoded JSON.
 /// - Maintain the currently selected <see cref="LevelMap"/> used by gameplay scene transitions.
 /// - Provide helper APIs for adding, removing, clearing, editing, and replacing levels.
 /// - Record best times, checkpoint splits, and best replays.
@@ -26,6 +29,28 @@ using UnityEngine;
 /// </remarks>
 public class GameDataManager : Generic.Singleton<GameDataManager>
 {
+	#region Save Keys
+
+	/// <summary>
+	/// Legacy PlayerPrefs key used by older saves that stored raw JSON directly.
+	/// </summary>
+	/// <remarks>
+	/// @ingroup game_data
+	/// @brief Kept for backwards compatibility when loading saves created before compression was added.
+	/// </remarks>
+	private const string GameDataKey = "GameData";
+
+	/// <summary>
+	/// PlayerPrefs key used for the compressed Base64-encoded game-data save.
+	/// </summary>
+	/// <remarks>
+	/// @ingroup game_data
+	/// @brief Stores GZip-compressed UTF-8 JSON encoded as Base64 so it can be saved as a PlayerPrefs string.
+	/// </remarks>
+	private const string CompressedGameDataKey = "GameDataCompressed";
+
+	#endregion Save Keys
+
 	#region Data Records
 
 	/// <summary>
@@ -683,13 +708,16 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Unity Methods
 
 	/// <summary>
-	/// Loads saved game data from PlayerPrefs if present.
+	/// Loads saved game data from PlayerPrefs if either the compressed or legacy save key is present.
 	/// </summary>
+	/// <remarks>
+	/// @brief Prefers the compressed save format and falls back to the legacy raw-JSON format when necessary.
+	/// </remarks>
 	protected override void Awake()
 	{
 		base.Awake();
 
-		if (PlayerPrefs.HasKey("GameData"))
+		if (PlayerPrefs.HasKey(CompressedGameDataKey) || PlayerPrefs.HasKey(GameDataKey))
 		{
 			LoadGameData();
 		}
@@ -713,10 +741,14 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Persistence
 
 	/// <summary>
-	/// Serializes <see cref="CurrentGameData"/> to JSON and writes it to PlayerPrefs.
+	/// Serializes <see cref="CurrentGameData"/> to JSON, compresses it, and writes it to PlayerPrefs.
 	/// </summary>
 	/// <remarks>
-	/// Data is stored under the PlayerPrefs key <c>GameData</c>.
+	/// @brief Saves game data as GZip-compressed UTF-8 JSON encoded as a Base64 string.
+	///
+	/// The JSON is compressed before it is encoded as Base64. Base64 is not used for compression;
+	/// it is only used to store the compressed binary data as a text value in PlayerPrefs.
+	/// The legacy raw-JSON key is deleted after a successful save so duplicated save data is not kept.
 	/// </remarks>
 	private void SaveGameData()
 	{
@@ -725,10 +757,13 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			CurrentGameData.EnsureValid();
 
 			string json = JsonUtility.ToJson(CurrentGameData);
-			PlayerPrefs.SetString("GameData", json);
+			string compressed = CompressToBase64(json);
+
+			PlayerPrefs.SetString(CompressedGameDataKey, compressed);
+			PlayerPrefs.DeleteKey(GameDataKey);
 			PlayerPrefs.Save();
 
-			Debug.Log($"[GameDataManager] Saved {CurrentGameData.Levels.Count} level(s).");
+			Debug.Log($"[GameDataManager] Saved {CurrentGameData.Levels.Count} level(s). Compressed size: {GetUtf8ByteCount(compressed)} bytes.");
 		}
 		catch (Exception e)
 		{
@@ -740,14 +775,25 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	/// Loads game data JSON from PlayerPrefs.
 	/// </summary>
 	/// <remarks>
-	/// Data is loaded from the PlayerPrefs key <c>GameData</c>. The content hash is recomputed after loading.
-	/// If loading fails, a new empty <see cref="GameData"/> instance is created.
+	/// @brief Loads compressed save data when available and supports the old raw-JSON save format.
+	///
+	/// The content hash is recomputed after loading. If loading fails, a new empty
+	/// <see cref="GameData"/> instance is created.
 	/// </remarks>
 	private void LoadGameData()
 	{
 		try
 		{
-			string json = PlayerPrefs.GetString("GameData");
+			string json = GetSavedGameDataJson();
+
+			if (string.IsNullOrEmpty(json))
+			{
+				CurrentGameData = new GameData();
+				CurrentGameData.EnsureValid();
+				Hash = CurrentGameData.Levels.GetContentHash();
+				return;
+			}
+
 			CurrentGameData = JsonUtility.FromJson<GameData>(json) ?? new GameData();
 			CurrentGameData.EnsureValid();
 
@@ -772,6 +818,108 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 			CurrentGameData.EnsureValid();
 			Hash = 0;
 		}
+	}
+
+	/// <summary>
+	/// Compresses a text string with GZip and converts the result into Base64.
+	/// </summary>
+	/// <param name="text">UTF-16 C# string to compress.</param>
+	/// <returns>Base64 representation of the compressed UTF-8 bytes.</returns>
+	/// <remarks>
+	/// @brief Converts JSON text into a PlayerPrefs-safe compressed string.
+	///
+	/// The input string is first encoded as UTF-8 bytes. Those bytes are then compressed
+	/// with <see cref="GZipStream"/> and finally encoded as Base64 so the binary compressed
+	/// payload can be stored using <see cref="PlayerPrefs.SetString(string, string)"/>.
+	/// </remarks>
+	private static string CompressToBase64(string text)
+	{
+		if (string.IsNullOrEmpty(text))
+			return string.Empty;
+
+		byte[] rawBytes = Encoding.UTF8.GetBytes(text);
+
+		using (MemoryStream output = new MemoryStream())
+		{
+			using (GZipStream gzip = new GZipStream(output, System.IO.Compression.CompressionLevel.Optimal))
+			{
+				gzip.Write(rawBytes, 0, rawBytes.Length);
+			}
+
+			return Convert.ToBase64String(output.ToArray());
+		}
+	}
+
+	/// <summary>
+	/// Converts a Base64 GZip payload back into its original text form.
+	/// </summary>
+	/// <param name="base64">Base64 representation of compressed UTF-8 text.</param>
+	/// <returns>Decompressed UTF-8 text.</returns>
+	/// <remarks>
+	/// @brief Restores JSON text previously produced by <see cref="CompressToBase64(string)"/>.
+	/// </remarks>
+	private static string DecompressFromBase64(string base64)
+	{
+		if (string.IsNullOrEmpty(base64))
+			return string.Empty;
+
+		byte[] compressedBytes = Convert.FromBase64String(base64);
+
+		using (MemoryStream input = new MemoryStream(compressedBytes))
+		using (GZipStream gzip = new GZipStream(input, CompressionMode.Decompress))
+		using (MemoryStream output = new MemoryStream())
+		{
+			gzip.CopyTo(output);
+			return Encoding.UTF8.GetString(output.ToArray());
+		}
+	}
+
+	/// <summary>
+	/// Reads the saved game-data JSON from either the compressed or legacy PlayerPrefs key.
+	/// </summary>
+	/// <returns>Decompressed or raw JSON string, or an empty string when no saved data exists.</returns>
+	/// <remarks>
+	/// @brief Centralized save-reader used by loading and debugging tools.
+	///
+	/// The compressed save key is preferred. If decompression of the compressed key fails and a
+	/// legacy raw-JSON save exists, the method falls back to the legacy save. This avoids losing
+	/// old save data if a compressed value becomes invalid during development.
+	/// </remarks>
+	private static string GetSavedGameDataJson()
+	{
+		if (PlayerPrefs.HasKey(CompressedGameDataKey))
+		{
+			try
+			{
+				string compressed = PlayerPrefs.GetString(CompressedGameDataKey, string.Empty);
+				return DecompressFromBase64(compressed);
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning($"[GameDataManager] Failed to decompress compressed save data: {e.Message}");
+
+				if (!PlayerPrefs.HasKey(GameDataKey))
+					throw;
+			}
+		}
+
+		return PlayerPrefs.GetString(GameDataKey, string.Empty);
+	}
+
+	/// <summary>
+	/// Gets the UTF-8 byte count of a string.
+	/// </summary>
+	/// <param name="text">Text whose encoded size should be measured.</param>
+	/// <returns>Number of bytes required to store the text as UTF-8.</returns>
+	/// <remarks>
+	/// @brief Helper used by save-size debugging logs.
+	/// </remarks>
+	private static int GetUtf8ByteCount(string text)
+	{
+		if (string.IsNullOrEmpty(text))
+			return 0;
+
+		return Encoding.UTF8.GetByteCount(text);
 	}
 
 	#endregion
@@ -1074,12 +1222,28 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 	#region Context Menu
 
 	/// <summary>
-	/// Copies the raw saved game-data JSON from PlayerPrefs to the system clipboard.
+	/// Copies the saved game-data JSON from PlayerPrefs to the system clipboard.
 	/// </summary>
+	/// <remarks>
+	/// @brief Copies decoded JSON even when the stored save uses compressed Base64 encoding.
+	///
+	/// This is mainly a debugging helper. The clipboard receives the readable JSON content,
+	/// not the compressed PlayerPrefs payload.
+	/// </remarks>
 	[ContextMenu("Copy Saved GameData To Clipboard")]
 	public void CopySavedGameDataToClipboard()
 	{
-		string json = PlayerPrefs.GetString("GameData", "");
+		string json;
+
+		try
+		{
+			json = GetSavedGameDataJson();
+		}
+		catch (Exception e)
+		{
+			Debug.LogError($"[GameDataManager] Failed to read saved GameData: {e.Message}");
+			return;
+		}
 
 		if (string.IsNullOrEmpty(json))
 		{
@@ -1088,25 +1252,72 @@ public class GameDataManager : Generic.Singleton<GameDataManager>
 		}
 
 		GUIUtility.systemCopyBuffer = json;
-		Debug.Log("[GameDataManager] Saved GameData copied to clipboard.");
+		Debug.Log("[GameDataManager] Saved GameData JSON copied to clipboard.");
 	}
 
 	/// <summary>
-	/// Deletes the saved game-data JSON from PlayerPrefs.
+	/// Deletes all saved game-data values from PlayerPrefs.
 	/// </summary>
+	/// <remarks>
+	/// @brief Removes both the compressed save key and the legacy raw-JSON save key.
+	/// </remarks>
 	[ContextMenu("Delete Saved GameData")]
 	public void DeleteSavedGameData()
 	{
-		if (!PlayerPrefs.HasKey("GameData"))
+		if (!PlayerPrefs.HasKey(CompressedGameDataKey) && !PlayerPrefs.HasKey(GameDataKey))
 		{
 			Debug.LogWarning("[GameDataManager] No saved GameData found to delete.");
 			return;
 		}
 
-		PlayerPrefs.DeleteKey("GameData");
+		PlayerPrefs.DeleteKey(CompressedGameDataKey);
+		PlayerPrefs.DeleteKey(GameDataKey);
 		PlayerPrefs.Save();
 
 		Debug.Log("[GameDataManager] Saved GameData deleted.");
+	}
+
+	/// <summary>
+	/// Prints the size of the saved game-data JSON and stored PlayerPrefs payload.
+	/// </summary>
+	/// <remarks>
+	/// @brief Reports decoded JSON size, compressed Base64 size, and approximate compression ratio.
+	/// </remarks>
+	[ContextMenu("Print Saved GameData Size")]
+	public void PrintSavedGameDataSize()
+	{
+		string json;
+
+		try
+		{
+			json = GetSavedGameDataJson();
+		}
+		catch (Exception e)
+		{
+			Debug.LogError($"[GameDataManager] Failed to read saved GameData: {e.Message}");
+			return;
+		}
+
+		if (string.IsNullOrEmpty(json))
+		{
+			Debug.LogWarning("[GameDataManager] No saved GameData found.");
+			return;
+		}
+
+		int jsonByteCount = GetUtf8ByteCount(json);
+
+		if (PlayerPrefs.HasKey(CompressedGameDataKey))
+		{
+			string compressed = PlayerPrefs.GetString(CompressedGameDataKey, string.Empty);
+			int compressedByteCount = GetUtf8ByteCount(compressed);
+			float ratio = jsonByteCount > 0 ? compressedByteCount / (float)jsonByteCount : 0f;
+
+			Debug.Log($"[GameDataManager] Saved GameData JSON size: {jsonByteCount} bytes ({jsonByteCount / 1024f:F2} KB, {jsonByteCount / 1024f / 1024f:F4} MB). Compressed Base64 size: {compressedByteCount} bytes ({compressedByteCount / 1024f:F2} KB, {compressedByteCount / 1024f / 1024f:F4} MB). Ratio: {ratio:P1}.");
+		}
+		else
+		{
+			Debug.Log($"[GameDataManager] Saved GameData JSON size: {jsonByteCount} bytes ({jsonByteCount / 1024f:F2} KB, {jsonByteCount / 1024f / 1024f:F4} MB). Save is using the legacy raw-JSON format.");
+		}
 	}
 
 	#endregion Context Menu

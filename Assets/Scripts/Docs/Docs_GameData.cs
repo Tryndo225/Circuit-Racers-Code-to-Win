@@ -7,9 +7,11 @@
  * @brief Persistent progression data, selected level state, best times, checkpoint splits, replays, and assist settings.
  *
  * The Game Data subsystem centers on ::GameDataManager, which derives from Generic::Singleton<GameDataManager>.
- * It owns a ::GameData instance, persists it through Unity PlayerPrefs as JSON under the key "GameData",
- * tracks the currently selected ::LevelMap, and exposes APIs for level lists, best times, checkpoint splits,
- * best replays, assist settings, and editable level replacement.
+ * It owns a ::GameData instance, persists it through Unity PlayerPrefs as GZip-compressed,
+ * Base64-encoded JSON under the key "GameDataCompressed", and keeps backwards compatibility
+ * with older raw JSON saves stored under the key "GameData". It also tracks the currently selected
+ * ::LevelMap and exposes APIs for level lists, best times, checkpoint splits, best replays,
+ * assist settings, and editable level replacement.
  *
  * Contents:
  * - @ref gdm_overview
@@ -28,7 +30,7 @@
  * @section gdm_overview Overview
  *
  * Responsibilities:
- * - Load and save ::GameData to PlayerPrefs as JSON.
+ * - Load and save ::GameData to PlayerPrefs as compressed Base64-encoded JSON.
  * - Maintain the currently selected ::LevelMap for gameplay scene transitions.
  * - Store custom levels and their best completion data.
  * - Store practice/test-map best time, checkpoint splits, and replay.
@@ -42,7 +44,7 @@
  * Dependencies:
  * - Generic::Singleton<T> base type.
  * - IEnumerableExtensions::IEnumerableExtensions::GetContentHash for level-list hash computation.
- * - UnityEngine.PlayerPrefs and JsonUtility for persistence.
+ * - UnityEngine.PlayerPrefs, JsonUtility, System.IO.Compression, and Base64 conversion for persistence.
  * - ::SceneManagement for loading the gameplay scene.
  * - ::LevelMap for level layout data.
  * - ::Replay for best-run replay storage.
@@ -99,21 +101,26 @@
  *
  * GameDataManager.Awake:
  * - Enforces the singleton rule.
- * - If PlayerPrefs contains "GameData", loads it.
+ * - If PlayerPrefs contains "GameDataCompressed" or the legacy "GameData" key, loads it.
  * - Otherwise initializes a fresh ::GameData instance and computes the initial Hash.
  *
  * GameDataManager.OnApplicationQuit:
- * - Saves CurrentGameData to PlayerPrefs.
+ * - Saves CurrentGameData to PlayerPrefs using the compressed save format.
  *
  * SaveGameData:
  * - Calls CurrentGameData.EnsureValid().
  * - Serializes CurrentGameData with JsonUtility.ToJson().
- * - Stores the JSON string in PlayerPrefs under "GameData".
+ * - Compresses the JSON with GZip.
+ * - Converts the compressed bytes to a Base64 string.
+ * - Stores the compressed Base64 payload in PlayerPrefs under "GameDataCompressed".
+ * - Removes the legacy raw-JSON "GameData" key after a successful compressed save.
  * - Calls PlayerPrefs.Save().
  *
  * LoadGameData:
- * - Reads JSON from PlayerPrefs key "GameData".
- * - Deserializes it with JsonUtility.FromJson<GameData>().
+ * - Reads the compressed Base64 payload from PlayerPrefs key "GameDataCompressed" when present.
+ * - Decompresses it back into readable JSON before deserialization.
+ * - Falls back to the legacy raw JSON key "GameData" when no compressed save exists.
+ * - Deserializes the JSON with JsonUtility.FromJson<GameData>().
  * - Repairs missing or older-format data with EnsureValid().
  * - Recomputes Hash from CurrentGameData.Levels.
  * - Falls back to a new empty ::GameData if loading fails.
@@ -269,7 +276,13 @@
  *
  * Context menu helpers:
  * - void CopySavedGameDataToClipboard()
- *   Copies the raw saved JSON from PlayerPrefs to the clipboard.
+ *   Copies the readable decoded JSON to the clipboard, even when the saved PlayerPrefs value is compressed.
+ *
+ * - void DeleteSavedGameData()
+ *   Deletes both the compressed save key and the legacy raw-JSON save key.
+ *
+ * - void PrintSavedGameDataSize()
+ *   Prints the decoded JSON size and, when available, the compressed Base64 payload size.
  *
  * ----------------------------------------------------------------------
  * @section gdm_level_editing Level Editing
@@ -325,8 +338,11 @@
  * @section gdm_persistence Persistence and Format
  *
  * Storage:
- * - PlayerPrefs key: "GameData".
- * - Value: JSON produced by JsonUtility.ToJson(CurrentGameData).
+ * - Main PlayerPrefs key: "GameDataCompressed".
+ * - Main value: Base64 text produced from GZip-compressed JsonUtility JSON.
+ * - Legacy PlayerPrefs key: "GameData".
+ * - Legacy value: raw JSON produced by JsonUtility.ToJson(CurrentGameData).
+ * - The legacy key is kept only for backwards-compatible loading of older saves.
  *
  * Saved data includes:
  * - Custom level list.
@@ -339,6 +355,8 @@
  * - ABS and traction-control settings.
  *
  * Loading:
+ * - The compressed key is preferred when both save formats exist.
+ * - The legacy raw-JSON key is used as a fallback when no compressed save exists.
  * - Missing older fields are repaired through EnsureValid().
  * - Missing split arrays are recreated.
  * - Missing assist settings are recreated.
@@ -346,7 +364,9 @@
  *
  * Limitations:
  * - PlayerPrefs is convenient for small saves, but not ideal for very large data.
- * - Stored replay data can grow quickly if many snapshots are saved.
+ * - Compression reduces repeated JSON text but does not remove the cost of serializing and deserializing large objects.
+ * - Stored replay data can still grow quickly if many snapshots are saved.
+ * - Base64 is used only so compressed binary data can be stored as a PlayerPrefs string.
  * - JsonUtility has Unity serialization limitations and does not support every C# type equally.
  *
  * ----------------------------------------------------------------------
@@ -356,14 +376,14 @@
  * - GetContentHash iterates the Levels list and is linear in the number of saved levels.
  * - Listener invocation copies callbacks to an array before calling them, avoiding mutation issues during callbacks.
  * - Avoid saving repeatedly in tight loops.
- * - Large replay objects increase JSON size and save/load cost.
+ * - Large replay objects increase decoded JSON size and save/load cost, even though the stored PlayerPrefs payload is compressed.
  *
  * ----------------------------------------------------------------------
  * @section gdm_troubleshooting Troubleshooting
  *
  * Data not loading:
- * - Check that PlayerPrefs contains the "GameData" key.
- * - Check the console for JsonUtility or EnsureValid errors.
+ * - Check that PlayerPrefs contains either the "GameDataCompressed" key or the legacy "GameData" key.
+ * - Check the console for compression, Base64, JsonUtility, or EnsureValid errors.
  * - Check whether an older schema needs fallback handling.
  *
  * Selected level does not start:
@@ -398,6 +418,7 @@
  * ----------------------------------------------------------------------
  * @section gdm_versions Version History
  *
+ * - v1.5: Added GZip-compressed Base64 PlayerPrefs storage with legacy raw-JSON loading support.
  * - v1.4: Added assist settings, best replays, checkpoint splits, editable copies, and level replacement.
  * - v1.3: Added practice/test-map best time and split storage.
  * - v1.2: Added hash-based change notifications and observer list.
