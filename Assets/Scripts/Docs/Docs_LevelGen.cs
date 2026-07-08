@@ -271,7 +271,7 @@
  * its configured position offset and rotation.
  *
  * Rule data:
- * - ::TrackPiece stores the prefab, placement position or offset, rotation, and pattern size.
+ * - ::TrackPiece stores the prefab, placement position or offset, rotation, pattern size, and source pattern key.
  * - ::TrackPatternCell represents one editable cell in the visual rule editor.
  * - ::TrackPieceRule stores the inspector-editable visual pattern and placement data.
  * - ::StringTrackPieceDictionary stores the generated compact string-keyed legend.
@@ -279,16 +279,26 @@
  * Pattern symbols:
  * - <c>1</c> marks a normal track-compatible cell.
  * - <c>X</c> marks an empty or ignored cell.
- * - <c>C</c> marks a checkpoint, start, or finish cell only when it is the center cell currently
- *   being matched.
+ * - <c>C</c> marks a checkpoint, start, or finish cell when it must be matched explicitly.
  *
  * Checkpoint matching:
- * - Checkpoint, start, and finish cells are represented as <c>C</c> only for the center of the
- *   current pattern.
- * - Checkpoint, start, and finish cells that appear as neighboring cells are treated as <c>1</c>.
- * - This avoids needing separate rule variants for normal pieces that are merely next to a checkpoint,
- *   such as horizontal straights with a checkpoint on the left or right.
- * - Checkpoint-specific prefabs can be assigned directly to rules whose center cell is <c>C</c>.
+ * - In 3x3 patterns, checkpoint, start, and finish neighbours are treated as <c>1</c>.
+ *   This lets ordinary one-cell pieces be placed next to checkpoints without requiring extra
+ *   checkpoint-adjacent rule variants.
+ * - In 3x3 patterns, the center checkpoint, start, or finish cell is represented as <c>C</c>,
+ *   so checkpoint-specific or start/finish-specific rules can be matched.
+ * - In larger patterns, checkpoint, start, and finish cells are represented as <c>C</c> even
+ *   when they are neighbours. This prevents larger prefabs from being placed over protected
+ *   checkpoint, start, or finish cells unless a rule explicitly supports that case.
+ *
+ * Larger-piece overlap handling:
+ * - The matching pattern is one layer larger than the physical footprint. For example, a 5x5
+ *   pattern may describe a piece whose actual footprint is the inner 3x3 area.
+ * - ::TrackPiece::PatternKey stores the source pattern used to match the piece.
+ * - ::RaceTrackPlacer uses PatternKey to remove only cells that belong to the piece's actual
+ *   inner footprint, rather than removing the whole surrounding square.
+ * - This prevents large bend pieces from hiding unrelated road tiles that were only part of
+ *   the surrounding matching context.
  *
  * Generated legend workflow:
  * - The editable ::TrackPieceRule list is the source of truth.
@@ -358,8 +368,10 @@
  *   Returns a multiline representation of the tile grid.
  *
  * ::TrackPiece:
- * - TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation, int size = 3)
- *   Stores prefab, placement offset or position, rotation, and pattern size.
+ * - TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation,
+ *              int size = 3, string patternKey = "")
+ *   Stores prefab, placement offset or position, rotation, pattern size, and the source
+ *   pattern key used for larger-piece footprint checks.
  *
  * ::TrackPieceRule:
  * - TrackPieceRule(string name, string patternKey, GameObject prefab, Vector3 positionOffset,
@@ -415,10 +427,14 @@
  * - ::RaceTrackPlacer consumes a ::LevelMap and instantiates visible track-piece prefabs.
  * - Track, checkpoint, start, and finish cells are matched through ::TrackPieceRule entries and
  *   the generated ::StringTrackPieceDictionary legend.
- * - During pattern extraction, CP/start/finish cells become <c>C</c> only when they are the center
- *   tile currently being matched; neighboring CP/start/finish cells are treated as normal track <c>1</c>.
+ * - During pattern extraction, CP/start/finish cells become <c>C</c> for the center tile.
+ *   In 3x3 patterns, neighbouring CP/start/finish cells are treated as normal track <c>1</c>.
+ *   In larger patterns, neighbouring CP/start/finish cells remain <c>C</c> so larger pieces
+ *   cannot silently cover protected checkpoint, start, or finish tiles.
  * - Checkpoint-specific prefabs are therefore selected by rules with a center <c>C</c>, instead of
  *   by a separate checkpointPrefab override.
+ * - Larger-piece overlap removal uses ::TrackPiece::PatternKey to remove only cells that belong
+ *   to the piece's actual inner footprint, rather than removing the whole surrounding square.
  * - The placed start/finish object is used as the car spawn reference.
  *
  * Race flow:
@@ -501,7 +517,8 @@
  * ----------------------------------------------------------------------
  * @section level_gen_versions Version History
  *
- * - v1.5: Added rule-based prefab placement documentation, generated legend workflow, and center-only checkpoint pattern matching.
+ * - v1.6: Added PatternKey-based footprint documentation for larger prefab overlap handling.
+ * - v1.5: Added rule-based prefab placement documentation, generated legend workflow, and checkpoint-aware pattern matching.
  * - v1.4: Added LevelMapValidator documentation and clarified endpoint, neighbor-count, and checkpoint rules.
  * - v1.3: Added IsDayTrack, checkpoint count, road count, copy/equality, and flattened serialization details.
  * - v1.2: Added straight-segment checkpoint stamping for intermediate checkpoints.

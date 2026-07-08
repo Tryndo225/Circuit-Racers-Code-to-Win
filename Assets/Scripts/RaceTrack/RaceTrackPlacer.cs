@@ -6,7 +6,7 @@ using UnityEngine;
 #region Helper Structures / Classes
 
 /// <summary>
-/// Describes a single placeable track piece: prefab, world-space pose, and pattern size.
+/// Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.
 /// </summary>
 /// <remarks>
 /// @ingroup level_gen
@@ -14,6 +14,9 @@ using UnityEngine;
 ///
 /// In the generated legend, <see cref="Position"/> is used as a local placement offset.
 /// During track placement, the placer converts it into the final world-space position.
+///
+/// <see cref="PatternKey"/> stores the flattened pattern that produced the piece. This is used
+/// for larger pieces where the matching pattern is larger than the actual occupied footprint. 
 /// </remarks>
 [Serializable]
 public struct TrackPiece
@@ -43,22 +46,39 @@ public struct TrackPiece
 	/// <summary>
 	/// Pattern size used by this piece, usually 3 or 5.
 	/// </summary>
+	/// <remarks>
+	/// The pattern size includes the matching border. For example, a 5x5 pattern may describe
+	/// a larger prefab whose actual occupied footprint is the inner 3x3 area.
+	/// </remarks>
 	[Tooltip("Pattern size used by this piece, usually 3 or 5.")]
 	public int Size;
 
 	/// <summary>
-	/// Creates a new <see cref="TrackPiece"/> with explicit prefab, pose, and pattern size.
+	/// Flattened pattern key that produced this track piece.
+	/// </summary>
+	/// <remarks>
+	/// This is used by <see cref="RaceTrackPlacer"/> to decide which cells are actually covered
+	/// by larger pieces. Without this, a large bend would remove the whole surrounding square,
+	/// including road tiles that are not part of the bend.
+	/// </remarks>
+	[Tooltip("Generated flattened pattern key that produced this track piece.")]
+	public string PatternKey;
+
+	/// <summary>
+	/// Creates a new <see cref="TrackPiece"/> with explicit prefab, pose, pattern size, and source pattern.
 	/// </summary>
 	/// <param name="prefab">Prefab reference. May be null for an empty/default legend entry.</param>
 	/// <param name="position">Placement position or local placement offset.</param>
 	/// <param name="rotation">Placement rotation.</param>
 	/// <param name="size">Pattern size used by this piece.</param>
-	public TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation, int size = 3)
+	/// <param name="patternKey">Flattened pattern key that produced this piece.</param>
+	public TrackPiece(GameObject prefab, Vector3 position, Quaternion rotation, int size = 3, string patternKey = "")
 	{
 		Prefab = prefab;
 		Position = position;
 		Rotation = rotation;
 		Size = size;
+		PatternKey = patternKey;
 	}
 }
 
@@ -72,7 +92,7 @@ public struct TrackPiece
 /// These values are converted into the same pattern symbols used by <see cref="RaceTrackPlacer"/>:
 /// - <see cref="Empty"/> becomes <c>X</c>.
 /// - <see cref="Track"/> becomes <c>1</c>.
-/// - <see cref="Checkpoint"/> becomes <c>C</c> for center checkpoint/start/finish cells.
+/// - <see cref="Checkpoint"/> becomes <c>C</c> for checkpoint/start/finish cells that should be matched explicitly.
 /// </remarks>
 public enum TrackPatternCell
 {
@@ -87,7 +107,7 @@ public enum TrackPatternCell
 	Track,
 
 	/// <summary>
-	/// Checkpoint, start, or finish cell when it is the center of the currently matched pattern. Converted to <c>C</c>.
+	/// Checkpoint, start, or finish cell that should be matched explicitly. Converted to <c>C</c>.
 	/// </summary>
 	Checkpoint
 }
@@ -132,6 +152,10 @@ public class TrackPieceRule
 	/// <summary>
 	/// Square pattern size used by this rule, usually 3 or 5.
 	/// </summary>
+	/// <remarks>
+	/// The pattern size describes the matching pattern, not necessarily the exact occupied footprint.
+	/// For example, a 5x5 pattern may be used for a prefab that occupies the inner 3x3 footprint.
+	/// </remarks>
 	[Tooltip("Square pattern size. Usually 3 for normal pieces or 5 for larger pieces.")]
 	public int Size = 3;
 
@@ -169,9 +193,14 @@ public class TrackPieceRule
 	/// Converts this editable rule into a runtime <see cref="TrackPiece"/>.
 	/// </summary>
 	/// <returns>Track-piece descriptor used by the pattern legend.</returns>
+	/// <remarks>
+	/// The generated <see cref="TrackPiece"/> keeps the produced pattern key so larger pieces can
+	/// later determine their actual covered footprint.
+	/// </remarks>
 	public TrackPiece ToTrackPiece()
 	{
-		return new TrackPiece(Prefab, PositionOffset, Quaternion.Euler(RotationEuler), Size);
+		string patternKey = ToPatternKey();
+		return new TrackPiece(Prefab, PositionOffset, Quaternion.Euler(RotationEuler), Size, patternKey);
 	}
 
 	/// <summary>
@@ -683,23 +712,46 @@ public class RaceTrackPlacer : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Replaces cells around larger placed pieces with traversal placeholders to avoid visual overlap.
+	/// Replaces cells covered by larger placed pieces with traversal placeholders to avoid visual overlap.
 	/// </summary>
 	/// <param name="pieces">Placement map to adjust.</param>
+	/// <remarks>
+	/// Larger pieces use a pattern that is one layer larger than their physical footprint. For example,
+	/// a 5x5 pattern can represent a piece whose actual footprint is the inner 3x3 area.
+	///
+	/// This method therefore does not remove the whole surrounding square. Instead, it removes only
+	/// cells that are part of the inner footprint and are marked as covered by the placed piece's
+	/// <see cref="TrackPiece.PatternKey"/>.
+	/// </remarks>
 	private void StopOverlaying(TrackPiece[,] pieces)
 	{
-		int surroundingBlockOverlayed;
-		for (int i = 0; i < pieces.GetLength(0); i++)
-		{
-			for (int j = 0; j < pieces.GetLength(1); j++)
-			{
-				surroundingBlockOverlayed = (pieces[i, j].Size / 2) - 1;
+		List<Coordinates> largePiecePositions = new List<Coordinates>();
 
-				if (pieces[i, j].Prefab != null && 0 < surroundingBlockOverlayed)
+		for (int x = 0; x < pieces.GetLength(0); x++)
+		{
+			for (int y = 0; y < pieces.GetLength(1); y++)
+			{
+				if (pieces[x, y].Prefab == null || pieces[x, y].Prefab == traversalPrefab)
+					continue;
+
+				int coveredArea = GetCoveredAreaRadius(pieces[x, y].Size);
+
+				if (coveredArea > 0)
 				{
-					RemoveAllSurrounding(new Coordinates(i, j), pieces, surroundingBlockOverlayed);
+					largePiecePositions.Add(new Coordinates(x, y));
 				}
 			}
+		}
+
+		foreach (Coordinates position in largePiecePositions)
+		{
+			if (!pieces.InBounds(position.X, position.Y))
+				continue;
+
+			if (pieces[position.X, position.Y].Prefab == null || pieces[position.X, position.Y].Prefab == traversalPrefab)
+				continue;
+
+			RemoveAllSurrounding(position, pieces, pieces[position.X, position.Y]);
 		}
 	}
 
@@ -754,13 +806,15 @@ public class RaceTrackPlacer : MonoBehaviour
 
 					if (trackPiece != null && trackPiece.Value.Prefab != null)
 					{
-						MarkSpaceAsUsed(coordinates, size);
-						AddTraversalPlaceHolders(coordinates, size, piecesToPlace);
+						MarkSpaceAsUsed(coordinates, trackPiece.Value);
+						AddTraversalPlaceHolders(coordinates, trackPiece.Value, piecesToPlace);
 						piecesToPlace[x, y] = trackPiece.Value;
 					}
 				}
 			}
 		}
+
+		StopOverlaying(piecesToPlace);
 
 		return piecesToPlace;
 	}
@@ -806,11 +860,16 @@ public class RaceTrackPlacer : MonoBehaviour
 	/// Pattern symbols:
 	/// - <c>1</c> marks track-compatible cells.
 	/// - <c>X</c> marks empty cells.
-	/// - <c>C</c> marks a checkpoint, start, or finish only when it is the center cell currently being matched.
+	/// - <c>C</c> marks checkpoint, start, or finish cells when they must be matched explicitly.
 	///
-	/// Checkpoint cells that appear as neighbouring cells are converted to <c>1</c>.
-	/// This prevents the rule table from needing separate variants for ordinary track pieces that are merely
-	/// next to a checkpoint.
+	/// For 3x3 patterns, checkpoint/start/finish neighbours are treated as normal track cells. This
+	/// allows ordinary road pieces to be placed next to checkpoints without needing extra pattern variants.
+	/// The center checkpoint/start/finish cell is still represented as <c>C</c>, so dedicated checkpoint
+	/// rules can be matched.
+	///
+	/// For larger patterns, checkpoint/start/finish cells are represented as <c>C</c> even when they are
+	/// neighbours. This prevents larger prefabs, such as 5x5 turns, from being placed over checkpoint,
+	/// start, or finish tiles unless a rule explicitly supports such a case.
 	///
 	/// Isolated single track symbols are converted to <c>X</c> to avoid stray matches.
 	/// </remarks>
@@ -843,7 +902,18 @@ public class RaceTrackPlacer : MonoBehaviour
 
 					if (isCheckpointLike)
 					{
-						c = isCenter ? 'C' : '1';
+						if (isCenter)
+						{
+							c = 'C';
+						}
+						else if (halfSize > 1)
+						{
+							c = 'C';
+						}
+						else
+						{
+							c = '1';
+						}
 					}
 					else if (levelMap.Tiles[x, y] == TrackTile || allowOverlap && levelMap.Tiles[x, y] == UsedTileValue)
 					{
@@ -915,26 +985,47 @@ public class RaceTrackPlacer : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Replaces surrounding placed pieces with traversal placeholders.
+	/// Replaces surrounding cells actually covered by a larger placed piece with traversal placeholders.
 	/// </summary>
 	/// <param name="position">Center coordinate of the larger piece.</param>
 	/// <param name="pieces">Placement map to modify.</param>
-	/// <param name="halfSize">Radius of the surrounding area to replace.</param>
-	private void RemoveAllSurrounding(Coordinates position, TrackPiece[,] pieces, int halfSize)
+	/// <param name="trackPiece">Placed piece whose pattern defines the covered cells.</param>
+	/// <remarks>
+	/// Only the inner footprint is checked. Cells in the outer matching border are ignored because
+	/// they are used only for recognizing the pattern, not for deciding which road prefabs are covered.
+	/// </remarks>
+	private void RemoveAllSurrounding(Coordinates position, TrackPiece[,] pieces, TrackPiece trackPiece)
 	{
-		for (int dx = -halfSize; dx <= halfSize; dx++)
+		int usedArea = GetCoveredAreaRadius(trackPiece.Size);
+
+		if (usedArea <= 0 || string.IsNullOrEmpty(trackPiece.PatternKey))
+			return;
+
+		for (int dx = -usedArea; dx <= usedArea; dx++)
 		{
-			for (int dy = -halfSize; dy <= halfSize; dy++)
+			for (int dy = -usedArea; dy <= usedArea; dy++)
 			{
 				if (dx == 0 && dy == 0)
 					continue;
 
+				if (!IsCoveredByPattern(trackPiece.PatternKey, trackPiece.Size, dx, dy))
+					continue;
+
 				int x = position.X + dx;
 				int y = position.Y + dy;
-				if (pieces.InBounds(x, y) && pieces[x, y].Prefab != null)
-				{
-					pieces[x, y].Prefab = traversalPrefab;
-				}
+
+				if (!pieces.InBounds(x, y))
+					continue;
+
+				if (pieces[x, y].Prefab == null)
+					continue;
+
+				Coordinates coords = new Coordinates(x, y);
+
+				if (IsCheckpointTile(coords))
+					continue;
+
+				pieces[x, y] = new TrackPiece(traversalPrefab, pieces[x, y].Position, pieces[x, y].Rotation, 1);
 			}
 		}
 	}
@@ -943,17 +1034,26 @@ public class RaceTrackPlacer : MonoBehaviour
 	/// Marks cells occupied by a larger piece so they are not placed as independent visible pieces.
 	/// </summary>
 	/// <param name="position">Center coordinate of the placed piece.</param>
-	/// <param name="size">Pattern size of the placed piece.</param>
-	private void MarkSpaceAsUsed(Coordinates position, int size)
+	/// <param name="trackPiece">Placed piece whose pattern defines the covered cells.</param>
+	/// <remarks>
+	/// The method uses the inner footprint of <paramref name="trackPiece"/> instead of the whole
+	/// square around the center. This prevents a large bend from marking road cells on the opposite
+	/// side that are part of the matching context but not physically covered by the prefab.
+	/// </remarks>
+	private void MarkSpaceAsUsed(Coordinates position, TrackPiece trackPiece)
 	{
-		int usedArea = (size / 2) - 1;
+		int usedArea = GetCoveredAreaRadius(trackPiece.Size);
+
+		if (usedArea <= 0 || string.IsNullOrEmpty(trackPiece.PatternKey))
+			return;
+
 		Coordinates coords;
 
 		for (int dx = -usedArea; dx <= usedArea; dx++)
 		{
 			for (int dy = -usedArea; dy <= usedArea; dy++)
 			{
-				if (dx != 0 && dy != 0)
+				if (!IsCoveredByPattern(trackPiece.PatternKey, trackPiece.Size, dx, dy))
 					continue;
 
 				coords = new Coordinates(position.X + dx, position.Y + dy);
@@ -974,17 +1074,24 @@ public class RaceTrackPlacer : MonoBehaviour
 	/// Adds traversal placeholders to the placement map for cells already covered by a larger piece.
 	/// </summary>
 	/// <param name="position">Center coordinate of the placed piece.</param>
-	/// <param name="size">Pattern size of the placed piece.</param>
+	/// <param name="trackPiece">Placed piece whose pattern defines the covered cells.</param>
 	/// <param name="pieces">Placement map to update.</param>
-	private void AddTraversalPlaceHolders(Coordinates position, int size, TrackPiece[,] pieces)
+	/// <remarks>
+	/// Only cells that belong to the piece footprint are turned into traversal placeholders.
+	/// Cells that appear in the outer matching border remain untouched.
+	/// </remarks>
+	private void AddTraversalPlaceHolders(Coordinates position, TrackPiece trackPiece, TrackPiece[,] pieces)
 	{
-		int usedArea = (size / 2) - 1;
+		int usedArea = GetCoveredAreaRadius(trackPiece.Size);
+
+		if (usedArea <= 0 || string.IsNullOrEmpty(trackPiece.PatternKey))
+			return;
 
 		for (int dx = -usedArea; dx <= usedArea; dx++)
 		{
 			for (int dy = -usedArea; dy <= usedArea; dy++)
 			{
-				if (dx != 0 && dy != 0)
+				if (!IsCoveredByPattern(trackPiece.PatternKey, trackPiece.Size, dx, dy))
 					continue;
 
 				int x = position.X + dx;
@@ -993,10 +1100,60 @@ public class RaceTrackPlacer : MonoBehaviour
 				if (levelMap.Tiles.InBounds(x, y) && levelMap.Tiles[x, y] == UsedTileValue)
 				{
 					if (pieces[x, y].Prefab == null)
-						pieces[x, y].Prefab = traversalPrefab;
+					{
+						pieces[x, y] = new TrackPiece(
+							traversalPrefab,
+							Vector3.zero,
+							Quaternion.identity,
+							1
+						);
+					}
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Checks whether an offset from a piece center is part of that piece's covered footprint.
+	/// </summary>
+	/// <param name="patternKey">Flattened pattern key of the placed piece.</param>
+	/// <param name="size">Pattern size.</param>
+	/// <param name="dx">X offset from the placed piece center.</param>
+	/// <param name="dy">Y offset from the placed piece center.</param>
+	/// <returns><c>true</c> if the offset is covered by the piece pattern; otherwise <c>false</c>.</returns>
+	/// <remarks>
+	/// The method checks the source pattern at the same relative offset. Any non-empty symbol
+	/// is treated as part of the covered footprint. The caller is responsible for limiting the
+	/// checked offsets to the inner footprint area, not the full matching pattern.
+	/// </remarks>
+	private static bool IsCoveredByPattern(string patternKey, int size, int dx, int dy)
+	{
+		if (string.IsNullOrEmpty(patternKey))
+			return false;
+
+		int halfSize = size / 2;
+		int px = dx + halfSize;
+		int py = dy + halfSize;
+		int index = py * size + px;
+
+		if (index < 0 || index >= patternKey.Length)
+			return false;
+
+		return patternKey[index] != 'X';
+	}
+
+	/// <summary>
+	/// Returns the radius of the actual covered footprint for a pattern size.
+	/// </summary>
+	/// <param name="patternSize">Size of the square matching pattern.</param>
+	/// <returns>Inner footprint radius in grid cells.</returns>
+	/// <remarks>
+	/// The matching pattern is one layer larger than the prefab footprint. Therefore, a 3x3 pattern
+	/// covers only the center cell, while a 5x5 pattern covers the inner 3x3 area.
+	/// </remarks>
+	private static int GetCoveredAreaRadius(int patternSize)
+	{
+		return Mathf.Max(0, (patternSize / 2) - 1);
 	}
 
 	/// <summary>
