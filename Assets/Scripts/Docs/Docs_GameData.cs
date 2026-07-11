@@ -10,7 +10,7 @@
  * It owns a ::GameData instance, persists it through Unity PlayerPrefs as GZip-compressed,
  * Base64-encoded JSON under the key "GameDataCompressed", and keeps backwards compatibility
  * with older raw JSON saves stored under the key "GameData". It also tracks the currently selected
- * ::LevelMap and exposes APIs for level lists, best times, checkpoint splits, best replays,
+ * ::levelMap and exposes APIs for level lists, best times, checkpoint splits, best replays,
  * assist settings, and editable level replacement.
  *
  * Contents:
@@ -31,7 +31,7 @@
  *
  * Responsibilities:
  * - Load and save ::GameData to PlayerPrefs as compressed Base64-encoded JSON.
- * - Maintain the currently selected ::LevelMap for gameplay scene transitions.
+ * - Maintain the currently selected ::levelMap for gameplay scene transitions.
  * - Store custom levels and their best completion data.
  * - Store practice/test-map best time, checkpoint splits, and replay.
  * - Store driving assist settings: ABS and traction control.
@@ -46,7 +46,7 @@
  * - IEnumerableExtensions::IEnumerableExtensions::GetContentHash for level-list hash computation.
  * - UnityEngine.PlayerPrefs, JsonUtility, System.IO.Compression, and Base64 conversion for persistence.
  * - ::SceneManagement for loading the gameplay scene.
- * - ::LevelMap for level layout data.
+ * - ::levelMap for level layout data.
  * - ::Replay for best-run replay storage.
  *
  * Threading:
@@ -76,7 +76,7 @@
  * - AssistsSettings: saved ABS and traction-control settings.
  *
  * ::GameDataManager::LevelData
- * - LevelMap: associated custom level.
+ * - levelMap: associated custom level.
  * - Time: best completion time in seconds, or float.MaxValue when unknown.
  * - CheckpointTimeSplits: checkpoint split times for the stored best run.
  * - BestReplay: replay associated with the stored best run.
@@ -86,7 +86,7 @@
  * - TC: whether traction-control assist is enabled.
  *
  * Equality and hashing:
- * - LevelData equality compares LevelMap, Time, CheckpointTimeSplits, and BestReplay.
+ * - LevelData equality compares levelMap, Time, CheckpointTimeSplits, and BestReplay.
  * - LevelData.GetHashCode includes the level map, time, replay, and split values.
  * - GameDataManager::Hash is computed from CurrentGameData.Levels using GetContentHash().
  *
@@ -194,8 +194,8 @@
  *
  * Create and save an edited level:
  * @code{.cs}
- * LevelMap original = GameDataManager.Instance.CurrentLevelMap;
- * LevelMap editable = GameDataManager.Instance.CreateEditableCopy(original);
+ * levelMap original = GameDataManager.Instance.CurrentLevelMap;
+ * levelMap editable = GameDataManager.Instance.CreateEditableCopy(original);
  *
  * if (editable != null)
  * {
@@ -211,7 +211,7 @@
  * - GameData CurrentGameData:
  *   Active saved game-data set.
  *
- * - LevelMap CurrentLevelMap:
+ * - levelMap CurrentLevelMap:
  *   Currently selected custom level. Null means the practice/test map is selected.
  *
  * - Replay CurrentLevelReplay:
@@ -241,7 +241,7 @@
  *   Removes a previously registered callback.
  *
  * Selection and flow:
- * - void SelectingLevelMap(LevelMap map)
+ * - void SelectingLevelMap(levelMap map)
  *   Selects a custom level for play. The map must already exist in CurrentGameData.
  *
  * - void GoToSelectedLevel()
@@ -258,20 +258,20 @@
  *   Records completion of the currently selected level. If CurrentLevelMap is null, the result is stored as
  *   a practice/test-map result. Otherwise, the selected custom level is updated if the time improves.
  *
- * - void AddLevel(LevelMap map)
+ * - void AddLevel(levelMap map)
  *   Adds a custom level if it is not already present.
  *
- * - void RemoveLevel(LevelMap levelMap)
+ * - void RemoveLevel(levelMap levelMap)
  *   Removes a custom level if present. Clears CurrentLevelMap if the removed level was selected.
  *
  * - void ClearLevels()
  *   Removes all custom levels and clears the current custom-level selection.
  *
  * Level editing:
- * - LevelMap CreateEditableCopy(LevelMap sourceMap)
+ * - levelMap CreateEditableCopy(levelMap sourceMap)
  *   Returns a copy of a stored level map for editing, or null if the map is invalid or not stored.
  *
- * - bool ReplaceLevel(LevelMap originalMap, LevelMap editedMap)
+ * - bool ReplaceLevel(levelMap originalMap, levelMap editedMap)
  *   Replaces a stored level with an edited copy. This resets best time, splits, and replay for that level.
  *
  * Context menu helpers:
@@ -343,6 +343,12 @@
  * - Legacy PlayerPrefs key: "GameData".
  * - Legacy value: raw JSON produced by JsonUtility.ToJson(CurrentGameData).
  * - The legacy key is kept only for backwards-compatible loading of older saves.
+ * 
+ * Level tile storage:
+ * - Saved custom levels contain ::LevelMap instances.
+ * - Each ::LevelMap stores its runtime Tiles grid as a flattened run-length encoded string.
+ * - This RLE tile string is part of the JSON saved by ::GameDataManager.
+ * - The complete JSON is then compressed with GZip and stored as Base64 in PlayerPrefs.
  *
  * Saved data includes:
  * - Custom level list.

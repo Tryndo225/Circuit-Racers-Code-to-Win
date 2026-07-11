@@ -18,8 +18,8 @@ using System.Text;
 /// - <see cref="LevelTileTypes.Track"/>: road.
 /// - <see cref="LevelTileTypes.PlaceHolder"/> and higher values: temporary placeholders used during generation.
 ///
-/// The runtime tile grid is stored in <see cref="Tiles"/>. Because Unity does not serialize rectangular
-/// 2D arrays directly, <see cref="tilesFlat"/> is used as a flattened serialization representation.
+/// The runtime tile grid is stored in <see cref="Tiles"/>. Because Unity does not serialize rectangular 2D arrays directly,
+/// <see cref="tilesFlatRLEString"/> is used as a flattened and run-length encoded serialization representation.
 /// </remarks>
 [Serializable]
 public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceiver
@@ -111,8 +111,8 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	/// <item><description><see cref="LevelTileTypes.PlaceHolder"/> and higher values = temporary placeholders used during generation.</description></item>
 	/// </list>
 	///
-	/// This field is not serialized directly. It is flattened into <see cref="tilesFlat"/> before serialization
-	/// and rebuilt from <see cref="tilesFlat"/> after deserialization.
+	/// This field is not serialized directly. It is flattened and encoded into <see cref="tilesFlatRLEString"/> 
+	/// before serialization and rebuilt from that RLE string after deserialization.
 	/// </remarks>
 	[NonSerialized] public int[,] Tiles;
 
@@ -152,10 +152,10 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	}
 
 	/// <summary>
-	/// Flattened tile array used for Unity serialization of <see cref="Tiles"/>.
+	/// Tile array converted to RLE string used for Unity serialization of <see cref="Tiles"/>.
 	/// </summary>
-	[UnityEngine.Tooltip("Flattened tile array used internally for Unity serialization of the 2D tile grid.")]
-	[UnityEngine.SerializeField] private int[] tilesFlat;
+	[UnityEngine.Tooltip("Flattened tile array and compressed with RLE")]
+	[UnityEngine.SerializeField] private string tilesFlatRLEString;
 
 	/// <summary>
 	/// Creates a default empty level map.
@@ -192,8 +192,8 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		CheckpointCountPerLap = info.GetInt32("checkpointCountPerLap");
 		RoadTileCount = info.GetInt32("roadTileCount");
 		IsDayTrack = info.GetBoolean("isDayTrack");
-		tilesFlat = (int[])info.GetValue("tilesFlat", typeof(int[]));
-		UnflattenTiles();
+		tilesFlatRLEString = info.GetString("tilesFlat");
+		UnflattenTilesFromRLEString();
 	}
 
 	/// <summary>
@@ -202,8 +202,8 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	/// <param name="info">Serialization target.</param>
 	/// <param name="context">Serialization context.</param>
 	/// <remarks>
-	/// The runtime <see cref="Tiles"/> grid is flattened into <see cref="tilesFlat"/> before being added to
-	/// the serialization data.
+	/// The runtime <see cref="Tiles"/> grid is flattened, compressed with run-length encoding,
+	/// and stored as a string before being added to the serialization data.
 	/// </remarks>
 	public void GetObjectData(SerializationInfo info, StreamingContext context)
 	{
@@ -217,8 +217,8 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 		info.AddValue("checkpointCountPerLap", CheckpointCountPerLap);
 		info.AddValue("roadTileCount", RoadTileCount);
 		info.AddValue("isDayTrack", IsDayTrack);
-		FlattenTiles();
-		info.AddValue("tilesFlat", tilesFlat);
+		FlattenTilesToRLEString();
+		info.AddValue("tilesFlat", tilesFlatRLEString);
 	}
 
 	/// <summary>
@@ -241,12 +241,14 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	}
 
 	/// <summary>
-	/// Writes <see cref="Tiles"/> into <see cref="tilesFlat"/> for serialization.
+	/// Flattens <see cref="Tiles"/> and writes the result into <see cref="tilesFlatRLEString"/>
+	/// using run-length encoding.
 	/// </summary>
-	private void FlattenTiles()
+	private void FlattenTilesToRLEString()
 	{
 		if (Tiles == null) return;
-		tilesFlat = GetFlatTiles();
+		int[] tilesFlat = GetFlatTiles();
+		tilesFlatRLEString = ImportExportManager.EncodeFlatTilesRLE(ImportExportManager.ConvertIntArrayToSByteArray(tilesFlat));
 	}
 
 
@@ -271,21 +273,25 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	}
 
 	/// <summary>
-	/// Recreates <see cref="Tiles"/> from <see cref="tilesFlat"/> after deserialization.
+	/// Decodes <see cref="tilesFlatRLEString"/> and rebuilds the runtime <see cref="Tiles"/> grid.
 	/// </summary>
-	private void UnflattenTiles()
+	private void UnflattenTilesFromRLEString()
 	{
-		if (Width <= 0 || Height <= 0 || tilesFlat == null) return;
+		if (Width <= 0 || Height <= 0 || tilesFlatRLEString == null) return;
+
+		int[] tilesFlat = new int[Width * Height];
+		bool resultCheck = ImportExportManager.TryDecodeFlatTilesRLE(tilesFlatRLEString, Width * Height, out tilesFlat);
+
 		Tiles = GetUnflattenedTiles(tilesFlat, Height, Width);
 	}
 
 
 	/// <summary>
-	/// Unity serialization callback that updates <see cref="tilesFlat"/> before serialization.
+	/// Unity serialization callback that updates the RLE tile string before serialization.
 	/// </summary>
 	public void OnBeforeSerialize()
 	{
-		FlattenTiles();
+		FlattenTilesToRLEString();
 	}
 
 	/// <summary>
@@ -293,7 +299,7 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	/// </summary>
 	public void OnAfterDeserialize()
 	{
-		UnflattenTiles();
+		UnflattenTilesFromRLEString();
 	}
 
 	/// <summary>

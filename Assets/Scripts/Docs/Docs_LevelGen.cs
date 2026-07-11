@@ -13,7 +13,7 @@
  * Main components:
  * - ::SeedFactory provides thread-safe integer seeds for System.Random instances.
  * - ::Coordinates represents integer tile-grid coordinates with arithmetic, equality, hashing, and serialization support.
- * - ::LevelMap stores serializable level metadata and the runtime 2D tile grid.
+ * - ::levelMap stores serializable level metadata and the runtime 2D tile grid.
  * - ::LevelGenerator creates point-to-point or circuit layouts by selecting targets, flooding paths,
  *   backtracking roads, and applying spacer tiles.
  * - ::LevelCheckPointMaker converts suitable intermediate straight road segments into checkpoint tiles.
@@ -22,7 +22,7 @@
  * - ::RaceTrackPlacer converts the validated grid layout into drivable scene prefabs.
  * - ::Array2DExtensions provides coordinate-based helpers for rectangular 2D arrays.
  *
- * Tile values are defined by ::LevelMap::LevelTileTypes:
+ * Tile values are defined by ::levelMap::LevelTileTypes:
  * - CP = -2: checkpoint tile.
  * - Spacer = -1: keep-out spacer tile.
  * - Grass = 0: empty tile.
@@ -50,7 +50,7 @@
  * - Produce point-to-point and circuit track layouts on a rectangular grid.
  * - Store track metadata such as name, size, endpoints, lap count, checkpoint count, road coverage,
  *   and day/night variant.
- * - Serialize and deserialize the 2D tile grid through a flattened int array.
+ * - Serialize and deserialize the 2D tile grid through a flattened run-length encoded string.
  * - Keep generated roads separated with spacer tiles.
  * - Add intermediate checkpoint tiles on long straight segments.
  * - Validate generated or imported maps before use.
@@ -59,7 +59,7 @@
  * Threading:
  * - ::SeedFactory::Next is thread-safe.
  * - ::LevelGenerator is CPU-only and does not instantiate Unity scene objects.
- * - ::LevelMap and tile arrays are mutable; the same map instance should not be modified by multiple threads.
+ * - ::levelMap and tile arrays are mutable; the same map instance should not be modified by multiple threads.
  * - Runtime placement and scene integration are Unity-main-thread work handled outside the generator.
  *
  * Important invariants:
@@ -84,7 +84,7 @@
  * - Serializable through ISerializable.
  * - ToString() returns a readable coordinate representation.
  *
- * ::LevelMap:
+ * ::levelMap:
  * - Name: display name of the level.
  * - Width and Height: grid size in tiles.
  * - Circuit: true for a closed circuit, false for point-to-point.
@@ -95,18 +95,21 @@
  * - RoadTileCount: number of road tiles recorded by generation.
  * - IsDayTrack: day/night scene or variant flag.
  * - Tiles: runtime int[,] tile grid.
- * - tilesFlat: serialized backing array used because Unity does not serialize rectangular 2D arrays directly.
+ * - tilesFlatRLEString: serialized backing string used because Unity does not serialize rectangular 2D arrays directly.
+ *   The grid is flattened in row-major order and then compressed with run-length encoding.
  *
  * Serialization:
  * - ::LevelMap implements ISerializable.
  * - ::LevelMap implements UnityEngine.ISerializationCallbackReceiver.
- * - OnBeforeSerialize flattens Tiles into tilesFlat.
- * - OnAfterDeserialize rebuilds Tiles from tilesFlat.
+ * - OnBeforeSerialize flattens Tiles in row-major order and stores them as an RLE string.
+ * - OnAfterDeserialize decodes the RLE string and rebuilds Tiles.
  * - GetFlatTiles() stores tiles in row-major order using flatTiles[y * Width + x].
  * - GetUnflattenedTiles(...) rebuilds an int[,] grid from row-major flat data.
+ * - The serialized tile string is produced through ::ImportExportManager::EncodeFlatTilesRLE
+ *   and decoded through ::ImportExportManager::TryDecodeFlatTilesRLE.
  *
  * Copy and equality:
- * - ::LevelMap::Copy creates a new map with copied metadata and copied tile data.
+ * - ::levelMap::Copy creates a new map with copied metadata and copied tile data.
  * - Equality compares metadata and tile contents.
  *
  * ----------------------------------------------------------------------
@@ -116,16 +119,16 @@
  * - Tiles are addressed as Tiles[x, y].
  * - X represents the column.
  * - Y represents the row.
- * - ::LevelMap::CardinalDirections contains the four-neighbor offsets:
+ * - ::levelMap::CardinalDirections contains the four-neighbor offsets:
  *   right, left, up, and down.
  *
  * Tile meanings:
- * - ::LevelMap::LevelTileTypes::Grass marks empty cells.
- * - ::LevelMap::LevelTileTypes::Track marks normal road cells.
- * - ::LevelMap::LevelTileTypes::CP marks checkpoint cells; during placement they are matched
+ * - ::levelMap::LevelTileTypes::Grass marks empty cells.
+ * - ::levelMap::LevelTileTypes::Track marks normal road cells.
+ * - ::levelMap::LevelTileTypes::CP marks checkpoint cells; during placement they are matched
  *   through track-piece rules rather than through a separate checkpoint-prefab override.
- * - ::LevelMap::LevelTileTypes::Spacer marks keep-out cells used to discourage cramped roads.
- * - ::LevelMap::LevelTileTypes::PlaceHolder and higher values are temporary flood-fill values.
+ * - ::levelMap::LevelTileTypes::Spacer marks keep-out cells used to discourage cramped roads.
+ * - ::levelMap::LevelTileTypes::PlaceHolder and higher values are temporary flood-fill values.
  *
  * ::Array2DExtensions:
  * - At<T>(T[,] array, Coordinates coords):
@@ -153,7 +156,7 @@
  *                                  int steps, int stepLength, int maxAttempts, System.Random rng)
  *
  * Initialization:
- * - Creates a new ::LevelMap.
+ * - Creates a new ::levelMap.
  * - Picks a random StartPoint inside the map using internal start padding.
  * - Sets Width, Height, Circuit, Tiles, and IsDayTrack.
  * - Initializes all cells to Grass.
@@ -187,7 +190,7 @@
  * ----------------------------------------------------------------------
  * @section level_gen_validation Validation
  *
- * ::LevelMapValidator validates structural correctness of a ::LevelMap.
+ * ::LevelMapValidator validates structural correctness of a ::levelMap.
  *
  * A valid map must:
  * - Be non-null.
@@ -205,8 +208,8 @@
  * - Place checkpoint tiles only on straight sections.
  *
  * Track-compatible tiles:
- * - ::LevelMap::LevelTileTypes::Track.
- * - ::LevelMap::LevelTileTypes::CP.
+ * - ::levelMap::LevelTileTypes::Track.
+ * - ::levelMap::LevelTileTypes::CP.
  *
  * Circuit rules:
  * - StartPoint and FinishPoint must be the same tile.
@@ -232,13 +235,13 @@
  * Purpose:
  * - Add intermediate checkpoint tiles after the basic road layout has been generated.
  * - Keep start and finish cells unchanged.
- * - Increment LevelMap::CheckpointCountPerLap for each generated checkpoint.
+ * - Increment levelMap::CheckpointCountPerLap for each generated checkpoint.
  *
  * Behaviour:
- * - Traversal starts from LevelMap::StartPoint.
+ * - Traversal starts from levelMap::StartPoint.
  * - It follows connected Track tiles using four-neighbor movement.
  * - It avoids immediately stepping back to the previous tile.
- * - It does not step onto LevelMap::FinishPoint.
+ * - It does not step onto levelMap::FinishPoint.
  * - It tracks direction changes to detect straight segments.
  * - When a straight segment is long enough, a checkpoint is placed near the middle.
  *
@@ -250,13 +253,13 @@
  *   ::TrackPieceRule entries, not through a separate checkpointPrefab field.
  *
  * Public entry point:
- * - ::LevelCheckPointMaker::GenerateCheckPoints(LevelMap levelMap,
+ * - ::LevelCheckPointMaker::GenerateCheckPoints(levelMap levelMap,
  *                                               int minStraightLengthForCheckPoint = 4)
  *
  * Preconditions:
  * - levelMap is non-null.
  * - levelMap.Tiles is initialized.
- * - Road cells are marked as ::LevelMap::LevelTileTypes::Track.
+ * - Road cells are marked as ::levelMap::LevelTileTypes::Track.
  *
  * Effects:
  * - Some Track cells may become CP cells.
@@ -265,7 +268,7 @@
  * ----------------------------------------------------------------------
  * @section level_gen_placement Prefab Track Placement
  *
- * ::RaceTrackPlacer converts a generated or loaded ::LevelMap into the visible drivable track scene.
+ * ::RaceTrackPlacer converts a generated or loaded ::levelMap into the visible drivable track scene.
  * It scans the 2D tile grid, extracts local square patterns around each track-compatible cell,
  * matches those patterns against a generated legend, and instantiates the selected prefab with
  * its configured position offset and rotation.
@@ -339,11 +342,11 @@
  * - void GetObjectData(SerializationInfo info, StreamingContext context)
  *   Writes coordinate serialization data.
  *
- * ::LevelMap:
- * - LevelMap()
+ * ::levelMap:
+ * - levelMap()
  *   Creates a default empty map.
  *
- * - LevelMap(SerializationInfo info, StreamingContext context)
+ * - levelMap(SerializationInfo info, StreamingContext context)
  *   Reconstructs a map from serialized data.
  *
  * - void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -356,12 +359,12 @@
  *   Rebuilds a rectangular tile grid from flattened row-major data.
  *
  * - void OnBeforeSerialize()
- *   Updates the flattened serialized tile array.
+ *   Updates the serialized RLE tile string from the runtime tile grid.
  *
  * - void OnAfterDeserialize()
- *   Rebuilds the runtime tile grid.
+ *   Decodes the serialized RLE tile string and rebuilds the runtime tile grid.
  *
- * - LevelMap Copy()
+ * - levelMap Copy()
  *   Returns a copied level map.
  *
  * - string ToString()
@@ -391,20 +394,20 @@
  *   Loads the current map, refreshes the generated legend, collects pattern sizes, and places the track.
  *
  * ::LevelGenerator:
- * - static LevelMap GenerateLevel(int width, int height, bool isCircuit,
+ * - static levelMap GenerateLevel(int width, int height, bool isCircuit,
  *                                 int steps, int stepLength, int maxAttempts, int seed)
  *   Generates a level from an explicit seed.
  *
- * - static LevelMap GenerateLevel(int width, int height, bool isCircuit,
+ * - static levelMap GenerateLevel(int width, int height, bool isCircuit,
  *                                 int steps, int stepLength, int maxAttempts, System.Random rng)
  *   Generates a level using a provided random source.
  *
  * ::LevelCheckPointMaker:
- * - static void GenerateCheckPoints(LevelMap levelMap, int minStraightLengthForCheckPoint = 4)
+ * - static void GenerateCheckPoints(levelMap levelMap, int minStraightLengthForCheckPoint = 4)
  *   Adds intermediate checkpoint tiles to long straight road segments.
  *
  * ::LevelMapValidator:
- * - static bool Validate(LevelMap lvl)
+ * - static bool Validate(levelMap lvl)
  *   Returns true when the map satisfies dimension, endpoint, connectivity, neighbor-count, and checkpoint rules.
  *
  * ::Array2DExtensions:
@@ -424,7 +427,7 @@
  * @section level_gen_integration Integration Notes
  *
  * Track placement:
- * - ::RaceTrackPlacer consumes a ::LevelMap and instantiates visible track-piece prefabs.
+ * - ::RaceTrackPlacer consumes a ::levelMap and instantiates visible track-piece prefabs.
  * - Track, checkpoint, start, and finish cells are matched through ::TrackPieceRule entries and
  *   the generated ::StringTrackPieceDictionary legend.
  * - During pattern extraction, CP/start/finish cells become <c>C</c> for the center tile.
@@ -442,15 +445,15 @@
  * - ::TrackManager starts the race, activates checkpoints, tracks laps/checkpoints, and handles respawn.
  *
  * Game data:
- * - ::GameDataManager stores custom ::LevelMap instances inside saved game data.
+ * - ::GameDataManager stores custom ::levelMap instances inside saved game data.
  * - Edited or imported maps should be validated before being stored.
  *
  * Import/export:
- * - ::ImportExportManager can encode and decode ::LevelMap data for sharing.
+ * - ::ImportExportManager can encode and decode ::levelMap data for sharing.
  * - Decoded maps should pass ::LevelMapValidator::Validate before being accepted.
  *
  * UI:
- * - Level editor UI can modify a copied ::LevelMap.
+ * - Level editor UI can modify a copied ::levelMap.
  * - Level preview UI can render Tiles directly or through generated preview textures.
  *
  * ----------------------------------------------------------------------
@@ -461,11 +464,14 @@
  * - Worst-case generation work is proportional to Width * Height per attempted path search.
  * - Validation is also linear in the number of tiles.
  * - Checkpoint stamping is linear in the traversed road length.
+ * - LevelMap serialization flattens the tile grid and applies RLE in linear time over Width * Height tiles.
  *
  * Allocation notes:
  * - Generation creates lists for modified flood-fill positions.
- * - LevelMap::Copy duplicates the tile grid.
+ * - levelMap::Copy duplicates the tile grid.
  * - GetFlatTiles allocates a new one-dimensional array.
+ * - RLE serialization allocates the encoded tile string used for stored LevelMap tile data.
+ * - RLE reduces save-data size when maps contain long repeated runs of grass, road, spacer, or checkpoint values.
  * - Debug Print output allocates strings and should not be used in performance-sensitive paths.
  *
  * Tuning:
@@ -523,5 +529,5 @@
  * - v1.3: Added IsDayTrack, checkpoint count, road count, copy/equality, and flattened serialization details.
  * - v1.2: Added straight-segment checkpoint stamping for intermediate checkpoints.
  * - v1.1: Added circuit finishing and road spacer refinement.
- * - v1.0: Initial flood-fill/backtrack generator with serializable LevelMap.
+ * - v1.0: Initial flood-fill/backtrack generator with serializable levelMap.
  */
