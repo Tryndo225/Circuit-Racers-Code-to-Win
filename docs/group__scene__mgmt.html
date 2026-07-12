@@ -275,8 +275,9 @@ Usage</h1>
 <div class="line"><span class="comment">// SceneAssetHelper -&gt; Scene</span></div>
 <div class="line"><span class="comment">// This resolves by path and only returns a valid Scene if that scene is loaded.</span></div>
 <div class="line">Scene scene = helper;</div>
-</div><!-- fragment --><p>Quit sentinel: </p><div class="fragment"><div class="line"><a class="code hl_class" href="class_scene_asset_helper.html">SceneAssetHelper</a> quit = <span class="keyword">new</span> <a class="code hl_class" href="class_scene_asset_helper.html">SceneAssetHelper</a>(<span class="stringliteral">&quot;Quit Game&quot;</span>, <span class="keywordtype">string</span>.Empty);</div>
+</div><!-- fragment --><p>Quit sentinel: </p><div class="fragment"><div class="line"><a class="code hl_class" href="class_scene_asset_helper.html">SceneAssetHelper</a> quit = <span class="keyword">new</span> <a class="code hl_class" href="class_scene_asset_helper.html">SceneAssetHelper</a>(<span class="stringliteral">&quot;Quit Game&quot;</span>, <span class="keywordtype">string</span>.<a class="code hl_enumvalue" href="group__level__gen.html#gga38ed0c1b5b067e658834da58a4223fbeace2c8aed9c2fa0cfbed56cbda4d8bf07">Empty</a>);</div>
 <div class="line">SceneManagement.Instance.ChangeScene(quit);</div>
+<div class="ttc" id="agroup__level__gen_html_gga38ed0c1b5b067e658834da58a4223fbeace2c8aed9c2fa0cfbed56cbda4d8bf07"><div class="ttname"><a href="group__level__gen.html#gga38ed0c1b5b067e658834da58a4223fbeace2c8aed9c2fa0cfbed56cbda4d8bf07">TrackPatternCell.Empty</a></div><div class="ttdeci">@ Empty</div><div class="ttdoc">Empty or non-track cell.</div><div class="ttdef"><b>Definition</b> <a href="_race_track_placer_8cs_source.html#l00102">RaceTrackPlacer.cs:102</a></div></div>
 </div><!-- fragment --><p>Scene-to-music pair: </p><div class="fragment"><div class="line"><span class="comment">// Configure SceneAssetHelperAudioClipPair entries in the SceneManagement inspector.</span></div>
 <div class="line"><span class="comment">// When the scene name or path matches, SceneManagement plays pair.AudioClip.</span></div>
 </div><!-- fragment --><hr  />
@@ -313,7 +314,7 @@ Integration Notes</h1>
 <li><a class="el" href="class_scene_asset_helper.html" title="Serializable, editor-friendly scene reference that stores a scene name and path.">SceneAssetHelper</a> fields are useful for Inspector-configured menu buttons.</li>
 </ul>
 <p>Game data:</p><ul>
-<li>Gameplay scene buttons may choose day or night scene helpers based on ::LevelMap::IsDayTrack.</li>
+<li>Gameplay scene buttons may choose day or night scene helpers based on ::levelMap::IsDayTrack.</li>
 <li><a class="el" href="class_game_data_manager.html#a8e9650842f1d9c746be23560a7bab3a0" title="Attempts to start gameplay by loading the level scene.">GameDataManager.GoToSelectedLevel</a> can also route into scene loading.</li>
 </ul>
 <p>Audio:</p><ul>

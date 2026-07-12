@@ -362,7 +362,7 @@ public class GenerateLevelButton : ButtonType
 		}
 		catch (Exception ex)
 		{
-			Debug.LogError($"Level generation failed: {ex}");
+			NotificationManager.Instance.Show($"Level generation failed: {ex}");
 		}
 	}
 }
@@ -558,7 +558,7 @@ public class ImportLevelButton : ClosePopUpButton
 	public override void Action()
 	{
 		if (!ImportExportManager.TryImportLevelFromString(textField.text))
-			Debug.LogError("Failed to import level: invalid format.");
+			NotificationManager.Instance.Show("Failed to import level: invalid format.");
 		else
 		{
 			base.Action();

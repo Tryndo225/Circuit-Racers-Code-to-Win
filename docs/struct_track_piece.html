@@ -120,21 +120,23 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('struct_track_p
 </div><!--header-->
 <div class="contents">
 
-<p>Describes a single placeable track piece: prefab, world-space pose, and pattern size.  
+<p>Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.  
  <a href="#details">More...</a></p>
 <div class="dynheader">
 Collaboration diagram for TrackPiece:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="struct_track_piece__coll__graph.svg" width="110" height="144"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="struct_track_piece__coll__graph.svg" width="110" height="166"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afa1cf838e1192a3d56033460fd1626fa" id="r_afa1cf838e1192a3d56033460fd1626fa"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#afa1cf838e1192a3d56033460fd1626fa">TrackPiece</a> (GameObject prefab, Vector3 position, Quaternion rotation, int size=3)</td></tr>
-<tr class="memdesc:afa1cf838e1192a3d56033460fd1626fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new TrackPiece with explicit prefab, pose, and pattern size.  <br /></td></tr>
+<tr class="memitem:a4c94bff12123e6ac3ac077b3f61b1823" id="r_a4c94bff12123e6ac3ac077b3f61b1823"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a4c94bff12123e6ac3ac077b3f61b1823">TrackPiece</a> (GameObject prefab, Vector3 position, Quaternion rotation, int size=3, string patternKey=&quot;&quot;)</td></tr>
+<tr class="memdesc:a4c94bff12123e6ac3ac077b3f61b1823"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new TrackPiece with explicit prefab, pose, pattern size, and source pattern.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:acabd1e980f7da8aa3a610b55a2ba54a2" id="r_acabd1e980f7da8aa3a610b55a2ba54a2"><td class="memItemLeft">string&#160;</td><td class="memItemRight"><a class="el" href="#acabd1e980f7da8aa3a610b55a2ba54a2">PatternKey</a></td></tr>
+<tr class="memdesc:acabd1e980f7da8aa3a610b55a2ba54a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flattened pattern key that produced this track piece.  <br /></td></tr>
 <tr class="memitem:abcb3eaef528f4769bf544f7de1890ce1" id="r_abcb3eaef528f4769bf544f7de1890ce1"><td class="memItemLeft">Vector3&#160;</td><td class="memItemRight"><a class="el" href="#abcb3eaef528f4769bf544f7de1890ce1">Position</a></td></tr>
 <tr class="memdesc:abcb3eaef528f4769bf544f7de1890ce1"><td class="mdescLeft">&#160;</td><td class="mdescRight">World-space position used when placing the prefab.  <br /></td></tr>
 <tr class="memitem:acf9b0991dba02e4097786419de5fd0bf" id="r_acf9b0991dba02e4097786419de5fd0bf"><td class="memItemLeft">GameObject&#160;</td><td class="memItemRight"><a class="el" href="#acf9b0991dba02e4097786419de5fd0bf">Prefab</a></td></tr>
@@ -145,13 +147,15 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a24cc4183e4c7922e1467271edfc1a418"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pattern size used by this piece, usually 3 or 5.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Describes a single placeable track piece: prefab, world-space pose, and pattern size. </p>
-<p>Stores the prefab and placement data used by RaceTrackPlacer. </p>
+<div class="textblock"><p>Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern. </p>
+<p>Stores the prefab and placement data used by RaceTrackPlacer.</p>
+<p>In the generated legend, Position is used as a local placement offset. During track placement, the placer converts it into the final world-space position.</p>
+<p>PatternKey stores the flattened pattern that produced the piece. This is used for larger pieces where the matching pattern is larger than the actual occupied footprint. </p>
 
-<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00016">16</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00022">22</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="afa1cf838e1192a3d56033460fd1626fa" name="afa1cf838e1192a3d56033460fd1626fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa1cf838e1192a3d56033460fd1626fa">&#9670;&#160;</a></span>TrackPiece()</h2>
+<a id="a4c94bff12123e6ac3ac077b3f61b1823" name="a4c94bff12123e6ac3ac077b3f61b1823"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c94bff12123e6ac3ac077b3f61b1823">&#9670;&#160;</a></span>TrackPiece()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -174,29 +178,56 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>size</em></span><span class="paramdefsep"> = </span><span class="paramdefval">3</span>&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>size</em></span><span class="paramdefsep"> = </span><span class="paramdefval">3</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string</td>          <td class="paramname"><span class="paramname"><em>patternKey</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Creates a new TrackPiece with explicit prefab, pose, and pattern size. </p>
+<p>Creates a new TrackPiece with explicit prefab, pose, pattern size, and source pattern. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">prefab</td><td>Prefab reference. May be null for an empty/default legend entry.</td></tr>
-    <tr><td class="paramname">position</td><td>World-space placement position.</td></tr>
-    <tr><td class="paramname">rotation</td><td>World-space placement rotation.</td></tr>
+    <tr><td class="paramname">position</td><td>Placement position or local placement offset.</td></tr>
+    <tr><td class="paramname">rotation</td><td>Placement rotation.</td></tr>
     <tr><td class="paramname">size</td><td>Pattern size used by this piece.</td></tr>
+    <tr><td class="paramname">patternKey</td><td>Flattened pattern key that produced this piece.</td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00049">49</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00075">75</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
 
-<p class="reference">References <a class="el" href="_race_track_placer_8cs_source.html#l00028">Position</a>, <a class="el" href="_race_track_placer_8cs_source.html#l00022">Prefab</a>, <a class="el" href="_race_track_placer_8cs_source.html#l00034">Rotation</a>, and <a class="el" href="_race_track_placer_8cs_source.html#l00040">Size</a>.</p>
+<p class="reference">References <a class="el" href="_race_track_placer_8cs_source.html#l00065">PatternKey</a>, <a class="el" href="_race_track_placer_8cs_source.html#l00038">Position</a>, <a class="el" href="_race_track_placer_8cs_source.html#l00028">Prefab</a>, <a class="el" href="_race_track_placer_8cs_source.html#l00044">Rotation</a>, and <a class="el" href="_race_track_placer_8cs_source.html#l00054">Size</a>.</p>
 
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="acabd1e980f7da8aa3a610b55a2ba54a2" name="acabd1e980f7da8aa3a610b55a2ba54a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acabd1e980f7da8aa3a610b55a2ba54a2">&#9670;&#160;</a></span>PatternKey</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string TrackPiece.PatternKey</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Flattened pattern key that produced this track piece. </p>
+<p>This is used by RaceTrackPlacer to decide which cells are actually covered by larger pieces. Without this, a large bend would remove the whole surrounding square, including road tiles that are not part of the bend. </p>
+
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00065">65</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00075">TrackPiece()</a>.</p>
+
+</div>
+</div>
 <a id="abcb3eaef528f4769bf544f7de1890ce1" name="abcb3eaef528f4769bf544f7de1890ce1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abcb3eaef528f4769bf544f7de1890ce1">&#9670;&#160;</a></span>Position</h2>
 
@@ -210,10 +241,11 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>World-space position used when placing the prefab. </p>
+<p>In the generated rule legend this value is treated as a local offset. During placement, the final world-space position is filled based on the grid coordinate and block size. </p>
 
-<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00028">28</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00038">38</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00049">TrackPiece()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00075">TrackPiece()</a>.</p>
 
 </div>
 </div>
@@ -231,9 +263,9 @@ Public Attributes</h2></td></tr>
 
 <p>Prefab to instantiate for this track cell. </p>
 
-<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00022">22</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00028">28</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00049">TrackPiece()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00075">TrackPiece()</a>.</p>
 
 </div>
 </div>
@@ -251,9 +283,9 @@ Public Attributes</h2></td></tr>
 
 <p>World-space rotation used when placing the prefab. </p>
 
-<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00034">34</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00044">44</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00049">TrackPiece()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00075">TrackPiece()</a>.</p>
 
 </div>
 </div>
@@ -270,10 +302,11 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Pattern size used by this piece, usually 3 or 5. </p>
+<p>The pattern size includes the matching border. For example, a 5x5 pattern may describe a larger prefab whose actual occupied footprint is the inner 3x3 area. </p>
 
-<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00040">40</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00054">54</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00049">TrackPiece()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_race_track_placer_8cs_source.html#l00075">TrackPiece()</a>.</p>
 
 </div>
 </div>

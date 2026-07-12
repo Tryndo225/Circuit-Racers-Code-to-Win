@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 26865774}
   - component: {fileID: 26865773}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Level Edit Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 2560, y: 1440}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -5079,7 +5079,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d7b8d65b2c73784793646d47a52b811, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelPreviewer
+  m_EditorClassIdentifier: 
   target: {fileID: 1922202879}
   grass:
     serializedVersion: 2
@@ -5089,7 +5089,7 @@ MonoBehaviour:
     rgba: 4284045657
   start:
     serializedVersion: 2
-    rgba: 4291921468
+    rgba: 4287688336
   finish:
     serializedVersion: 2
     rgba: 4278190335

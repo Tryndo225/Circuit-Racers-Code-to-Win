@@ -16,6 +16,7 @@ var class_game_data_manager =
     [ "GoToSelectedLevel", "class_game_data_manager.html#a8e9650842f1d9c746be23560a7bab3a0", null ],
     [ "OnDestroy", "class_game_data_manager.html#a8f11887c04156101f73abf4a2d2fada4", null ],
     [ "Persist", "class_game_data_manager.html#a9f9c9fefcab60afbcbc4173c73d99c8b", null ],
+    [ "PrintSavedGameDataSize", "class_game_data_manager.html#a9c057dc829e2a87e4884c81a82e34d1c", null ],
     [ "RemoveLevel", "class_game_data_manager.html#a5be821bacd3d739de21db848aaccb9ef", null ],
     [ "RemoveListener", "class_game_data_manager.html#a033a3349038fe95e19abd61963e376c0", null ],
     [ "ReplaceLevel", "class_game_data_manager.html#a88f6e5689f09e80d2127a4ac6f5576c9", null ],

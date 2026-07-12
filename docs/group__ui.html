@@ -280,8 +280,8 @@ Components</h1>
 <li><a class="el" href="class_button_script.html" title="Generic UI button driver that delegates its click behavior to a pluggable ButtonType strategy.">ButtonScript</a> stores a serialized <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a> and calls its Action method.</li>
 <li><a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a> is the abstract base class for serialized UI actions.</li>
 <li><a class="el" href="class_change_scene_button.html" title="Button strategy that changes to a configured scene through SceneManagement.">ChangeSceneButton</a> loads a configured <a class="el" href="class_scene_asset_helper.html" title="Serializable, editor-friendly scene reference that stores a scene name and path.">SceneAssetHelper</a> through <a class="el" href="class_scene_management.html" title="Centralized scene loader and background-music router.">SceneManagement</a>.</li>
-<li><a class="el" href="class_select_level_button.html" title="Button strategy that stores a specific LevelMap as the currently selected level.">SelectLevelButton</a> selects a concrete <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> in <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
-<li><a class="el" href="class_remove_level_button.html" title="Button strategy that removes a specific LevelMap from GameDataManager.">RemoveLevelButton</a> removes a concrete <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> from <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
+<li><a class="el" href="class_select_level_button.html" title="Button strategy that stores a specific LevelMap as the currently selected level.">SelectLevelButton</a> selects a concrete ::levelMap in <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
+<li><a class="el" href="class_remove_level_button.html" title="Button strategy that removes a specific LevelMap from GameDataManager.">RemoveLevelButton</a> removes a concrete ::levelMap from <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
 <li><a class="el" href="class_generate_level_button.html" title="Button strategy that procedurally generates a level, creates checkpoints, and displays the result in ...">GenerateLevelButton</a> generates a level asynchronously, adds checkpoints, and displays it through <a class="el" href="class_level_pop_up.html" title="Simple popup controller that previews a generated LevelMap and lets the user accept (add to game data...">LevelPopUp</a>.</li>
 <li><a class="el" href="class_clear_levels_button.html" title="Button strategy that clears all saved levels from GameDataManager.">ClearLevelsButton</a> clears all saved custom levels.</li>
 <li><a class="el" href="class_go_to_selected_level.html" title="Button strategy that starts gameplay using the level currently selected in GameDataManager.">GoToSelectedLevel</a> delegates gameplay transition to <a class="el" href="class_game_data_manager.html#a8e9650842f1d9c746be23560a7bab3a0" title="Attempts to start gameplay by loading the level scene.">GameDataManager.GoToSelectedLevel</a>.</li>
@@ -300,11 +300,11 @@ Components</h1>
 <li><a class="el" href="class_level_entry.html" title="UI entry representing a single saved level row.">LevelEntry</a> also exposes callbacks for selecting, exporting, renaming, and removing the level.</li>
 </ul>
 <p>Level preview and popup:</p><ul>
-<li><a class="el" href="class_level_previewer.html" title="Renders a small top-down preview image of a LevelMap into a UI RawImage.">LevelPreviewer</a> renders a color-coded preview texture from a <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>.</li>
+<li><a class="el" href="class_level_previewer.html" title="Renders a small top-down preview image of a LevelMap into a UI RawImage.">LevelPreviewer</a> renders a color-coded preview texture from a ::levelMap.</li>
 <li><a class="el" href="class_level_pop_up.html" title="Simple popup controller that previews a generated LevelMap and lets the user accept (add to game data...">LevelPopUp</a> shows or hides a generated level preview and can add the previewed level to saved data.</li>
 </ul>
 <p>Level editor:</p><ul>
-<li><a class="el" href="class_level_editor_manager.html" title="Manages the level editor UI and applies user edits to an editable LevelMap copy.">LevelEditorManager</a> edits an editable <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> copy.</li>
+<li><a class="el" href="class_level_editor_manager.html" title="Manages the level editor UI and applies user edits to an editable LevelMap copy.">LevelEditorManager</a> edits an editable ::levelMap copy.</li>
 <li>It supports painting grass, track, and checkpoint tiles.</li>
 <li>It supports moving start/finish points, changing circuit mode, day/night mode, lap count, and level name.</li>
 <li>It can regenerate checkpoints, validate maps, save new levels, or replace edited levels.</li>
@@ -359,13 +359,13 @@ Lifecycle</h1>
 <li>Uses public callbacks for select, export, remove, and rename actions.</li>
 </ul>
 <p><a class="el" href="class_level_previewer.html" title="Renders a small top-down preview image of a LevelMap into a UI RawImage.">LevelPreviewer</a>:</p><ul>
-<li>Creates a preview texture from <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> tile data.</li>
+<li>Creates a preview texture from levelMap tile data.</li>
 <li>Uses point filtering for pixel-like previews.</li>
 <li>Clears old texture references when requested.</li>
 </ul>
 <p><a class="el" href="class_level_pop_up.html" title="Simple popup controller that previews a generated LevelMap and lets the user accept (add to game data...">LevelPopUp</a>:</p><ul>
 <li>Hides itself on Start.</li>
-<li>ShowMap stores the previewed <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>, activates the visual container, and asks <a class="el" href="class_level_previewer.html" title="Renders a small top-down preview image of a LevelMap into a UI RawImage.">LevelPreviewer</a> to render it.</li>
+<li>ShowMap stores the previewed levelMap, activates the visual container, and asks <a class="el" href="class_level_previewer.html" title="Renders a small top-down preview image of a LevelMap into a UI RawImage.">LevelPreviewer</a> to render it.</li>
 <li>HideMap clears the preview and hides the container.</li>
 <li>KeepMap adds the current map to <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a> and closes the popup.</li>
 </ul>
@@ -463,11 +463,11 @@ Public API Reference</h1>
 <li>void OnLevelNameChange(string name) Updates the stored level name.</li>
 </ul>
 <p><a class="el" href="class_level_previewer.html" title="Renders a small top-down preview image of a LevelMap into a UI RawImage.">LevelPreviewer</a>:</p><ul>
-<li>Task ShowPreviewAsync(LevelMap map) Renders a preview for the provided map.</li>
+<li>Task ShowPreviewAsync(levelMap map) Renders a preview for the provided map.</li>
 <li>void Clear() Clears the displayed preview texture reference.</li>
 </ul>
 <p><a class="el" href="class_level_pop_up.html" title="Simple popup controller that previews a generated LevelMap and lets the user accept (add to game data...">LevelPopUp</a>:</p><ul>
-<li>void ShowMap(LevelMap map) Shows the popup and previews the provided map.</li>
+<li>void ShowMap(levelMap map) Shows the popup and previews the provided map.</li>
 <li>void HideMap() Clears the previewed map and hides the popup.</li>
 <li>void KeepMap() Adds the previewed map to saved game data and closes the popup.</li>
 </ul>
@@ -520,7 +520,7 @@ Integration Notes</h1>
 </ul>
 <p>Scene management:</p><ul>
 <li><a class="el" href="class_change_scene_button.html" title="Button strategy that changes to a configured scene through SceneManagement.">ChangeSceneButton</a>, <a class="el" href="class_replay_button.html" title="Button strategy that opens the replay scene only when the selected level has a saved best replay.">ReplayButton</a>, <a class="el" href="class_edit_button.html" title="Button strategy that opens the editor scene only when a level is currently selected.">EditButton</a>, and ::GoPlayButtom route through <a class="el" href="class_scene_management.html" title="Centralized scene loader and background-music router.">SceneManagement</a>.</li>
-<li>::GoPlayButtom chooses day or night gameplay scene from LevelMap::IsDayTrack.</li>
+<li>::GoPlayButtom chooses day or night gameplay scene from levelMap::IsDayTrack.</li>
 </ul>
 <p>Race state:</p><ul>
 <li><a class="el" href="class_track_race_overlay_source.html" title="Race overlay state source that feeds live track/race data into RaceOverlay.">TrackRaceOverlaySource</a> connects live race systems to <a class="el" href="class_race_overlay.html" title="HUD controller for race status, countdown, timing, checkpoint splits, counters, and final results.">RaceOverlay</a>.</li>
@@ -531,7 +531,7 @@ Integration Notes</h1>
 <li>Import, replay, edit, and custom notification buttons can show feedback through <a class="el" href="class_notification_manager.html" title="Persistent UI notification manager that displays one text popup at a time.">NotificationManager</a>.</li>
 </ul>
 <p>Editor:</p><ul>
-<li><a class="el" href="class_level_editor_manager.html" title="Manages the level editor UI and applies user edits to an editable LevelMap copy.">LevelEditorManager</a> edits a temporary <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> copy and validates before saving or replacing.</li>
+<li><a class="el" href="class_level_editor_manager.html" title="Manages the level editor UI and applies user edits to an editable LevelMap copy.">LevelEditorManager</a> edits a temporary levelMap copy and validates before saving or replacing.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="ui_performance"></a>
@@ -565,7 +565,7 @@ Troubleshooting</h1>
 <li>Check console output for generation exceptions.</li>
 </ul>
 <p>Blank preview:</p><ul>
-<li>Check that the <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> is non-null and has positive dimensions.</li>
+<li>Check that the levelMap is non-null and has positive dimensions.</li>
 <li>Check that the RawImage target is assigned in <a class="el" href="class_level_previewer.html" title="Renders a small top-down preview image of a LevelMap into a UI RawImage.">LevelPreviewer</a>.</li>
 <li>Check that ShowPreviewAsync is called after UI layout exists.</li>
 </ul>

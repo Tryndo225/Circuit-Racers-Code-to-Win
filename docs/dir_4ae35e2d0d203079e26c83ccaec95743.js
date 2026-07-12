@@ -8,8 +8,6 @@ var dir_4ae35e2d0d203079e26c83ccaec95743 =
     [ "LevelPopUp.cs", "_level_pop_up_8cs.html", null ],
     [ "LevelPreviewer.cs", "_level_previewer_8cs.html", null ],
     [ "LevelScrollContent.cs", "_level_scroll_content_8cs.html", null ],
-    [ "NotificationManager.cs", "_notification_manager_8cs.html", null ],
-    [ "NotificationPopup.cs", "_notification_popup_8cs.html", null ],
     [ "RaceOverlay.cs", "_race_overlay_8cs.html", null ],
     [ "RaceOverlaySource.cs", "_race_overlay_source_8cs.html", null ],
     [ "ReplayRaceOverlaySource.cs", "_replay_race_overlay_source_8cs.html", null ],

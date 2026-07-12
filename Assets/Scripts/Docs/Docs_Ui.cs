@@ -88,8 +88,8 @@
  * - ::ButtonScript stores a serialized ::ButtonType and calls its Action method.
  * - ::ButtonType is the abstract base class for serialized UI actions.
  * - ::ChangeSceneButton loads a configured ::SceneAssetHelper through ::SceneManagement.
- * - ::SelectLevelButton selects a concrete ::LevelMap in ::GameDataManager.
- * - ::RemoveLevelButton removes a concrete ::LevelMap from ::GameDataManager.
+ * - ::SelectLevelButton selects a concrete ::levelMap in ::GameDataManager.
+ * - ::RemoveLevelButton removes a concrete ::levelMap from ::GameDataManager.
  * - ::GenerateLevelButton generates a level asynchronously, adds checkpoints, and displays it through ::LevelPopUp.
  * - ::ClearLevelsButton clears all saved custom levels.
  * - ::GoToSelectedLevel delegates gameplay transition to ::GameDataManager::GoToSelectedLevel.
@@ -108,11 +108,11 @@
  * - ::LevelEntry also exposes callbacks for selecting, exporting, renaming, and removing the level.
  *
  * Level preview and popup:
- * - ::LevelPreviewer renders a color-coded preview texture from a ::LevelMap.
+ * - ::LevelPreviewer renders a color-coded preview texture from a ::levelMap.
  * - ::LevelPopUp shows or hides a generated level preview and can add the previewed level to saved data.
  *
  * Level editor:
- * - ::LevelEditorManager edits an editable ::LevelMap copy.
+ * - ::LevelEditorManager edits an editable ::levelMap copy.
  * - It supports painting grass, track, and checkpoint tiles.
  * - It supports moving start/finish points, changing circuit mode, day/night mode, lap count, and level name.
  * - It can regenerate checkpoints, validate maps, save new levels, or replace edited levels.
@@ -167,13 +167,13 @@
  * - Uses public callbacks for select, export, remove, and rename actions.
  *
  * ::LevelPreviewer:
- * - Creates a preview texture from LevelMap tile data.
+ * - Creates a preview texture from levelMap tile data.
  * - Uses point filtering for pixel-like previews.
  * - Clears old texture references when requested.
  *
  * ::LevelPopUp:
  * - Hides itself on Start.
- * - ShowMap stores the previewed LevelMap, activates the visual container, and asks LevelPreviewer to render it.
+ * - ShowMap stores the previewed levelMap, activates the visual container, and asks LevelPreviewer to render it.
  * - HideMap clears the preview and hides the container.
  * - KeepMap adds the current map to ::GameDataManager and closes the popup.
  *
@@ -313,14 +313,14 @@
  *   Updates the stored level name.
  *
  * ::LevelPreviewer:
- * - Task ShowPreviewAsync(LevelMap map)
+ * - Task ShowPreviewAsync(levelMap map)
  *   Renders a preview for the provided map.
  *
  * - void Clear()
  *   Clears the displayed preview texture reference.
  *
  * ::LevelPopUp:
- * - void ShowMap(LevelMap map)
+ * - void ShowMap(levelMap map)
  *   Shows the popup and previews the provided map.
  *
  * - void HideMap()
@@ -408,7 +408,7 @@
  *
  * Scene management:
  * - ::ChangeSceneButton, ::ReplayButton, ::EditButton, and ::GoPlayButtom route through ::SceneManagement.
- * - ::GoPlayButtom chooses day or night gameplay scene from LevelMap::IsDayTrack.
+ * - ::GoPlayButtom chooses day or night gameplay scene from levelMap::IsDayTrack.
  *
  * Race state:
  * - ::TrackRaceOverlaySource connects live race systems to ::RaceOverlay.
@@ -419,7 +419,7 @@
  * - Import, replay, edit, and custom notification buttons can show feedback through ::NotificationManager.
  *
  * Editor:
- * - ::LevelEditorManager edits a temporary LevelMap copy and validates before saving or replacing.
+ * - ::LevelEditorManager edits a temporary levelMap copy and validates before saving or replacing.
  *
  * ----------------------------------------------------------------------
  * @section ui_performance Performance and GC
@@ -452,7 +452,7 @@
  * - Check console output for generation exceptions.
  *
  * Blank preview:
- * - Check that the LevelMap is non-null and has positive dimensions.
+ * - Check that the levelMap is non-null and has positive dimensions.
  * - Check that the RawImage target is assigned in ::LevelPreviewer.
  * - Check that ShowPreviewAsync is called after UI layout exists.
  *
@@ -506,6 +506,6 @@
  *
  * @details
  * The Level UI group contains UI components focused specifically on saved custom levels.
- * These components display saved ::LevelMap data, best times, day/night icons, preview textures,
+ * These components display saved ::levelMap data, best times, day/night icons, preview textures,
  * and list-level actions such as select, rename, export, and remove.
  */

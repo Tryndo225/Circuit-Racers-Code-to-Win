@@ -165,7 +165,7 @@ Classes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Persistent progression data, selected level state, best times, checkpoint splits, replays, and assist settings. </p>
-<p>The Game Data subsystem centers on <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>, which derives from <a class="el" href="class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components.">Generic.Singleton&lt;GameDataManager&gt;</a>. It owns a ::GameData instance, persists it through Unity PlayerPrefs as JSON under the key "GameData", tracks the currently selected <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>, and exposes APIs for level lists, best times, checkpoint splits, best replays, assist settings, and editable level replacement.</p>
+<p>The Game Data subsystem centers on <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>, which derives from <a class="el" href="class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components.">Generic.Singleton&lt;GameDataManager&gt;</a>. It owns a ::GameData instance, persists it through Unity PlayerPrefs as GZip-compressed, Base64-encoded JSON under the key "GameDataCompressed", and keeps backwards compatibility with older raw JSON saves stored under the key "GameData". It also tracks the currently selected ::levelMap and exposes APIs for level lists, best times, checkpoint splits, best replays, assist settings, and editable level replacement.</p>
 <p>Contents:</p><ul>
 <li><a class="el" href="#gdm_overview" title="Overview">Overview</a></li>
 <li><a class="el" href="#gdm_data_model" title="Data Model">Data Model</a></li>
@@ -183,8 +183,8 @@ Classes</h2></td></tr>
  <h1 class="doxsection"><a class="anchor" id="gdm_overview"></a>
 Overview</h1>
 <p>Responsibilities:</p><ul>
-<li>Load and save ::GameData to PlayerPrefs as JSON.</li>
-<li>Maintain the currently selected <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> for gameplay scene transitions.</li>
+<li>Load and save ::GameData to PlayerPrefs as compressed Base64-encoded JSON.</li>
+<li>Maintain the currently selected ::levelMap for gameplay scene transitions.</li>
 <li>Store custom levels and their best completion data.</li>
 <li>Store practice/test-map best time, checkpoint splits, and replay.</li>
 <li>Store driving assist settings: ABS and traction control.</li>
@@ -197,9 +197,9 @@ Overview</h1>
 <p>Dependencies:</p><ul>
 <li><a class="el" href="class_generic_1_1_singleton-1-g.html" title="Minimal persistent singleton base for Unity components.">Generic.Singleton&lt;T&gt;</a> base type.</li>
 <li>IEnumerableExtensions::IEnumerableExtensions::GetContentHash for level-list hash computation.</li>
-<li>UnityEngine.PlayerPrefs and JsonUtility for persistence.</li>
+<li>UnityEngine.PlayerPrefs, JsonUtility, System.IO.Compression, and Base64 conversion for persistence.</li>
 <li><a class="el" href="class_scene_management.html" title="Centralized scene loader and background-music router.">SceneManagement</a> for loading the gameplay scene.</li>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> for level layout data.</li>
+<li>::levelMap for level layout data.</li>
 <li><a class="el" href="class_replay.html" title="Serializable race replay containing an ordered list of recorded ReplaySnapshot values.">Replay</a> for best-run replay storage.</li>
 </ul>
 <p>Threading:</p><ul>
@@ -229,7 +229,7 @@ Data Model</h1>
 <li>AssistsSettings: saved ABS and traction-control settings.</li>
 </ul>
 <p><a class="el" href="class_game_data_manager_1_1_level_data.html" title="Serializable record containing a level map and its best saved run data.">GameDataManager.LevelData</a></p><ul>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>: associated custom level.</li>
+<li>levelMap: associated custom level.</li>
 <li>Time: best completion time in seconds, or float.MaxValue when unknown.</li>
 <li>CheckpointTimeSplits: checkpoint split times for the stored best run.</li>
 <li>BestReplay: replay associated with the stored best run.</li>
@@ -239,7 +239,7 @@ Data Model</h1>
 <li>TC: whether traction-control assist is enabled.</li>
 </ul>
 <p>Equality and hashing:</p><ul>
-<li>LevelData equality compares <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>, Time, CheckpointTimeSplits, and BestReplay.</li>
+<li>LevelData equality compares levelMap, Time, CheckpointTimeSplits, and BestReplay.</li>
 <li>LevelData.GetHashCode includes the level map, time, replay, and split values.</li>
 <li><a class="el" href="class_game_data_manager.html#a35418732f84ead447d77f9a1d7444f85" title="Hash of the current level-list content.">GameDataManager.Hash</a> is computed from CurrentGameData.Levels using GetContentHash().</li>
 </ul>
@@ -252,23 +252,28 @@ Data Model</h1>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="gdm_lifecycle"></a>
 Lifecycle</h1>
-<p><a class="el" href="class_game_data_manager.html#a3c43b7da0c3b3e27591267789663b1e2" title="Loads saved game data from PlayerPrefs if present.">GameDataManager.Awake</a>:</p><ul>
+<p><a class="el" href="class_game_data_manager.html#a3c43b7da0c3b3e27591267789663b1e2" title="Loads saved game data from PlayerPrefs if either the compressed or legacy save key is present.">GameDataManager.Awake</a>:</p><ul>
 <li>Enforces the singleton rule.</li>
-<li>If PlayerPrefs contains "GameData", loads it.</li>
+<li>If PlayerPrefs contains "GameDataCompressed" or the legacy "GameData" key, loads it.</li>
 <li>Otherwise initializes a fresh ::GameData instance and computes the initial Hash.</li>
 </ul>
 <p>GameDataManager.OnApplicationQuit:</p><ul>
-<li>Saves CurrentGameData to PlayerPrefs.</li>
+<li>Saves CurrentGameData to PlayerPrefs using the compressed save format.</li>
 </ul>
 <p>SaveGameData:</p><ul>
 <li>Calls CurrentGameData.EnsureValid().</li>
 <li>Serializes CurrentGameData with JsonUtility.ToJson().</li>
-<li>Stores the JSON string in PlayerPrefs under "GameData".</li>
+<li>Compresses the JSON with GZip.</li>
+<li>Converts the compressed bytes to a Base64 string.</li>
+<li>Stores the compressed Base64 payload in PlayerPrefs under "GameDataCompressed".</li>
+<li>Removes the legacy raw-JSON "GameData" key after a successful compressed save.</li>
 <li>Calls PlayerPrefs.Save().</li>
 </ul>
 <p>LoadGameData:</p><ul>
-<li>Reads JSON from PlayerPrefs key "GameData".</li>
-<li>Deserializes it with JsonUtility.FromJson&lt;GameData&gt;().</li>
+<li>Reads the compressed Base64 payload from PlayerPrefs key "GameDataCompressed" when present.</li>
+<li>Decompresses it back into readable JSON before deserialization.</li>
+<li>Falls back to the legacy raw JSON key "GameData" when no compressed save exists.</li>
+<li>Deserializes the JSON with JsonUtility.FromJson&lt;GameData&gt;().</li>
 <li>Repairs missing or older-format data with EnsureValid().</li>
 <li>Recomputes Hash from CurrentGameData.Levels.</li>
 <li>Falls back to a new empty ::GameData if loading fails.</li>
@@ -282,7 +287,7 @@ Lifecycle</h1>
 Usage</h1>
 <p>Select an existing level and start gameplay: </p><div class="fragment"><div class="line"><a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.SelectingLevelMap(levelMap);</div>
 <div class="line"><a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.GoToSelectedLevel();</div>
-<div class="ttc" id="aclass_game_data_manager_html"><div class="ttname"><a href="class_game_data_manager.html">GameDataManager</a></div><div class="ttdoc">Runtime manager for persistent game progression data.</div><div class="ttdef"><b>Definition</b> <a href="_game_data_manager_8cs_source.html#l00027">GameDataManager.cs:28</a></div></div>
+<div class="ttc" id="aclass_game_data_manager_html"><div class="ttname"><a href="class_game_data_manager.html">GameDataManager</a></div><div class="ttdoc">Runtime manager for persistent game progression data.</div><div class="ttdef"><b>Definition</b> <a href="_game_data_manager_8cs_source.html#l00030">GameDataManager.cs:31</a></div></div>
 <div class="ttc" id="aclass_generic_1_1_singleton-1-g_html_a5f40d530bbeab160905a3312f7daf178"><div class="ttname"><a href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Generic.Singleton-1-g.Instance</a></div><div class="ttdeci">static T Instance</div><div class="ttdoc">Gets the current singleton instance, or null if no instance has awoken yet.</div><div class="ttdef"><b>Definition</b> <a href="_scripts_2_miscellaneous_2_utilities_8cs_source.html#l00151">Scripts/Miscellaneous/Utilities.cs:151</a></div></div>
 </div><!-- fragment --><p>Add a new custom level: </p><div class="fragment"><div class="line"><a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.AddLevel(levelMap);</div>
 </div><!-- fragment --><p>Complete the current level: </p><div class="fragment"><div class="line"><span class="keywordtype">float</span> elapsedSeconds = <a class="code hl_class" href="class_race_time_manager.html">RaceTimeManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.GetCurrentRaceTime();</div>
@@ -292,7 +297,7 @@ Usage</h1>
 <div class="line"><a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.CompleteLevel(elapsedSeconds, splits, replay);</div>
 <div class="ttc" id="aclass_race_time_manager_html"><div class="ttname"><a href="class_race_time_manager.html">RaceTimeManager</a></div><div class="ttdoc">Manages race timing, lap timing, checkpoint splits, and race completion.</div><div class="ttdef"><b>Definition</b> <a href="_race_time_manager_8cs_source.html#l00021">RaceTimeManager.cs:22</a></div></div>
 <div class="ttc" id="aclass_replay_html"><div class="ttname"><a href="class_replay.html">Replay</a></div><div class="ttdoc">Serializable race replay containing an ordered list of recorded ReplaySnapshot values.</div><div class="ttdef"><b>Definition</b> <a href="_replay_8cs_source.html#l00121">Replay.cs:122</a></div></div>
-<div class="ttc" id="aclass_replay_manager_html"><div class="ttname"><a href="class_replay_manager.html">ReplayManager</a></div><div class="ttdoc">Records replay snapshots during a race.</div><div class="ttdef"><b>Definition</b> <a href="_replay_manager_8cs_source.html#l00014">ReplayManager.cs:15</a></div></div>
+<div class="ttc" id="aclass_replay_manager_html"><div class="ttname"><a href="class_replay_manager.html">ReplayManager</a></div><div class="ttdoc">Records replay snapshots during a race.</div><div class="ttdef"><b>Definition</b> <a href="_replay_manager_8cs_source.html#l00015">ReplayManager.cs:16</a></div></div>
 </div><!-- fragment --><p>Read the current best replay: </p><div class="fragment"><div class="line"><a class="code hl_class" href="class_replay.html">Replay</a> replay = <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.CurrentLevelReplay;</div>
 </div><!-- fragment --><p>Read a saved checkpoint split: </p><div class="fragment"><div class="line"><span class="keywordtype">float</span> referenceSplit = <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.GetCurrentMapSplit(splitIndex);</div>
 </div><!-- fragment --><p>Read and update assists: </p><div class="fragment"><div class="line"><span class="keywordtype">bool</span> absEnabled = <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.GetABS();</div>
@@ -317,8 +322,8 @@ Usage</h1>
 <div class="line">{</div>
 <div class="line">    Debug.Log(<span class="stringliteral">&quot;Game data changed. Hash = &quot;</span> + <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.Hash);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Create and save an edited level: </p><div class="fragment"><div class="line">LevelMap original = <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.CurrentLevelMap;</div>
-<div class="line">LevelMap editable = <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.CreateEditableCopy(original);</div>
+</div><!-- fragment --><p>Create and save an edited level: </p><div class="fragment"><div class="line">levelMap original = <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.CurrentLevelMap;</div>
+<div class="line">levelMap editable = <a class="code hl_class" href="class_game_data_manager.html">GameDataManager</a>.<a class="code hl_property" href="class_generic_1_1_singleton-1-g.html#a5f40d530bbeab160905a3312f7daf178">Instance</a>.CreateEditableCopy(original);</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">if</span> (editable != <span class="keyword">null</span>)</div>
 <div class="line">{</div>
@@ -330,7 +335,7 @@ Usage</h1>
 Public API Reference</h1>
 <p>Properties:</p><ul>
 <li>GameData CurrentGameData: Active saved game-data set.</li>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> CurrentLevelMap: Currently selected custom level. Null means the practice/test map is selected.</li>
+<li>levelMap CurrentLevelMap: Currently selected custom level. Null means the practice/test map is selected.</li>
 <li><a class="el" href="class_replay.html" title="Serializable race replay containing an ordered list of recorded ReplaySnapshot values.">Replay</a> CurrentLevelReplay: Best replay for the selected custom level, or the practice/test-map replay when no custom level is selected.</li>
 <li>int Hash: Content hash of the current custom-level list.</li>
 </ul>
@@ -345,23 +350,25 @@ Public API Reference</h1>
 <li>void RemoveListener(Action action) Removes a previously registered callback.</li>
 </ul>
 <p>Selection and flow:</p><ul>
-<li>void SelectingLevelMap(LevelMap map) Selects a custom level for play. The map must already exist in CurrentGameData.</li>
+<li>void SelectingLevelMap(levelMap map) Selects a custom level for play. The map must already exist in CurrentGameData.</li>
 <li>void <a class="el" href="class_go_to_selected_level.html" title="Button strategy that starts gameplay using the level currently selected in GameDataManager.">GoToSelectedLevel()</a> Loads the "Level" scene through <a class="el" href="class_scene_management.html" title="Centralized scene loader and background-music router.">SceneManagement</a> when CurrentLevelMap is set.</li>
 <li>float GetCurrentMapSplit(int splitIndex) Returns a saved split for the selected custom level, or the practice/test-map split if no custom level is selected.</li>
 <li><a class="el" href="class_replay.html" title="Serializable race replay containing an ordered list of recorded ReplaySnapshot values.">Replay</a> GetCurrentMapReplay() Returns the best replay for the selected custom level, or the practice/test-map replay if no custom level is selected.</li>
 </ul>
 <p>Progression:</p><ul>
 <li>void CompleteLevel(float time, float[] checkpointSplits, Replay replay) Records completion of the currently selected level. If CurrentLevelMap is null, the result is stored as a practice/test-map result. Otherwise, the selected custom level is updated if the time improves.</li>
-<li>void AddLevel(LevelMap map) Adds a custom level if it is not already present.</li>
-<li>void RemoveLevel(LevelMap levelMap) Removes a custom level if present. Clears CurrentLevelMap if the removed level was selected.</li>
+<li>void AddLevel(levelMap map) Adds a custom level if it is not already present.</li>
+<li>void RemoveLevel(levelMap levelMap) Removes a custom level if present. Clears CurrentLevelMap if the removed level was selected.</li>
 <li>void ClearLevels() Removes all custom levels and clears the current custom-level selection.</li>
 </ul>
 <p>Level editing:</p><ul>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> CreateEditableCopy(LevelMap sourceMap) Returns a copy of a stored level map for editing, or null if the map is invalid or not stored.</li>
-<li>bool ReplaceLevel(LevelMap originalMap, LevelMap editedMap) Replaces a stored level with an edited copy. This resets best time, splits, and replay for that level.</li>
+<li>levelMap CreateEditableCopy(levelMap sourceMap) Returns a copy of a stored level map for editing, or null if the map is invalid or not stored.</li>
+<li>bool ReplaceLevel(levelMap originalMap, levelMap editedMap) Replaces a stored level with an edited copy. This resets best time, splits, and replay for that level.</li>
 </ul>
 <p>Context menu helpers:</p><ul>
-<li>void CopySavedGameDataToClipboard() Copies the raw saved JSON from PlayerPrefs to the clipboard.</li>
+<li>void CopySavedGameDataToClipboard() Copies the readable decoded JSON to the clipboard, even when the saved PlayerPrefs value is compressed.</li>
+<li>void DeleteSavedGameData() Deletes both the compressed save key and the legacy raw-JSON save key.</li>
+<li>void PrintSavedGameDataSize() Prints the decoded JSON size and, when available, the compressed Base64 payload size.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="gdm_level_editing"></a>
@@ -416,8 +423,17 @@ Integration Notes</h1>
  <h1 class="doxsection"><a class="anchor" id="gdm_persistence"></a>
 Persistence and Format</h1>
 <p>Storage:</p><ul>
-<li>PlayerPrefs key: "GameData".</li>
-<li>Value: JSON produced by JsonUtility.ToJson(CurrentGameData).</li>
+<li>Main PlayerPrefs key: "GameDataCompressed".</li>
+<li>Main value: Base64 text produced from GZip-compressed JsonUtility JSON.</li>
+<li>Legacy PlayerPrefs key: "GameData".</li>
+<li>Legacy value: raw JSON produced by JsonUtility.ToJson(CurrentGameData).</li>
+<li>The legacy key is kept only for backwards-compatible loading of older saves.</li>
+</ul>
+<p>Level tile storage:</p><ul>
+<li>Saved custom levels contain <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> instances.</li>
+<li>Each <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> stores its runtime Tiles grid as a flattened run-length encoded string.</li>
+<li>This RLE tile string is part of the JSON saved by <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
+<li>The complete JSON is then compressed with GZip and stored as Base64 in PlayerPrefs.</li>
 </ul>
 <p>Saved data includes:</p><ul>
 <li>Custom level list.</li>
@@ -430,6 +446,8 @@ Persistence and Format</h1>
 <li>ABS and traction-control settings.</li>
 </ul>
 <p>Loading:</p><ul>
+<li>The compressed key is preferred when both save formats exist.</li>
+<li>The legacy raw-JSON key is used as a fallback when no compressed save exists.</li>
 <li>Missing older fields are repaired through EnsureValid().</li>
 <li>Missing split arrays are recreated.</li>
 <li>Missing assist settings are recreated.</li>
@@ -437,7 +455,9 @@ Persistence and Format</h1>
 </ul>
 <p>Limitations:</p><ul>
 <li>PlayerPrefs is convenient for small saves, but not ideal for very large data.</li>
-<li>Stored replay data can grow quickly if many snapshots are saved.</li>
+<li>Compression reduces repeated JSON text but does not remove the cost of serializing and deserializing large objects.</li>
+<li>Stored replay data can still grow quickly if many snapshots are saved.</li>
+<li>Base64 is used only so compressed binary data can be stored as a PlayerPrefs string.</li>
 <li>JsonUtility has Unity serialization limitations and does not support every C# type equally.</li>
 </ul>
 <hr  />
@@ -448,14 +468,14 @@ Performance and GC</h1>
 <li>GetContentHash iterates the Levels list and is linear in the number of saved levels.</li>
 <li>Listener invocation copies callbacks to an array before calling them, avoiding mutation issues during callbacks.</li>
 <li>Avoid saving repeatedly in tight loops.</li>
-<li>Large replay objects increase JSON size and save/load cost.</li>
+<li>Large replay objects increase decoded JSON size and save/load cost, even though the stored PlayerPrefs payload is compressed.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="gdm_troubleshooting"></a>
 Troubleshooting</h1>
 <p>Data not loading:</p><ul>
-<li>Check that PlayerPrefs contains the "GameData" key.</li>
-<li>Check the console for JsonUtility or EnsureValid errors.</li>
+<li>Check that PlayerPrefs contains either the "GameDataCompressed" key or the legacy "GameData" key.</li>
+<li>Check the console for compression, Base64, JsonUtility, or EnsureValid errors.</li>
 <li>Check whether an older schema needs fallback handling.</li>
 </ul>
 <p>Selected level does not start:</p><ul>
@@ -491,6 +511,7 @@ Troubleshooting</h1>
  <h1 class="doxsection"><a class="anchor" id="gdm_versions"></a>
 Version History</h1>
 <ul>
+<li>v1.5: Added GZip-compressed Base64 PlayerPrefs storage with legacy raw-JSON loading support.</li>
 <li>v1.4: Added assist settings, best replays, checkpoint splits, editable copies, and level replacement.</li>
 <li>v1.3: Added practice/test-map best time and split storage.</li>
 <li>v1.2: Added hash-based change notifications and observer list.</li>

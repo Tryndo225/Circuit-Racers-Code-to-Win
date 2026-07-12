@@ -100,7 +100,7 @@ public class LevelEntry : MonoBehaviour
 	/// </remarks>
 	public void RemoveLevel()
 	{
-		// Debug.Log($"Removing level from game data. Level map: \n {levelData.LevelMap.Tithisles}");
+		// Debug.Log($"Removing level from game data. Level map: \n {levelData.levelMap.Tithisles}");
 		GameDataManager.Instance.RemoveLevel(levelData.LevelMap);
 	}
 

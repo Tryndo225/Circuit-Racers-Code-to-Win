@@ -377,7 +377,7 @@ Performance and GC</h1>
 <li>Longer races create more snapshots and larger save data.</li>
 <li><a class="el" href="class_replay.html" title="Serializable race replay containing an ordered list of recorded ReplaySnapshot values.">Replay</a> objects are copied when saved and when assigned for playback.</li>
 <li><a class="el" href="class_replay_previewer.html" title="Plays back recorded race replays by moving a replay car through recorded snapshots.">ReplayPreviewer</a> interpolation is linear in normal playback and uses cached snapshot indices.</li>
-<li>Large replay objects increase PlayerPrefs JSON size when saved through <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
+<li>Large replay objects increase decoded JSON size and compressed PlayerPrefs payload size when saved through <a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a>.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="replay_system_troubleshooting"></a>

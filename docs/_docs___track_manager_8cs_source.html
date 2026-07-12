@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___track_
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment"> * - carSpawnHorizontalOffset (float): forward/backward offset applied relative to the spawn rotation.</span></div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> * Track Settings:</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * - levelMap (LevelMap): runtime level map used when the race is started from generated or saved track data.</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * - levelMap (levelMap): runtime level map used when the race is started from generated or saved track data.</span></div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment"> * - isCircuit (bool): true for lap-based circuit races; false for point-to-point races.</span></div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment"> * - laps (int, ShowIf(isCircuit)): number of laps required to finish a circuit race.</span></div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment"> *</span></div>
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___track_
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="comment"> * Generated or saved track:</span></div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment"> * - A ::RaceTrackPlacer is responsible for generated-track setup.</span></div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment"> * - When a RaceTrackPlacer exists, TrackManager.Start() returns early.</span></div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment"> * - The generated-track flow should provide the track layout and call ::TrackManager::StartRace(LevelMap).</span></div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment"> * - The generated-track flow should provide the track layout and call ::TrackManager::StartRace(levelMap).</span></div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment"> * Custom inputs:</span></div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment"> * - Disable defaultBindings.</span></div>
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___track_
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="comment"> * @section track_mng_api Public API Reference</span></div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span><span class="comment"> * Race control:</span></div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment"> * - void StartRace(LevelMap lvlMap): configures race settings from an optional level map,</span></div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment"> * - void StartRace(levelMap lvlMap): configures race settings from an optional level map,</span></div>
 <div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="comment"> *   wires checkpoint listeners, and starts the restart countdown.</span></div>
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span><span class="comment"> * - void CheckPointTaken(): advances checkpoint and lap progression, records lap transitions,</span></div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="comment"> *   and finishes the race when the required final condition is met.</span></div>

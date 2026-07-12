@@ -47,7 +47,7 @@ public static class LevelCheckPointMaker
 	/// Preconditions:
 	/// - <paramref name="levelMap"/> is non-null.
 	/// - <c>levelMap.Tiles</c> is a valid 2D grid.
-	/// - Road cells are marked with <see cref="LevelMap.LevelTileTypes.Track"/>.
+	/// - Road cells are marked with <see cref="LevelMap.LevelTileTypes.Track"/> and checkpoint cells with <see cref="LevelMap.LevelTileTypes.CP"/>.
 	///
 	/// Effects:
 	/// - Some road cells may be converted to checkpoint cells with <see cref="LevelMap.LevelTileTypes.CP"/>.
@@ -128,7 +128,7 @@ public static class LevelCheckPointMaker
 	/// </returns>
 	/// <remarks>
 	/// The method checks the cardinal directions from <see cref="LevelMap.CardinalDirections"/>.
-	/// It only steps onto tiles marked with <see cref="LevelMap.LevelTileTypes.Track"/>, avoids the immediately previous tile,
+	/// It only steps onto tiles marked with <see cref="LevelMap.LevelTileTypes.Track"/> or <see cref="LevelMap.LevelTileTypes.CP"/>, avoids the immediately previous tile,
 	/// and does not step onto <see cref="LevelMap.FinishPoint"/>.
 	/// </remarks>
 	private static Coordinates Step(LevelMap levelMap, ref Coordinates position, ref Coordinates lastVisited)
@@ -140,7 +140,7 @@ public static class LevelCheckPointMaker
 			if (!levelMap.Tiles.InBounds(next.X, next.Y))
 				continue;
 
-			if (levelMap.Tiles[next.X, next.Y] == TrackTile && next != lastVisited && next != levelMap.FinishPoint)
+			if ((levelMap.Tiles[next.X, next.Y] == TrackTile || levelMap.Tiles[next.X, next.Y] == CheckpointTile) && next != lastVisited && next != levelMap.FinishPoint)
 			{
 				lastVisited = position;
 				position = next;

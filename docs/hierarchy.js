@@ -155,6 +155,7 @@ var hierarchy =
       [ "ReadOnlyDrawer", "class_read_only_drawer.html", null ],
       [ "ShowIfDrawer", "class_show_if_drawer.html", null ],
       [ "StringTrackPieceDictionaryDrawer", "class_string_track_piece_dictionary_drawer.html", null ],
+      [ "TrackPieceRuleDrawer", "class_track_piece_rule_drawer.html", null ],
       [ "WheelSpecDrawer", "class_wheel_spec_drawer.html", null ],
       [ "sc.terrain.proceduralpainter.PropertyDrawers.ChannelPickerAttributeDrawer", "classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_channel_picker_attribute_drawer.html", null ],
       [ "sc.terrain.proceduralpainter.PropertyDrawers.ResolutionDropdownAttributeDrawer", "classsc_1_1terrain_1_1proceduralpainter_1_1_property_drawers_1_1_resolution_dropdown_attribute_drawer.html", null ],
@@ -186,6 +187,7 @@ var hierarchy =
       [ "TMPro.TMP_PhoneNumberValidator", "class_t_m_pro_1_1_t_m_p___phone_number_validator.html", null ]
     ] ],
     [ "TrackPiece", "struct_track_piece.html", null ],
+    [ "TrackPieceRule", "class_track_piece_rule.html", null ],
     [ "UIParallaxLayer", "struct_u_i_parallax_layer.html", null ],
     [ "UnityEngine.ISerializationCallbackReceiver", null, [
       [ "LevelMap", "class_level_map.html", null ],

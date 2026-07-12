@@ -153,7 +153,23 @@ Classes</h2></td></tr>
 <tr class="memitem:StringTrackPieceDictionary" id="r_StringTrackPieceDictionary"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_string_track_piece_dictionary.html">StringTrackPieceDictionary</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.  <a href="class_string_track_piece_dictionary.html#details">More...</a><br /></td></tr>
 <tr class="memitem:TrackPiece" id="r_TrackPiece"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="struct_track_piece.html">TrackPiece</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Describes a single placeable track piece: prefab, world-space pose, and pattern size.  <a href="struct_track_piece.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.  <a href="struct_track_piece.html#details">More...</a><br /></td></tr>
+<tr class="memitem:TrackPieceRule" id="r_TrackPieceRule"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_track_piece_rule.html">TrackPieceRule</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inspector-editable rule used to generate one entry in the track-piece legend.  <a href="class_track_piece_rule.html#details">More...</a><br /></td></tr>
+<tr class="memitem:TrackPieceRuleDrawer" id="r_TrackPieceRuleDrawer"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_track_piece_rule_drawer.html">TrackPieceRuleDrawer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom property drawer for editing TrackPieceRule entries in the Unity Inspector.  <a href="class_track_piece_rule_drawer.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ga38ed0c1b5b067e658834da58a4223fbe" id="r_ga38ed0c1b5b067e658834da58a4223fbe"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="#ga38ed0c1b5b067e658834da58a4223fbe">TrackPatternCell</a> { <br />
+&#160;&#160;<a class="el" href="#gga38ed0c1b5b067e658834da58a4223fbeace2c8aed9c2fa0cfbed56cbda4d8bf07">TrackPatternCell.Empty</a>
+, <br />
+&#160;&#160;<a class="el" href="#gga38ed0c1b5b067e658834da58a4223fbea92ea731d3af6677905303c88689f5d55">TrackPatternCell.Track</a>
+, <br />
+&#160;&#160;<a class="el" href="#gga38ed0c1b5b067e658834da58a4223fbeaef41311079c448d0beb06ec07db0bf8c">TrackPatternCell.Checkpoint</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:ga38ed0c1b5b067e658834da58a4223fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cell value used by the visual track-piece rule editor.  <a href="#ga38ed0c1b5b067e658834da58a4223fbe">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -166,13 +182,15 @@ Functions</h2></td></tr>
 <p>Main components:</p><ul>
 <li><a class="el" href="class_seed_factory.html" title="Thread-safe seed provider for initializing Random instances without repeated seed values.">SeedFactory</a> provides thread-safe integer seeds for System.Random instances.</li>
 <li><a class="el" href="struct_coordinates.html" title="Integer coordinate pair with arithmetic, equality, and serialization support.">Coordinates</a> represents integer tile-grid coordinates with arithmetic, equality, hashing, and serialization support.</li>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> stores serializable level metadata and the runtime 2D tile grid.</li>
+<li>::levelMap stores serializable level metadata and the runtime 2D tile grid.</li>
 <li><a class="el" href="class_level_generator.html" title="Procedural level generator for circuit and point-to-point tracks.">LevelGenerator</a> creates point-to-point or circuit layouts by selecting targets, flooding paths, backtracking roads, and applying spacer tiles.</li>
 <li><a class="el" href="class_level_check_point_maker.html" title="Utility that scans a generated LevelMap road and places checkpoint tiles on long straight segments.">LevelCheckPointMaker</a> converts suitable intermediate straight road segments into checkpoint tiles.</li>
 <li><a class="el" href="class_level_map_validator.html" title="Validates the structural correctness of a generated LevelMap.">LevelMapValidator</a> verifies structural correctness before a map is used or saved.</li>
+<li><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a>, <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a>, and <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a> describe prefab-selection rules.</li>
+<li><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> converts the validated grid layout into drivable scene prefabs.</li>
 <li><a class="el" href="class_array2_d_extensions.html" title="Extension helpers for rectangular 2D arrays used by level generation.">Array2DExtensions</a> provides coordinate-based helpers for rectangular 2D arrays.</li>
 </ul>
-<p>Tile values are defined by ::LevelMap::LevelTileTypes:</p><ul>
+<p>Tile values are defined by ::levelMap::LevelTileTypes:</p><ul>
 <li>CP = -2: checkpoint tile.</li>
 <li>Spacer = -1: keep-out spacer tile.</li>
 <li>Grass = 0: empty tile.</li>
@@ -186,6 +204,7 @@ Functions</h2></td></tr>
 <li><a class="el" href="#level_gen_generation" title="Generation Pipeline">Generation Pipeline</a></li>
 <li><a class="el" href="#level_gen_validation" title="Validation">Validation</a></li>
 <li><a class="el" href="#level_gen_checkpoints" title="Checkpoint Stamping">Checkpoint Stamping</a></li>
+<li><a class="el" href="#level_gen_placement" title="Prefab Track Placement">Prefab Track Placement</a></li>
 <li><a class="el" href="#level_gen_api" title="Public API Reference">Public API Reference</a></li>
 <li><a class="el" href="#level_gen_integration" title="Integration Notes">Integration Notes</a></li>
 <li><a class="el" href="#level_gen_performance" title="Performance and GC">Performance and GC</a></li>
@@ -198,15 +217,16 @@ Overview</h1>
 <p>Responsibilities:</p><ul>
 <li>Produce point-to-point and circuit track layouts on a rectangular grid.</li>
 <li>Store track metadata such as name, size, endpoints, lap count, checkpoint count, road coverage, and day/night variant.</li>
-<li>Serialize and deserialize the 2D tile grid through a flattened int array.</li>
+<li>Serialize and deserialize the 2D tile grid through a flattened run-length encoded string.</li>
 <li>Keep generated roads separated with spacer tiles.</li>
 <li>Add intermediate checkpoint tiles on long straight segments.</li>
 <li>Validate generated or imported maps before use.</li>
+<li>Convert validated grid layouts into drivable prefab-based track pieces.</li>
 </ul>
 <p>Threading:</p><ul>
 <li><a class="el" href="class_seed_factory.html#a27d88aeec73527d679939cf5e92e85f0" title="Returns the next integer seed and advances the internal seed state atomically.">SeedFactory.Next</a> is thread-safe.</li>
 <li><a class="el" href="class_level_generator.html" title="Procedural level generator for circuit and point-to-point tracks.">LevelGenerator</a> is CPU-only and does not instantiate Unity scene objects.</li>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> and tile arrays are mutable; the same map instance should not be modified by multiple threads.</li>
+<li>::levelMap and tile arrays are mutable; the same map instance should not be modified by multiple threads.</li>
 <li>Runtime placement and scene integration are Unity-main-thread work handled outside the generator.</li>
 </ul>
 <p>Important invariants:</p><ul>
@@ -233,7 +253,7 @@ Data Model</h1>
 <li>Serializable through ISerializable.</li>
 <li>ToString() returns a readable coordinate representation.</li>
 </ul>
-<p><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>:</p><ul>
+<p>::levelMap:</p><ul>
 <li>Name: display name of the level.</li>
 <li>Width and Height: grid size in tiles.</li>
 <li>Circuit: true for a closed circuit, false for point-to-point.</li>
@@ -244,18 +264,19 @@ Data Model</h1>
 <li>RoadTileCount: number of road tiles recorded by generation.</li>
 <li>IsDayTrack: day/night scene or variant flag.</li>
 <li>Tiles: runtime int[,] tile grid.</li>
-<li>tilesFlat: serialized backing array used because Unity does not serialize rectangular 2D arrays directly.</li>
+<li>tilesFlatRLEString: serialized backing string used because Unity does not serialize rectangular 2D arrays directly. The grid is flattened in row-major order and then compressed with run-length encoding.</li>
 </ul>
 <p>Serialization:</p><ul>
 <li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> implements ISerializable.</li>
 <li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> implements UnityEngine.ISerializationCallbackReceiver.</li>
-<li>OnBeforeSerialize flattens Tiles into tilesFlat.</li>
-<li>OnAfterDeserialize rebuilds Tiles from tilesFlat.</li>
+<li>OnBeforeSerialize flattens Tiles in row-major order and stores them as an RLE string.</li>
+<li>OnAfterDeserialize decodes the RLE string and rebuilds Tiles.</li>
 <li>GetFlatTiles() stores tiles in row-major order using flatTiles[y * Width + x].</li>
 <li>GetUnflattenedTiles(...) rebuilds an int[,] grid from row-major flat data.</li>
+<li>The serialized tile string is produced through <a class="el" href="class_import_export_manager.html#a09d133e74aacc3a38681fdf8d4a7fa38" title="Encodes a flat tile array with run-length encoding.">ImportExportManager.EncodeFlatTilesRLE</a> and decoded through <a class="el" href="class_import_export_manager.html#ab35591231708cb968e4018a120e629a3" title="Attempts to decode run-length encoded tile data into a flat integer tile array.">ImportExportManager.TryDecodeFlatTilesRLE</a>.</li>
 </ul>
 <p>Copy and equality:</p><ul>
-<li>::LevelMap::Copy creates a new map with copied metadata and copied tile data.</li>
+<li>::levelMap::Copy creates a new map with copied metadata and copied tile data.</li>
 <li>Equality compares metadata and tile contents.</li>
 </ul>
 <hr  />
@@ -265,14 +286,14 @@ Tile Model</h1>
 <li>Tiles are addressed as Tiles[x, y].</li>
 <li>X represents the column.</li>
 <li>Y represents the row.</li>
-<li>::LevelMap::CardinalDirections contains the four-neighbor offsets: right, left, up, and down.</li>
+<li>::levelMap::CardinalDirections contains the four-neighbor offsets: right, left, up, and down.</li>
 </ul>
 <p>Tile meanings:</p><ul>
-<li>::LevelMap::LevelTileTypes::Grass marks empty cells.</li>
-<li>::LevelMap::LevelTileTypes::Track marks normal road cells.</li>
-<li>::LevelMap::LevelTileTypes::CP marks checkpoint cells.</li>
-<li>::LevelMap::LevelTileTypes::Spacer marks keep-out cells used to discourage cramped roads.</li>
-<li>::LevelMap::LevelTileTypes::PlaceHolder and higher values are temporary flood-fill values.</li>
+<li>::levelMap::LevelTileTypes::Grass marks empty cells.</li>
+<li>::levelMap::LevelTileTypes::Track marks normal road cells.</li>
+<li>::levelMap::LevelTileTypes::CP marks checkpoint cells; during placement they are matched through track-piece rules rather than through a separate checkpoint-prefab override.</li>
+<li>::levelMap::LevelTileTypes::Spacer marks keep-out cells used to discourage cramped roads.</li>
+<li>::levelMap::LevelTileTypes::PlaceHolder and higher values are temporary flood-fill values.</li>
 </ul>
 <p><a class="el" href="class_array2_d_extensions.html" title="Extension helpers for rectangular 2D arrays used by level generation.">Array2DExtensions</a>:</p><ul>
 <li>At&lt;T&gt;(T[,] array, Coordinates coords): Returns a by-reference alias to array[coords.X, coords.Y].</li>
@@ -290,7 +311,7 @@ Generation Pipeline</h1>
 <li><a class="el" href="class_level_generator.html#af36f7dc329dcf47670ffdd4a97b416ca" title="Generates a level using an explicit integer seed.">LevelGenerator.GenerateLevel</a>(int width, int height, bool isCircuit, int steps, int stepLength, int maxAttempts, System.Random rng)</li>
 </ul>
 <p>Initialization:</p><ul>
-<li>Creates a new <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>.</li>
+<li>Creates a new ::levelMap.</li>
 <li>Picks a random StartPoint inside the map using internal start padding.</li>
 <li>Sets Width, Height, Circuit, Tiles, and IsDayTrack.</li>
 <li>Initializes all cells to Grass.</li>
@@ -321,7 +342,7 @@ Generation Pipeline</h1>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="level_gen_validation"></a>
 Validation</h1>
-<p><a class="el" href="class_level_map_validator.html" title="Validates the structural correctness of a generated LevelMap.">LevelMapValidator</a> validates structural correctness of a <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>.</p>
+<p><a class="el" href="class_level_map_validator.html" title="Validates the structural correctness of a generated LevelMap.">LevelMapValidator</a> validates structural correctness of a ::levelMap.</p>
 <p>A valid map must:</p><ul>
 <li>Be non-null.</li>
 <li>Have a non-null Tiles grid.</li>
@@ -338,8 +359,8 @@ Validation</h1>
 <li>Place checkpoint tiles only on straight sections.</li>
 </ul>
 <p>Track-compatible tiles:</p><ul>
-<li>::LevelMap::LevelTileTypes::Track.</li>
-<li>::LevelMap::LevelTileTypes::CP.</li>
+<li>::levelMap::LevelTileTypes::Track.</li>
+<li>::levelMap::LevelTileTypes::CP.</li>
 </ul>
 <p>Circuit rules:</p><ul>
 <li>StartPoint and FinishPoint must be the same tile.</li>
@@ -364,13 +385,13 @@ Checkpoint Stamping</h1>
 <p>Purpose:</p><ul>
 <li>Add intermediate checkpoint tiles after the basic road layout has been generated.</li>
 <li>Keep start and finish cells unchanged.</li>
-<li>Increment LevelMap::CheckpointCountPerLap for each generated checkpoint.</li>
+<li>Increment levelMap::CheckpointCountPerLap for each generated checkpoint.</li>
 </ul>
 <p>Behaviour:</p><ul>
-<li>Traversal starts from LevelMap::StartPoint.</li>
+<li>Traversal starts from levelMap::StartPoint.</li>
 <li>It follows connected Track tiles using four-neighbor movement.</li>
 <li>It avoids immediately stepping back to the previous tile.</li>
-<li>It does not step onto LevelMap::FinishPoint.</li>
+<li>It does not step onto levelMap::FinishPoint.</li>
 <li>It tracks direction changes to detect straight segments.</li>
 <li>When a straight segment is long enough, a checkpoint is placed near the middle.</li>
 </ul>
@@ -378,18 +399,51 @@ Checkpoint Stamping</h1>
 <li>This utility is intended for intermediate checkpoints.</li>
 <li>The start and finish blocks already provide their own checkpoint trigger in the placed track scene.</li>
 <li>Therefore the generator does not need to create extra checkpoint tiles on the start or finish cells.</li>
+<li>Intermediate checkpoint prefabs are selected during track placement through checkpoint-specific <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> entries, not through a separate checkpointPrefab field.</li>
 </ul>
 <p>Public entry point:</p><ul>
-<li><a class="el" href="#ga62e10e573f8e506a8faa4f94db07236f" title="Walks the road network in levelMap  and converts midpoint tiles of sufficiently long straight segment...">LevelCheckPointMaker.GenerateCheckPoints</a>(<a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> levelMap, int minStraightLengthForCheckPoint = 4)</li>
+<li><a class="el" href="#ga62e10e573f8e506a8faa4f94db07236f" title="Walks the road network in levelMap  and converts midpoint tiles of sufficiently long straight segment...">LevelCheckPointMaker.GenerateCheckPoints</a>(levelMap levelMap, int minStraightLengthForCheckPoint = 4)</li>
 </ul>
 <p>Preconditions:</p><ul>
 <li>levelMap is non-null.</li>
 <li>levelMap.Tiles is initialized.</li>
-<li>Road cells are marked as ::LevelMap::LevelTileTypes::Track.</li>
+<li>Road cells are marked as ::levelMap::LevelTileTypes::Track.</li>
 </ul>
 <p>Effects:</p><ul>
 <li>Some Track cells may become CP cells.</li>
 <li>CheckpointCountPerLap increases for each generated checkpoint.</li>
+</ul>
+<hr  />
+ <h1 class="doxsection"><a class="anchor" id="level_gen_placement"></a>
+Prefab Track Placement</h1>
+<p><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> converts a generated or loaded ::levelMap into the visible drivable track scene. It scans the 2D tile grid, extracts local square patterns around each track-compatible cell, matches those patterns against a generated legend, and instantiates the selected prefab with its configured position offset and rotation.</p>
+<p>Rule data:</p><ul>
+<li><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a> stores the prefab, placement position or offset, rotation, pattern size, and source pattern key.</li>
+<li><a class="el" href="#ga38ed0c1b5b067e658834da58a4223fbe" title="Cell value used by the visual track-piece rule editor.">TrackPatternCell</a> represents one editable cell in the visual rule editor.</li>
+<li><a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> stores the inspector-editable visual pattern and placement data.</li>
+<li><a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a> stores the generated compact string-keyed legend.</li>
+</ul>
+<p>Pattern symbols:</p><ul>
+<li><code>1</code> marks a normal track-compatible cell.</li>
+<li><code>X</code> marks an empty or ignored cell.</li>
+<li><code>C</code> marks a checkpoint, start, or finish cell when it must be matched explicitly.</li>
+</ul>
+<p>Checkpoint matching:</p><ul>
+<li>In 3x3 patterns, checkpoint, start, and finish neighbours are treated as <code>1</code>. This lets ordinary one-cell pieces be placed next to checkpoints without requiring extra checkpoint-adjacent rule variants.</li>
+<li>In 3x3 patterns, the center checkpoint, start, or finish cell is represented as <code>C</code>, so checkpoint-specific or start/finish-specific rules can be matched.</li>
+<li>In larger patterns, checkpoint, start, and finish cells are represented as <code>C</code> even when they are neighbours. This prevents larger prefabs from being placed over protected checkpoint, start, or finish cells unless a rule explicitly supports that case.</li>
+</ul>
+<p>Larger-piece overlap handling:</p><ul>
+<li>The matching pattern is one layer larger than the physical footprint. For example, a 5x5 pattern may describe a piece whose actual footprint is the inner 3x3 area.</li>
+<li><a class="el" href="struct_track_piece.html#acabd1e980f7da8aa3a610b55a2ba54a2" title="Flattened pattern key that produced this track piece.">TrackPiece.PatternKey</a> stores the source pattern used to match the piece.</li>
+<li><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> uses PatternKey to remove only cells that belong to the piece's actual inner footprint, rather than removing the whole surrounding square.</li>
+<li>This prevents large bend pieces from hiding unrelated road tiles that were only part of the surrounding matching context.</li>
+</ul>
+<p>Generated legend workflow:</p><ul>
+<li>The editable <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> list is the source of truth.</li>
+<li>RaceTrackPlacer.OnValidate() rebuilds the serialized read-only <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a> so developers can inspect the resulting pattern strings in the Inspector.</li>
+<li>RaceTrackPlacer.Start() rebuilds the legend again before placement as a safety step.</li>
+<li>Larger pattern sizes are tried before smaller fallback patterns.</li>
 </ul>
 <hr  />
  <h1 class="doxsection"><a class="anchor" id="level_gen_api"></a>
@@ -407,27 +461,40 @@ Public API Reference</h1>
 <li>bool Equals(Coordinates other) Checks value equality.</li>
 <li>void GetObjectData(SerializationInfo info, StreamingContext context) Writes coordinate serialization data.</li>
 </ul>
-<p><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>:</p><ul>
-<li>LevelMap() Creates a default empty map.</li>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap(SerializationInfo info, StreamingContext context)</a> Reconstructs a map from serialized data.</li>
+<p>::levelMap:</p><ul>
+<li>levelMap() Creates a default empty map.</li>
+<li>levelMap(SerializationInfo info, StreamingContext context) Reconstructs a map from serialized data.</li>
 <li>void GetObjectData(SerializationInfo info, StreamingContext context) Writes serialized map data.</li>
 <li>int[] GetFlatTiles() Returns a row-major flattened copy of Tiles.</li>
 <li>static int[,] GetUnflattenedTiles(int[] flatTiles, int height, int width) Rebuilds a rectangular tile grid from flattened row-major data.</li>
-<li>void OnBeforeSerialize() Updates the flattened serialized tile array.</li>
-<li>void OnAfterDeserialize() Rebuilds the runtime tile grid.</li>
-<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> Copy() Returns a copied level map.</li>
+<li>void OnBeforeSerialize() Updates the serialized RLE tile string from the runtime tile grid.</li>
+<li>void OnAfterDeserialize() Decodes the serialized RLE tile string and rebuilds the runtime tile grid.</li>
+<li>levelMap Copy() Returns a copied level map.</li>
 <li>string ToString() Returns a multiline representation of the tile grid.</li>
 </ul>
+<p><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a>:</p><ul>
+<li><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a>(GameObject prefab, Vector3 position, Quaternion rotation, int size = 3, string patternKey = "") Stores prefab, placement offset or position, rotation, pattern size, and the source pattern key used for larger-piece footprint checks.</li>
+</ul>
+<p><a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a>:</p><ul>
+<li><a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a>(string name, string patternKey, GameObject prefab, Vector3 positionOffset, Vector3 rotationEuler, int size = 3) Creates an editable visual rule from a compact pattern string.</li>
+<li>string ToPatternKey() Converts the visual rule pattern into the generated string-keyed legend format.</li>
+<li><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a> ToTrackPiece() Converts the rule into a runtime placement descriptor.</li>
+<li>void NormalizePatternLength() Ensures odd square pattern sizes and matching array lengths.</li>
+</ul>
+<p><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a>:</p><ul>
+<li>OnValidate() Rebuilds the generated read-only pattern legend in the editor.</li>
+<li>Start() Loads the current map, refreshes the generated legend, collects pattern sizes, and places the track.</li>
+</ul>
 <p><a class="el" href="class_level_generator.html" title="Procedural level generator for circuit and point-to-point tracks.">LevelGenerator</a>:</p><ul>
-<li>static <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> GenerateLevel(int width, int height, bool isCircuit,
+<li>static levelMap GenerateLevel(int width, int height, bool isCircuit,
                                 int steps, int stepLength, int maxAttempts, int seed) Generates a level from an explicit seed.</li>
-<li>static <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLength, int maxAttempts, System.Random rng) Generates a level using a provided random source.</li>
+<li>static levelMap GenerateLevel(int width, int height, bool isCircuit, int steps, int stepLength, int maxAttempts, System.Random rng) Generates a level using a provided random source.</li>
 </ul>
 <p><a class="el" href="class_level_check_point_maker.html" title="Utility that scans a generated LevelMap road and places checkpoint tiles on long straight segments.">LevelCheckPointMaker</a>:</p><ul>
-<li>static void GenerateCheckPoints(<a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> levelMap, int minStraightLengthForCheckPoint = 4) Adds intermediate checkpoint tiles to long straight road segments.</li>
+<li>static void GenerateCheckPoints(levelMap levelMap, int minStraightLengthForCheckPoint = 4) Adds intermediate checkpoint tiles to long straight road segments.</li>
 </ul>
 <p><a class="el" href="class_level_map_validator.html" title="Validates the structural correctness of a generated LevelMap.">LevelMapValidator</a>:</p><ul>
-<li>static bool Validate(LevelMap lvl) Returns true when the map satisfies dimension, endpoint, connectivity, neighbor-count, and checkpoint rules.</li>
+<li>static bool Validate(levelMap lvl) Returns true when the map satisfies dimension, endpoint, connectivity, neighbor-count, and checkpoint rules.</li>
 </ul>
 <p><a class="el" href="class_array2_d_extensions.html" title="Extension helpers for rectangular 2D arrays used by level generation.">Array2DExtensions</a>:</p><ul>
 <li>static ref T At&lt;T&gt;(this T[,] array, Coordinates coords) Returns a by-reference element at the given coordinate.</li>
@@ -439,8 +506,11 @@ Public API Reference</h1>
  <h1 class="doxsection"><a class="anchor" id="level_gen_integration"></a>
 Integration Notes</h1>
 <p>Track placement:</p><ul>
-<li><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> consumes a <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> and instantiates visible track-piece prefabs.</li>
-<li>CP tiles are converted into checkpoint prefabs with <a class="el" href="class_check_point_listener.html" title="Trigger-based checkpoint sensor that records the player&#39;s pose and velocities when entered.">CheckPointListener</a> components.</li>
+<li><a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> consumes a ::levelMap and instantiates visible track-piece prefabs.</li>
+<li>Track, checkpoint, start, and finish cells are matched through <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> entries and the generated <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a> legend.</li>
+<li>During pattern extraction, CP/start/finish cells become <code>C</code> for the center tile. In 3x3 patterns, neighbouring CP/start/finish cells are treated as normal track <code>1</code>. In larger patterns, neighbouring CP/start/finish cells remain <code>C</code> so larger pieces cannot silently cover protected checkpoint, start, or finish tiles.</li>
+<li>Checkpoint-specific prefabs are therefore selected by rules with a center <code>C</code>, instead of by a separate checkpointPrefab override.</li>
+<li>Larger-piece overlap removal uses <a class="el" href="struct_track_piece.html#acabd1e980f7da8aa3a610b55a2ba54a2" title="Flattened pattern key that produced this track piece.">TrackPiece.PatternKey</a> to remove only cells that belong to the piece's actual inner footprint, rather than removing the whole surrounding square.</li>
 <li>The placed start/finish object is used as the car spawn reference.</li>
 </ul>
 <p>Race flow:</p><ul>
@@ -448,15 +518,15 @@ Integration Notes</h1>
 <li><a class="el" href="class_track_manager.html" title="Manages race flow for a track with sequential checkpoints.">TrackManager</a> starts the race, activates checkpoints, tracks laps/checkpoints, and handles respawn.</li>
 </ul>
 <p>Game data:</p><ul>
-<li><a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a> stores custom <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> instances inside saved game data.</li>
+<li><a class="el" href="class_game_data_manager.html" title="Runtime manager for persistent game progression data.">GameDataManager</a> stores custom ::levelMap instances inside saved game data.</li>
 <li>Edited or imported maps should be validated before being stored.</li>
 </ul>
 <p>Import/export:</p><ul>
-<li><a class="el" href="class_import_export_manager.html" title="Utility for encoding, decoding, importing, and exporting LevelMap data.">ImportExportManager</a> can encode and decode <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> data for sharing.</li>
+<li><a class="el" href="class_import_export_manager.html" title="Utility for encoding, decoding, importing, and exporting LevelMap data.">ImportExportManager</a> can encode and decode ::levelMap data for sharing.</li>
 <li>Decoded maps should pass <a class="el" href="class_level_map_validator.html#a5aecd8063cf0f048615a4bfd79782451" title="Validates a level map.">LevelMapValidator.Validate</a> before being accepted.</li>
 </ul>
 <p>UI:</p><ul>
-<li>Level editor UI can modify a copied <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>.</li>
+<li>Level editor UI can modify a copied ::levelMap.</li>
 <li>Level preview UI can render Tiles directly or through generated preview textures.</li>
 </ul>
 <hr  />
@@ -467,11 +537,14 @@ Performance and GC</h1>
 <li>Worst-case generation work is proportional to Width * Height per attempted path search.</li>
 <li>Validation is also linear in the number of tiles.</li>
 <li>Checkpoint stamping is linear in the traversed road length.</li>
+<li><a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> serialization flattens the tile grid and applies RLE in linear time over Width * Height tiles.</li>
 </ul>
 <p>Allocation notes:</p><ul>
 <li>Generation creates lists for modified flood-fill positions.</li>
-<li>LevelMap::Copy duplicates the tile grid.</li>
+<li>levelMap::Copy duplicates the tile grid.</li>
 <li>GetFlatTiles allocates a new one-dimensional array.</li>
+<li>RLE serialization allocates the encoded tile string used for stored <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a> tile data.</li>
+<li>RLE reduces save-data size when maps contain long repeated runs of grass, road, spacer, or checkpoint values.</li>
 <li>Debug Print output allocates strings and should not be used in performance-sensitive paths.</li>
 </ul>
 <p>Tuning:</p><ul>
@@ -503,6 +576,7 @@ Troubleshooting</h1>
 <li>Lower minStraightLengthForCheckPoint.</li>
 <li>Ensure the generated road contains long enough straight segments.</li>
 <li>Remember that start and finish checkpoint triggers are provided by placed start/finish prefabs.</li>
+<li>Ensure checkpoint-specific <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> entries exist for the required center-<code>C</code> patterns.</li>
 </ul>
 <p>Checkpoint validation fails:</p><ul>
 <li>Checkpoint tiles must sit on straight sections.</li>
@@ -523,13 +597,51 @@ Troubleshooting</h1>
  <h1 class="doxsection"><a class="anchor" id="level_gen_versions"></a>
 Version History</h1>
 <ul>
+<li>v1.6: Added PatternKey-based footprint documentation for larger prefab overlap handling.</li>
+<li>v1.5: Added rule-based prefab placement documentation, generated legend workflow, and checkpoint-aware pattern matching.</li>
 <li>v1.4: Added <a class="el" href="class_level_map_validator.html" title="Validates the structural correctness of a generated LevelMap.">LevelMapValidator</a> documentation and clarified endpoint, neighbor-count, and checkpoint rules.</li>
 <li>v1.3: Added IsDayTrack, checkpoint count, road count, copy/equality, and flattened serialization details.</li>
 <li>v1.2: Added straight-segment checkpoint stamping for intermediate checkpoints.</li>
 <li>v1.1: Added circuit finishing and road spacer refinement.</li>
-<li>v1.0: Initial flood-fill/backtrack generator with serializable <a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>. </li>
+<li>v1.0: Initial flood-fill/backtrack generator with serializable levelMap. </li>
 </ul>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
+<a id="ga38ed0c1b5b067e658834da58a4223fbe" name="ga38ed0c1b5b067e658834da58a4223fbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga38ed0c1b5b067e658834da58a4223fbe">&#9670;&#160;</a></span>TrackPatternCell</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#ga38ed0c1b5b067e658834da58a4223fbe">TrackPatternCell</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cell value used by the visual track-piece rule editor. </p>
+<p>Represents one cell in a square pattern used to generate a compact pattern key.</p>
+<p>These values are converted into the same pattern symbols used by RaceTrackPlacer:</p><ul>
+<li>Empty becomes <code>X</code>.</li>
+<li>Track becomes <code>1</code>.</li>
+<li>Checkpoint becomes <code>C</code> for checkpoint/start/finish cells that should be matched explicitly. </li>
+</ul>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga38ed0c1b5b067e658834da58a4223fbeace2c8aed9c2fa0cfbed56cbda4d8bf07" name="gga38ed0c1b5b067e658834da58a4223fbeace2c8aed9c2fa0cfbed56cbda4d8bf07"></a>Empty&#160;</td><td class="fielddoc"><p>Empty or non-track cell. </p>
+<p>Converted to <code>X</code>. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga38ed0c1b5b067e658834da58a4223fbea92ea731d3af6677905303c88689f5d55" name="gga38ed0c1b5b067e658834da58a4223fbea92ea731d3af6677905303c88689f5d55"></a>Track&#160;</td><td class="fielddoc"><p>Track-compatible cell. </p>
+<p>Converted to <code>1</code>. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga38ed0c1b5b067e658834da58a4223fbeaef41311079c448d0beb06ec07db0bf8c" name="gga38ed0c1b5b067e658834da58a4223fbeaef41311079c448d0beb06ec07db0bf8c"></a>Checkpoint&#160;</td><td class="fielddoc"><p>Checkpoint, start, or finish cell that should be matched explicitly. </p>
+<p>Converted to <code>C</code>. </p>
+</td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00097">97</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="ga62e10e573f8e506a8faa4f94db07236f" name="ga62e10e573f8e506a8faa4f94db07236f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga62e10e573f8e506a8faa4f94db07236f">&#9670;&#160;</a></span>GenerateCheckPoints()</h2>
 
@@ -568,7 +680,7 @@ Version History</h1>
 <p>Preconditions:</p><ul>
 <li><em>levelMap</em>  is non-null.</li>
 <li><code>levelMap.Tiles</code> is a valid 2D grid.</li>
-<li>Road cells are marked with LevelMap.LevelTileTypes.Track.</li>
+<li>Road cells are marked with LevelMap.LevelTileTypes.Track and checkpoint cells with LevelMap.LevelTileTypes.CP.</li>
 </ul>
 <p>Effects:</p><ul>
 <li>Some road cells may be converted to checkpoint cells with LevelMap.LevelTileTypes.CP.</li>

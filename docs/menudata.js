@@ -122,4 +122,7 @@ var menudata={children:[
 {text:"v",url:"functions_prop.html#index_v"}]},
 {text:"Events",url:"functions_evnt.html"}]}]},
 {text:"Files",url:"files.html",children:[
-{text:"File List",url:"files.html"}]}]}
+{text:"File List",url:"files.html"},
+{text:"File Members",url:"globals.html",children:[
+{text:"All",url:"globals.html"},
+{text:"Enumerations",url:"globals_enum.html"}]}]}]}

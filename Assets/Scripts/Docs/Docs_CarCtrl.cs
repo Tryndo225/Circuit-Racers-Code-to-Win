@@ -4,7 +4,7 @@
  *
  * @defgroup car_ctrl Vehicle Control
  * @ingroup systems
- * @brief Modular four-wheel car stack: input, drivetrain, transmission, audio, lights, VFX, collision SFX, and camera follow.
+ * @brief Modular vehicle-control stack supporting configurable wheel counts, input, drivetrain, transmission, audio, lights, VFX, collision SFX, and camera follow.
  *
  * @details
  * The Vehicle Control subsystem is composed of small, focused MonoBehaviours:

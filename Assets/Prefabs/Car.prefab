@@ -281,7 +281,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c5d9f19e780c084cb10538f9394847b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  smokePrefab: {fileID: 1457396519881852359, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
@@ -717,7 +717,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c5d9f19e780c084cb10538f9394847b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  smokePrefab: {fileID: 1457396519881852359, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
@@ -1389,7 +1389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c5d9f19e780c084cb10538f9394847b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  smokePrefab: {fileID: 1457396519881852359, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}
@@ -1892,16 +1892,16 @@ MonoBehaviour:
   handbrakeTorque: 9000
   redlineFadeStart: 0.9
   forwardGears:
-  - 3
-  - 2.5
-  - 1.5
-  - 1
-  - 0.75
+  - 3.2
+  - 2.25
+  - 1.7
+  - 1.4
+  - 1.25
   finalDrive: 3.5
   idleRPM: 900
   redlineRPM: 8000
   shiftUpRPM: 7000
-  shiftDownRPM: 1200
+  shiftDownRPM: 2000
   shiftDuration: 0.2
   shiftSlipThreshold: 0.5
   antiRollToggle: 0
@@ -2177,16 +2177,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardGears:
-  - 3
-  - 2.5
-  - 1.5
-  - 1
-  - 0.75
+  - 3.2
+  - 2.25
+  - 1.7
+  - 1.4
+  - 1.25
   finalDrive: 3.5
   idleRPM: 900
   redlineRPM: 8000
   shiftUpRPM: 7000
-  shiftDownRPM: 1200
+  shiftDownRPM: 2000
   shiftDuration: 0.2
   slipThreshold: 0.5
 --- !u!114 &4071285767021976057
@@ -2543,7 +2543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c5d9f19e780c084cb10538f9394847b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smokePrefab: {fileID: 4121091811527957601, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
+  smokePrefab: {fileID: 1457396519881852359, guid: ddf4ea2625767fd4bb4153e7e4009ad5, type: 3}
   skidTrailPrefab: {fileID: 898613622893200497, guid: 6fd2fade2d303a34f8783e1bdd06d5a8, type: 3}
   skidAudioClip: {fileID: 8300000, guid: b566acb800f931e43b2aad38695cc3d7, type: 3}
   skidAudioMixerGroup: {fileID: 626203679155648146, guid: 061197b0a4ac0cd46814cefa120716f0, type: 2}

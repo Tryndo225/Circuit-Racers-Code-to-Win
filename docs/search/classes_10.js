@@ -21,7 +21,9 @@ var searchData=
   ['tmpro_5finstructionoverlay_18',['TMPro_InstructionOverlay',['../class_t_m_pro_1_1_examples_1_1_t_m_pro___instruction_overlay.html',1,'TMPro::Examples']]],
   ['trackmanager_19',['TrackManager',['../class_track_manager.html',1,'']]],
   ['trackpiece_20',['TrackPiece',['../struct_track_piece.html',1,'']]],
-  ['trackraceoverlaysource_21',['TrackRaceOverlaySource',['../class_track_race_overlay_source.html',1,'']]],
-  ['transmissioncontroller_22',['TransmissionController',['../class_transmission_controller.html',1,'']]],
-  ['tyreeffects_23',['TyreEffects',['../class_tyre_effects.html',1,'']]]
+  ['trackpiecerule_21',['TrackPieceRule',['../class_track_piece_rule.html',1,'']]],
+  ['trackpieceruledrawer_22',['TrackPieceRuleDrawer',['../class_track_piece_rule_drawer.html',1,'']]],
+  ['trackraceoverlaysource_23',['TrackRaceOverlaySource',['../class_track_race_overlay_source.html',1,'']]],
+  ['transmissioncontroller_24',['TransmissionController',['../class_transmission_controller.html',1,'']]],
+  ['tyreeffects_25',['TyreEffects',['../class_tyre_effects.html',1,'']]]
 ];

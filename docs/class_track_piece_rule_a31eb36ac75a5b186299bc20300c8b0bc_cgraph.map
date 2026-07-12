@@ -1,0 +1,5 @@
+<map id="TrackPieceRule.ToPatternKey" name="TrackPieceRule.ToPatternKey">
+<area shape="rect" id="Node000001" title="Converts the visual pattern into a compact flattened string key." alt="" coords="5,13,203,40"/>
+<area shape="rect" id="Node000002" href="$class_track_piece_rule.html#ab97029e1cd748ac8bb3da384625b6b26" title="Ensures that the pattern size is valid and that the pattern array has the correct length." alt="" coords="251,5,428,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,24,238,26,232,27,203,29"/>
+</map>

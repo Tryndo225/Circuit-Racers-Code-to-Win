@@ -17,7 +17,7 @@ var searchData=
   ['showtracktime_14',['ShowTrackTime',['../struct_race_overlay_state.html#a1bb6d4690f4efd100a7dd4bb7739a139',1,'RaceOverlayState']]],
   ['showwords_15',['ShowWords',['../class_t_m_pro_1_1_examples_1_1_t_m_p___text_info_debug_tool.html#acbe5aae60599c2d82b692ecfd550ce36',1,'TMPro::Examples::TMP_TextInfoDebugTool']]],
   ['sidewaysgriplockedmultiplier_16',['sidewaysGripLockedMultiplier',['../class_drive_train_controller.html#a186c3e20811e04b55ae2cdc27b9b5893',1,'DriveTrainController']]],
-  ['size_17',['Size',['../struct_track_piece.html#a24cc4183e4c7922e1467271edfc1a418',1,'TrackPiece']]],
+  ['size_17',['Size',['../struct_track_piece.html#a24cc4183e4c7922e1467271edfc1a418',1,'TrackPiece.Size'],['../class_track_piece_rule.html#a67c06bc2e964e41168f7da0a6e4084b4',1,'TrackPieceRule.Size']]],
   ['size_18',['size',['../class_generate_level_button.html#ab125aa286e1680767852f730aefcc002',1,'GenerateLevelButton']]],
   ['slipthreshold_19',['slipThreshold',['../class_transmission_controller.html#aa9d47ea0614a722fe234f827ebc93d7a',1,'TransmissionController']]],
   ['snapshots_20',['Snapshots',['../class_replay.html#a6fb9b885149183e67964bfe92421a156',1,'Replay']]],

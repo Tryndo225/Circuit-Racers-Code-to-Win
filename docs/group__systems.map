@@ -1,6 +1,6 @@
 <map id="Systems" name="Systems">
 <area shape="rect" id="Node000002" href="$group__audio__mgr.html" title="Centralized background music and sound&#45;effect playback with pooling, clip reuse for loops,..." alt="" coords="141,5,250,32"/>
-<area shape="rect" id="Node000003" href="$group__car__ctrl.html" title="Modular four&#45;wheel car stack: input, drivetrain, transmission, audio, lights, VFX,..." alt="" coords="141,56,250,83"/>
+<area shape="rect" id="Node000003" href="$group__car__ctrl.html" title="Modular vehicle&#45;control stack supporting configurable wheel counts, input, drivetrain,..." alt="" coords="141,56,250,83"/>
 <area shape="rect" id="Node000004" href="$group__core__utils.html" title="Small shared helpers for commands, layer masks, content hashing, singletons, and serializable diction..." alt="" coords="147,107,244,133"/>
 <area shape="rect" id="Node000005" href="$group__game__data.html" title="Persistent progression data, selected level state, best times, checkpoint splits, replays,..." alt="" coords="151,157,240,184"/>
 <area shape="rect" id="Node000006" href="$group__level__gen.html" title="Procedural creation, representation, validation, and placement support for grid&#45;based race tracks." alt="" coords="136,208,255,235"/>

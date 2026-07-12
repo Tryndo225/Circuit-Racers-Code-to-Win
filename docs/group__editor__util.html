@@ -137,7 +137,7 @@ Classes</h2></td></tr>
 <tr class="memitem:ShowIfDrawer" id="r_ShowIfDrawer"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_show_if_drawer.html">ShowIfDrawer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inspector drawer for ShowIfAttribute.  <a href="class_show_if_drawer.html#details">More...</a><br /></td></tr>
 <tr class="memitem:StringTrackPieceDictionaryDrawer" id="r_StringTrackPieceDictionaryDrawer"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_string_track_piece_dictionary_drawer.html">StringTrackPieceDictionaryDrawer</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable, foldout-friendly key/value list (string -&gt; <code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, and pattern size.">TrackPiece</a></code>).  <a href="class_string_track_piece_dictionary_drawer.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable, foldout-friendly key/value list (string -&gt; <code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a></code>).  <a href="class_string_track_piece_dictionary_drawer.html#details">More...</a><br /></td></tr>
 <tr class="memitem:WheelSpecDrawer" id="r_WheelSpecDrawer"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_wheel_spec_drawer.html">WheelSpecDrawer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compact 1-row drawer for WheelSpec showing collider, visual, powered, and steering columns.  <a href="class_wheel_spec_drawer.html#details">More...</a><br /></td></tr>
 </table>
@@ -162,7 +162,8 @@ Overview</h1>
 <li>Show or hide Inspector fields based on boolean conditions through <a class="el" href="class_show_if_drawer.html" title="Inspector drawer for ShowIfAttribute.">ShowIfDrawer</a>.</li>
 <li>Render selected fields as disabled/read-only through <a class="el" href="class_read_only_drawer.html" title="Inspector drawer that renders fields marked with ReadOnlyAttribute as disabled.">ReadOnlyDrawer</a>.</li>
 <li>Provide a type-selection UI for managed-reference polymorphic fields through <a class="el" href="class_button_type_drawer.html" title="Custom property drawer for polymorphic ButtonType managed references.">ButtonTypeDrawer</a>.</li>
-<li>Edit <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a> data with a reorderable key/value list.</li>
+<li>Edit visual <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> entries with a Rule-Tile-like pattern grid.</li>
+<li>Display generated <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a> data for inspection through a reorderable key/value list.</li>
 </ul>
 <p>Scope:</p><ul>
 <li>Editor-only quality-of-life.</li>
@@ -173,7 +174,7 @@ Overview</h1>
 <li>UnityEditor.</li>
 <li>UnityEditorInternal.ReorderableList for the track-piece dictionary drawer.</li>
 <li>UnityEditor.TypeCache for discovering concrete <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a> subclasses.</li>
-<li>Runtime data types such as <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a>, <a class="el" href="struct_wheel_spec.html" title="Serializable wheel specification used by VehicleController.">WheelSpec</a>, <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a>, <a class="el" href="class_read_only_attribute.html" title="Inspector-only attribute that marks a field as read-only in the Unity Editor.">ReadOnlyAttribute</a>, and <a class="el" href="class_show_if_attribute.html" title="Conditional display attribute for Inspector fields.">ShowIfAttribute</a>.</li>
+<li>Runtime data types such as <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a>, <a class="el" href="struct_wheel_spec.html" title="Serializable wheel specification used by VehicleController.">WheelSpec</a>, <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a>, <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a>, <a class="el" href="class_read_only_attribute.html" title="Inspector-only attribute that marks a field as read-only in the Unity Editor.">ReadOnlyAttribute</a>, and <a class="el" href="class_show_if_attribute.html" title="Conditional display attribute for Inspector fields.">ShowIfAttribute</a>.</li>
 </ul>
 <p>Threading:</p><ul>
 <li>Unity Editor thread only.</li>
@@ -186,7 +187,8 @@ Contained Assets</h1>
 <li><a class="el" href="class_button_type_drawer.html" title="Custom property drawer for polymorphic ButtonType managed references.">ButtonTypeDrawer</a> Custom drawer for managed-reference fields whose base type is <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a>. It shows a Type popup, discovers concrete subclasses with TypeCache, creates selected instances through reflection, and draws the selected strategy object's serialized fields inline.</li>
 <li><a class="el" href="class_read_only_drawer.html" title="Inspector drawer that renders fields marked with ReadOnlyAttribute as disabled.">ReadOnlyDrawer</a> Drawer for fields marked with <a class="el" href="class_read_only_attribute.html" title="Inspector-only attribute that marks a field as read-only in the Unity Editor.">ReadOnlyAttribute</a>. It preserves Unity's normal property drawing, including child fields, but wraps the GUI in a disabled scope so the value cannot be edited.</li>
 <li><a class="el" href="class_show_if_drawer.html" title="Inspector drawer for ShowIfAttribute.">ShowIfDrawer</a> Drawer for fields marked with <a class="el" href="class_show_if_attribute.html" title="Conditional display attribute for Inspector fields.">ShowIfAttribute</a>. It looks up a boolean condition field and only draws the decorated property when the condition matches the required state.</li>
-<li><a class="el" href="class_string_track_piece_dictionary_drawer.html" title="Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable,...">StringTrackPieceDictionaryDrawer</a> ReorderableList-based drawer for <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a>, which stores string keys mapped to <a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, and pattern size.">TrackPiece</a> values. It keeps the hidden serialized key and value arrays synchronized.</li>
+<li><a class="el" href="class_track_piece_rule_drawer.html" title="Custom property drawer for editing TrackPieceRule entries in the Unity Inspector.">TrackPieceRuleDrawer</a> Rule-Tile-like drawer for <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a>. It draws regular rule fields on the left and a clickable square pattern grid on the right, allowing track-piece patterns to be edited visually.</li>
+<li><a class="el" href="class_string_track_piece_dictionary_drawer.html" title="Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable,...">StringTrackPieceDictionaryDrawer</a> ReorderableList-based drawer for <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a>, which stores string keys mapped to <a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a> values. It keeps the hidden serialized key and value arrays synchronized. In the track-placement workflow this dictionary is normally generated from <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> entries and shown read-only for inspection.</li>
 <li><a class="el" href="class_wheel_spec_drawer.html" title="Compact 1-row drawer for WheelSpec showing collider, visual, powered, and steering columns.">WheelSpecDrawer</a> Compact one-row drawer for <a class="el" href="struct_wheel_spec.html" title="Serializable wheel specification used by VehicleController.">WheelSpec</a>. It displays the fields in four equal columns: collider, visual, powered, and steering.</li>
 </ul>
 <hr  />
@@ -214,14 +216,24 @@ Drawer Behaviors</h1>
 <li>If the condition is valid, the property is shown only when its value equals <a class="el" href="class_show_if_attribute.html#a42b9cd3a47204648070afcf0ac20debc" title="Required state of Field for the decorated property to be shown.">ShowIfAttribute.RequiredState</a>.</li>
 <li>Hidden fields return height 0, so no empty spacing remains in the Inspector.</li>
 </ul>
+<p><a class="el" href="class_track_piece_rule_drawer.html" title="Custom property drawer for editing TrackPieceRule entries in the Unity Inspector.">TrackPieceRuleDrawer</a>:</p><ul>
+<li>Targets <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a>.</li>
+<li>Shows a foldout header using the rule name when available.</li>
+<li>Draws name, prefab, position offset, rotation, and pattern size fields on the left.</li>
+<li>Draws a clickable square pattern grid on the right.</li>
+<li>Cycles each grid cell through empty, track, and checkpoint states.</li>
+<li>Automatically resizes the flattened pattern array when the selected pattern size changes.</li>
+<li>Supports 3x3 and larger odd-sized patterns such as 5x5.</li>
+</ul>
 <p><a class="el" href="class_string_track_piece_dictionary_drawer.html" title="Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable,...">StringTrackPieceDictionaryDrawer</a>:</p><ul>
 <li>Targets <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a>.</li>
 <li>Uses ReorderableList for add, remove, reorder, header drawing, element drawing, and element height.</li>
 <li>Reads the hidden serialized backing arrays named keys and values.</li>
 <li>Keeps keys and values synchronized by size and order.</li>
 <li>Shows an error help box if the expected backing arrays cannot be found.</li>
-<li>Draws each entry as a foldout with an editable key and the serialized <a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, and pattern size.">TrackPiece</a> value.</li>
+<li>Draws each entry as a foldout with a key and the serialized <a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a> value.</li>
 <li>Prevents duplicate keys at edit time.</li>
+<li>Can be combined with <a class="el" href="class_read_only_attribute.html" title="Inspector-only attribute that marks a field as read-only in the Unity Editor.">ReadOnlyAttribute</a> when the dictionary is generated from visual rules and should be inspected rather than edited directly.</li>
 </ul>
 <p><a class="el" href="class_wheel_spec_drawer.html" title="Compact 1-row drawer for WheelSpec showing collider, visual, powered, and steering columns.">WheelSpecDrawer</a>:</p><ul>
 <li>Targets <a class="el" href="struct_wheel_spec.html" title="Serializable wheel specification used by VehicleController.">WheelSpec</a>.</li>
@@ -266,11 +278,14 @@ Usage Examples</h1>
 <div class="line">    [SerializeReference] <span class="keyword">private</span> <a class="code hl_class" href="class_button_type.html">ButtonType</a> onClick;</div>
 <div class="line">}</div>
 <div class="ttc" id="aclass_button_type_html"><div class="ttname"><a href="class_button_type.html">ButtonType</a></div><div class="ttdoc">Abstract base class for serialized UI button actions.</div><div class="ttdef"><b>Definition</b> <a href="_button_script_8cs_source.html#l00088">ButtonScript.cs:89</a></div></div>
-</div><!-- fragment --><p>String-to-track-piece dictionary: </p><div class="fragment"><div class="line"><span class="keyword">public</span> <span class="keyword">class </span>TrackLegend : MonoBehaviour</div>
+</div><!-- fragment --><p>Visual track-piece rule with generated legend: </p><div class="fragment"><div class="line"><span class="keyword">public</span> <span class="keyword">class </span>TrackLegend : MonoBehaviour</div>
 <div class="line">{</div>
-<div class="line">    [SerializeField] <span class="keyword">private</span> <a class="code hl_class" href="class_string_track_piece_dictionary.html">StringTrackPieceDictionary</a> legend;</div>
+<div class="line">    [SerializeField] <span class="keyword">private</span> List&lt;TrackPieceRule&gt; rules;</div>
+<div class="line"> </div>
+<div class="line">    [SerializeField, ReadOnly]</div>
+<div class="line">    <span class="keyword">private</span> <a class="code hl_class" href="class_string_track_piece_dictionary.html">StringTrackPieceDictionary</a> generatedLegend;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclass_string_track_piece_dictionary_html"><div class="ttname"><a href="class_string_track_piece_dictionary.html">StringTrackPieceDictionary</a></div><div class="ttdoc">Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.</div><div class="ttdef"><b>Definition</b> <a href="_race_track_placer_8cs_source.html#l00068">RaceTrackPlacer.cs:69</a></div></div>
+<div class="ttc" id="aclass_string_track_piece_dictionary_html"><div class="ttname"><a href="class_string_track_piece_dictionary.html">StringTrackPieceDictionary</a></div><div class="ttdoc">Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.</div><div class="ttdef"><b>Definition</b> <a href="_race_track_placer_8cs_source.html#l00294">RaceTrackPlacer.cs:295</a></div></div>
 </div><!-- fragment --><p>Compact wheel setup: </p><div class="fragment"><div class="line"><span class="keyword">public</span> <span class="keyword">class </span>AxleSetup : MonoBehaviour</div>
 <div class="line">{</div>
 <div class="line">    [Tooltip(<span class="stringliteral">&quot;Collider | Visual | Powered | Steering&quot;</span>)]</div>
@@ -291,9 +306,15 @@ Integration Notes</h1>
 <li>Concrete <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a> subclasses must be non-abstract and non-generic to appear in the popup.</li>
 <li>If assembly definitions are used, the editor assembly containing the drawer must be able to reference the runtime assembly containing <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a> and its subclasses.</li>
 </ul>
+<p>Track-piece rule editing:</p><ul>
+<li><a class="el" href="class_track_piece_rule_drawer.html" title="Custom property drawer for editing TrackPieceRule entries in the Unity Inspector.">TrackPieceRuleDrawer</a> depends on the field names Name, Prefab, PositionOffset, RotationEuler, Size, and Pattern.</li>
+<li>Renaming these fields requires updating the drawer.</li>
+<li>The drawer only changes the Inspector presentation. Runtime pattern matching still uses the generated string-keyed legend.</li>
+</ul>
 <p>Serializable dictionaries:</p><ul>
 <li><a class="el" href="class_string_track_piece_dictionary_drawer.html" title="Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable,...">StringTrackPieceDictionaryDrawer</a> expects the backing field names from ::SerializableDictionary: keys and values.</li>
 <li>Renaming those backing fields requires updating the drawer.</li>
+<li>In <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a>, the dictionary is generated from visual <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> entries and can be shown with <a class="el" href="class_read_only_attribute.html" title="Inspector-only attribute that marks a field as read-only in the Unity Editor.">ReadOnlyAttribute</a> so developers can verify compact pattern strings.</li>
 </ul>
 <p>Vehicle setup:</p><ul>
 <li><a class="el" href="class_wheel_spec_drawer.html" title="Compact 1-row drawer for WheelSpec showing collider, visual, powered, and steering columns.">WheelSpecDrawer</a> assumes the field names collider, visual, powered, and steering.</li>
@@ -332,13 +353,24 @@ Troubleshooting</h1>
 <li>Changing to a different concrete type creates a fresh instance.</li>
 <li>This is expected because different strategies have different serialized fields.</li>
 </ul>
+<p>Track-piece rule grid does not draw correctly:</p><ul>
+<li>Confirm the field type is exactly <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> or a list/array of that type.</li>
+<li>Confirm the drawer script is compiled as editor-only code.</li>
+<li>Confirm the Pattern array exists and that Size is an odd value of at least 3.</li>
+</ul>
+<p>Generated pattern legend is empty:</p><ul>
+<li>Confirm RaceTrackPlacer.OnValidate() is rebuilding the dictionary from the visual rule list.</li>
+<li>Check that the rule list is not empty and that each rule has a valid pattern size.</li>
+<li>Reopen or reselect the object if Unity has not refreshed serialized generated values yet.</li>
+</ul>
 <p>Dictionary drawer shows backing-field error:</p><ul>
 <li>Confirm ::SerializableDictionary still uses serialized fields named keys and values.</li>
 <li>Confirm the field type is exactly <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a>.</li>
 </ul>
 <p>Duplicate dictionary keys:</p><ul>
 <li>Use unique pattern keys.</li>
-<li>The drawer prevents duplicate keys in the editor, but existing serialized duplicates may still need manual cleanup.</li>
+<li>When the dictionary is generated from <a class="el" href="class_track_piece_rule.html" title="Inspector-editable rule used to generate one entry in the track-piece legend.">TrackPieceRule</a> entries, duplicate visual patterns will overwrite earlier generated entries during rebuild.</li>
+<li>Check the generated legend to verify that each intended pattern appears only once.</li>
 </ul>
 <p><a class="el" href="struct_wheel_spec.html" title="Serializable wheel specification used by VehicleController.">WheelSpec</a> columns are unclear:</p><ul>
 <li>Add a tooltip or header on the parent wheel array, for example: "Collider | Visual | Powered | Steering".</li>
@@ -347,6 +379,7 @@ Troubleshooting</h1>
  <h1 class="doxsection"><a class="anchor" id="editor_util_versions"></a>
 Version History</h1>
 <ul>
+<li>v1.3: Added <a class="el" href="class_track_piece_rule_drawer.html" title="Custom property drawer for editing TrackPieceRule entries in the Unity Inspector.">TrackPieceRuleDrawer</a> and documented the generated read-only pattern legend workflow.</li>
 <li>v1.2: Added managed-reference <a class="el" href="class_button_type.html" title="Abstract base class for serialized UI button actions.">ButtonType</a> drawer and compact <a class="el" href="struct_wheel_spec.html" title="Serializable wheel specification used by VehicleController.">WheelSpec</a> drawer.</li>
 <li>v1.1: Added ShowIf and ReadOnly drawers.</li>
 <li>v1.0: Added <a class="el" href="class_string_track_piece_dictionary.html" title="Serializable dictionary mapping a string pattern key to a TrackPiece descriptor.">StringTrackPieceDictionary</a> ReorderableList drawer. </li>

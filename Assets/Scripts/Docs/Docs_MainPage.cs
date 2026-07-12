@@ -285,5 +285,9 @@ Tooling groups:
 - \ref editor_attrs "Editor Attributes"
 - \ref editor_util "Editor Utilities"
 
+# AI Disclosure
+
+AI-assistance was used to help draft portions of the code documentation. AI-generated content was subsequently reviewed, corrected, and proofread by the author, however some parts may contain slightly outdated documnetation.
+
 Happy racing!
 */

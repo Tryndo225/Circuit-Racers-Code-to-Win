@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('class_string_t
 </div><!--header-->
 <div class="contents">
 
-<p>Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable, foldout-friendly key/value list (string -&gt; <code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, and pattern size.">TrackPiece</a></code>).  
+<p>Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable, foldout-friendly key/value list (string -&gt; <code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a></code>).  
  <a href="#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for StringTrackPieceDictionaryDrawer:</div>
@@ -141,12 +141,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ac8e060b53d952beb9917d5897e7ea30e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main GUI entry point: ensures the list is built, syncs sizes, and renders the reorderable list.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable, foldout-friendly key/value list (string -&gt; <code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, and pattern size.">TrackPiece</a></code>). </p>
+<div class="textblock"><p>Custom inspector drawer for StringTrackPieceDictionary that presents a reorderable, foldout-friendly key/value list (string -&gt; <code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a></code>). </p>
 <p>Features:</p><ul>
 <li>Uses ReorderableList for drag reordering, add/remove, and custom element drawing.</li>
 <li>Keeps the hidden <code>keys</code> and <code>values</code> backing arrays strictly in sync (size &amp; order).</li>
 <li>Prevents duplicate keys at edit time with a simple dialog warning.</li>
-<li>Draws the value (<code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, and pattern size.">TrackPiece</a></code>) generically, including prefab, position, and rotation fields. Threading: Unity Editor thread only; excluded from player builds by <code>#if UNITY_EDITOR</code>. </li>
+<li>Draws the value (<code><a class="el" href="struct_track_piece.html" title="Describes a single placeable track piece: prefab, world-space pose, pattern size, and source pattern.">TrackPiece</a></code>) generically, including prefab, position, and rotation fields. Threading: Unity Editor thread only; excluded from player builds by <code>#if UNITY_EDITOR</code>. </li>
 </ul>
 
 <p class="definition">Definition at line <a class="el" href="_string_track_piece_dictionary_drawer_8cs_source.html#l00020">20</a> of file <a class="el" href="_string_track_piece_dictionary_drawer_8cs_source.html">StringTrackPieceDictionaryDrawer.cs</a>.</p>

@@ -11,7 +11,7 @@
 <!-- Node0 -->
 <g id="Node000000" class="node">
 <title>Node0</title>
-<g id="a_Node000000"><a xlink:href="struct_track_piece.html" target="_top" xlink:title="Describes a single placeable track piece: prefab, world&#45;space pose, and pattern size.">
+<g id="a_Node000000"><a xlink:href="struct_track_piece.html" target="_top" xlink:title="Describes a single placeable track piece: prefab, world&#45;space pose, pattern size, and source pattern.">
 <polygon fill="white" stroke="#666666" points="65.5,-20 0,-20 0,0 65.5,0 65.5,-20"/>
 <text xml:space="preserve" text-anchor="middle" x="32.75" y="-6.5" font-family="Helvetica,sans-Serif" font-size="10.00">TrackPiece</text>
 </a>

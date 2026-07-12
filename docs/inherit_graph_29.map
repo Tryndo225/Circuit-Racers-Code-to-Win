@@ -1,9 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,92,107"/>
-<area shape="rect" id="Node000001" href="$class_t_m_pro_1_1_t_m_p___text_event_handler_1_1_line_selection_event.html" title=" " alt="" coords="140,5,347,48"/>
-<area shape="poly" id="edge139_Node000000_Node000001" title=" " alt="" coords="99,72,139,57,176,47,171,50,141,63,102,76"/>
-<area shape="rect" id="Node000002" href="$class_t_m_pro_1_1_t_m_p___text_event_handler_1_1_link_selection_event.html" title=" " alt="" coords="140,72,347,115"/>
-<area shape="poly" id="edge140_Node000000_Node000002" title=" " alt="" coords="107,91,142,92,137,94,108,96"/>
-<area shape="rect" id="Node000003" href="$class_t_m_pro_1_1_t_m_p___text_event_handler_1_1_word_selection_event.html" title=" " alt="" coords="140,139,347,181"/>
-<area shape="poly" id="edge141_Node000000_Node000003" title=" " alt="" coords="101,110,141,124,176,138,171,138,139,129,101,115"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,47,92,73"/>
+<area shape="rect" id="Node000001" href="$class_t_m_pro_1_1_t_m_p___text_event_handler_1_1_character_selection_event.html" title=" " alt="" coords="140,5,347,48"/>
+<area shape="poly" id="edge138_Node000000_Node000001" title=" " alt="" coords="106,48,142,43,137,46,108,53"/>
+<area shape="rect" id="Node000002" href="$class_t_m_pro_1_1_t_m_p___text_event_handler_1_1_sprite_selection_event.html" title=" " alt="" coords="140,72,347,115"/>
+<area shape="poly" id="edge139_Node000000_Node000002" title=" " alt="" coords="107,67,142,75,137,76,107,73"/>
 </map>

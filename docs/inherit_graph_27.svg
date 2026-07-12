@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="Node000000" class="node">
 <title>Node0</title>
-<g id="a_Node000000"><a xlink:href="struct_u_i_parallax_layer.html" target="_top" xlink:title="Per&#45;layer configuration for a UI parallax effect.">
+<g id="a_Node000000"><a xlink:href="class_track_piece_rule.html" target="_top" xlink:title="Inspector&#45;editable rule used to generate one entry in the track&#45;piece legend.">
 <polygon fill="white" stroke="#666666" points="85.75,-20 0,-20 0,0 85.75,0 85.75,-20"/>
-<text xml:space="preserve" text-anchor="middle" x="42.88" y="-6.5" font-family="Helvetica,sans-Serif" font-size="10.00">UIParallaxLayer</text>
+<text xml:space="preserve" text-anchor="middle" x="42.88" y="-6.5" font-family="Helvetica,sans-Serif" font-size="10.00">TrackPieceRule</text>
 </a>
 </g>
 </g>

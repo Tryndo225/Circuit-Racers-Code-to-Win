@@ -77,7 +77,7 @@
  * - carSpawnHorizontalOffset (float): forward/backward offset applied relative to the spawn rotation.
  *
  * Track Settings:
- * - levelMap (LevelMap): runtime level map used when the race is started from generated or saved track data.
+ * - levelMap (levelMap): runtime level map used when the race is started from generated or saved track data.
  * - isCircuit (bool): true for lap-based circuit races; false for point-to-point races.
  * - laps (int, ShowIf(isCircuit)): number of laps required to finish a circuit race.
  *
@@ -182,7 +182,7 @@
  * Generated or saved track:
  * - A ::RaceTrackPlacer is responsible for generated-track setup.
  * - When a RaceTrackPlacer exists, TrackManager.Start() returns early.
- * - The generated-track flow should provide the track layout and call ::TrackManager::StartRace(LevelMap).
+ * - The generated-track flow should provide the track layout and call ::TrackManager::StartRace(levelMap).
  *
  * Custom inputs:
  * - Disable defaultBindings.
@@ -192,7 +192,7 @@
  * @section track_mng_api Public API Reference
  *
  * Race control:
- * - void StartRace(LevelMap lvlMap): configures race settings from an optional level map,
+ * - void StartRace(levelMap lvlMap): configures race settings from an optional level map,
  *   wires checkpoint listeners, and starts the restart countdown.
  * - void CheckPointTaken(): advances checkpoint and lap progression, records lap transitions,
  *   and finishes the race when the required final condition is met.

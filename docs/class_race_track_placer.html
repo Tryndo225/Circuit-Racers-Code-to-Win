@@ -137,7 +137,8 @@ Collaboration diagram for RaceTrackPlacer:</div>
 <p>Builds the visible track scene from a grid-based level map.</p>
 <p>The placer reads the selected level from GameDataManager.CurrentLevelMap, creates a working placement map, walks the track from LevelMap.StartPoint, instantiates the matching prefabs, registers checkpoints, and either starts the race or initializes replay playback.</p>
 <p>Requirements:</p><ul>
-<li>trackPieceLegend keys must represent square patterns such as 3x3 or 5x5.</li>
+<li>trackPieceRules must represent square patterns such as 3x3 or 5x5.</li>
+<li>trackPieceLegend is generated from trackPieceRules and stores the compact pattern strings.</li>
 <li>GameDataManager.CurrentLevelMap must contain a valid LevelMap before placement starts.</li>
 <li>Track cells use LevelMap.LevelTileTypes.Track.</li>
 <li>Checkpoint cells use LevelMap.LevelTileTypes.CP.</li>
@@ -146,7 +147,7 @@ Collaboration diagram for RaceTrackPlacer:</div>
 <li>Unity main thread only, because this component instantiates prefabs and accesses scene objects. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00095">95</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_race_track_placer_8cs_source.html#l00322">322</a> of file <a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="_race_track_placer_8cs_source.html">RaceTrackPlacer.cs</a></li>
 </ul>

@@ -204,7 +204,7 @@ Inspector (TrackManager)</h1>
 <li>carSpawnHorizontalOffset (float): forward/backward offset applied relative to the spawn rotation.</li>
 </ul>
 <p>Track Settings:</p><ul>
-<li>levelMap (<a class="el" href="class_level_map.html" title="Serializable level definition for a grid-based race track.">LevelMap</a>): runtime level map used when the race is started from generated or saved track data.</li>
+<li>levelMap (levelMap): runtime level map used when the race is started from generated or saved track data.</li>
 <li>isCircuit (bool): true for lap-based circuit races; false for point-to-point races.</li>
 <li>laps (int, ShowIf(isCircuit)): number of laps required to finish a circuit race.</li>
 </ul>
@@ -309,7 +309,7 @@ Usage</h1>
 <p>Generated or saved track:</p><ul>
 <li>A <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> is responsible for generated-track setup.</li>
 <li>When a <a class="el" href="class_race_track_placer.html" title="Procedural track placer that scans a LevelMap, matches local tile patterns, and instantiates track-pi...">RaceTrackPlacer</a> exists, TrackManager.Start() returns early.</li>
-<li>The generated-track flow should provide the track layout and call <a class="el" href="class_track_manager.html#af254c6684dd7c1ef39a7e6def5feb3a1" title="Starts race setup from a provided level map or from existing scene checkpoint data.">TrackManager.StartRace(LevelMap)</a>.</li>
+<li>The generated-track flow should provide the track layout and call ::TrackManager::StartRace(levelMap).</li>
 </ul>
 <p>Custom inputs:</p><ul>
 <li>Disable defaultBindings.</li>
@@ -319,7 +319,7 @@ Usage</h1>
  <h1 class="doxsection"><a class="anchor" id="track_mng_api"></a>
 Public API Reference</h1>
 <p>Race control:</p><ul>
-<li>void StartRace(LevelMap lvlMap): configures race settings from an optional level map, wires checkpoint listeners, and starts the restart countdown.</li>
+<li>void StartRace(levelMap lvlMap): configures race settings from an optional level map, wires checkpoint listeners, and starts the restart countdown.</li>
 <li>void CheckPointTaken(): advances checkpoint and lap progression, records lap transitions, and finishes the race when the required final condition is met.</li>
 </ul>
 <p>Runtime progress:</p><ul>

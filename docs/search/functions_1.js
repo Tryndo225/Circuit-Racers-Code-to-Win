@@ -4,7 +4,7 @@ var searchData=
   ['changescenebutton_1',['ChangeSceneButton',['../class_change_scene_button.html#ab18b4689af60093caa9106a8e81f7e69',1,'ChangeSceneButton']]],
   ['checkpointpassed_2',['CheckpointPassed',['../class_race_time_manager.html#a921d3588823479c6468b2c6d2fb2e7c0',1,'RaceTimeManager']]],
   ['checkpointtaken_3',['CheckPointTaken',['../class_track_manager.html#a148e1831d0184528f4f0835c074e813a',1,'TrackManager']]],
-  ['clear_4',['Clear',['../class_serializable_dictionary-2-g.html#a3c803fb1a4687e1017bcb46c7b601418',1,'SerializableDictionary-2-g.Clear()'],['../class_level_previewer.html#a106268ea54b00e88611d49f6681145fa',1,'LevelPreviewer.Clear()'],['../class_notification_manager.html#a6182721aa186fc4743b0ac691b7e050c',1,'NotificationManager.Clear()']]],
+  ['clear_4',['Clear',['../class_notification_manager.html#a6182721aa186fc4743b0ac691b7e050c',1,'NotificationManager.Clear()'],['../class_serializable_dictionary-2-g.html#a3c803fb1a4687e1017bcb46c7b601418',1,'SerializableDictionary-2-g.Clear()'],['../class_level_previewer.html#a106268ea54b00e88611d49f6681145fa',1,'LevelPreviewer.Clear()']]],
   ['clearcheckpoints_5',['ClearCheckPoints',['../class_check_point_manager.html#a47db71ec27fe8de1b2d1fe722e8f0d40',1,'CheckPointManager']]],
   ['clearlevels_6',['ClearLevels',['../class_game_data_manager.html#a01ccd95b645ee5190eb06a7d79ff8376',1,'GameDataManager']]],
   ['clearlevelsbutton_7',['ClearLevelsButton',['../class_clear_levels_button.html#a957213043d0101239d74a63deaf1b071',1,'ClearLevelsButton']]],

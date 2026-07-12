@@ -151,6 +151,8 @@ var annotated_dup =
     [ "StringTrackPieceDictionaryDrawer", "class_string_track_piece_dictionary_drawer.html", "class_string_track_piece_dictionary_drawer" ],
     [ "TrackManager", "class_track_manager.html", "class_track_manager" ],
     [ "TrackPiece", "struct_track_piece.html", "struct_track_piece" ],
+    [ "TrackPieceRule", "class_track_piece_rule.html", "class_track_piece_rule" ],
+    [ "TrackPieceRuleDrawer", "class_track_piece_rule_drawer.html", "class_track_piece_rule_drawer" ],
     [ "TrackRaceOverlaySource", "class_track_race_overlay_source.html", "class_track_race_overlay_source" ],
     [ "TransmissionController", "class_transmission_controller.html", "class_transmission_controller" ],
     [ "TyreEffects", "class_tyre_effects.html", null ],

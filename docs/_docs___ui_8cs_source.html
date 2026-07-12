@@ -209,8 +209,8 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"> * - ::ButtonScript stores a serialized ::ButtonType and calls its Action method.</span></div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment"> * - ::ButtonType is the abstract base class for serialized UI actions.</span></div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="comment"> * - ::ChangeSceneButton loads a configured ::SceneAssetHelper through ::SceneManagement.</span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment"> * - ::SelectLevelButton selects a concrete ::LevelMap in ::GameDataManager.</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> * - ::RemoveLevelButton removes a concrete ::LevelMap from ::GameDataManager.</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment"> * - ::SelectLevelButton selects a concrete ::levelMap in ::GameDataManager.</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> * - ::RemoveLevelButton removes a concrete ::levelMap from ::GameDataManager.</span></div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment"> * - ::GenerateLevelButton generates a level asynchronously, adds checkpoints, and displays it through ::LevelPopUp.</span></div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"> * - ::ClearLevelsButton clears all saved custom levels.</span></div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment"> * - ::GoToSelectedLevel delegates gameplay transition to ::GameDataManager::GoToSelectedLevel.</span></div>
@@ -229,11 +229,11 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment"> * - ::LevelEntry also exposes callbacks for selecting, exporting, renaming, and removing the level.</span></div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> * Level preview and popup:</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> * - ::LevelPreviewer renders a color-coded preview texture from a ::LevelMap.</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> * - ::LevelPreviewer renders a color-coded preview texture from a ::levelMap.</span></div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> * - ::LevelPopUp shows or hides a generated level preview and can add the previewed level to saved data.</span></div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> * Level editor:</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> * - ::LevelEditorManager edits an editable ::LevelMap copy.</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> * - ::LevelEditorManager edits an editable ::levelMap copy.</span></div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> * - It supports painting grass, track, and checkpoint tiles.</span></div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="comment"> * - It supports moving start/finish points, changing circuit mode, day/night mode, lap count, and level name.</span></div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="comment"> * - It can regenerate checkpoints, validate maps, save new levels, or replace edited levels.</span></div>
@@ -288,13 +288,13 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="comment"> * - Uses public callbacks for select, export, remove, and rename actions.</span></div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="comment"> * ::LevelPreviewer:</span></div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="comment"> * - Creates a preview texture from LevelMap tile data.</span></div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="comment"> * - Creates a preview texture from levelMap tile data.</span></div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="comment"> * - Uses point filtering for pixel-like previews.</span></div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="comment"> * - Clears old texture references when requested.</span></div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="comment"> * ::LevelPopUp:</span></div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="comment"> * - Hides itself on Start.</span></div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment"> * - ShowMap stores the previewed LevelMap, activates the visual container, and asks LevelPreviewer to render it.</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment"> * - ShowMap stores the previewed levelMap, activates the visual container, and asks LevelPreviewer to render it.</span></div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="comment"> * - HideMap clears the preview and hides the container.</span></div>
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="comment"> * - KeepMap adds the current map to ::GameDataManager and closes the popup.</span></div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment"> *</span></div>
@@ -434,14 +434,14 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="comment"> *   Updates the stored level name.</span></div>
 <div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="comment"> * ::LevelPreviewer:</span></div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="comment"> * - Task ShowPreviewAsync(LevelMap map)</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="comment"> * - Task ShowPreviewAsync(levelMap map)</span></div>
 <div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="comment"> *   Renders a preview for the provided map.</span></div>
 <div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="comment"> * - void Clear()</span></div>
 <div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="comment"> *   Clears the displayed preview texture reference.</span></div>
 <div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="comment"> * ::LevelPopUp:</span></div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="comment"> * - void ShowMap(LevelMap map)</span></div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="comment"> * - void ShowMap(levelMap map)</span></div>
 <div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="comment"> *   Shows the popup and previews the provided map.</span></div>
 <div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span><span class="comment"> * - void HideMap()</span></div>
@@ -529,7 +529,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span><span class="comment"> * Scene management:</span></div>
 <div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span><span class="comment"> * - ::ChangeSceneButton, ::ReplayButton, ::EditButton, and ::GoPlayButtom route through ::SceneManagement.</span></div>
-<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span><span class="comment"> * - ::GoPlayButtom chooses day or night gameplay scene from LevelMap::IsDayTrack.</span></div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span><span class="comment"> * - ::GoPlayButtom chooses day or night gameplay scene from levelMap::IsDayTrack.</span></div>
 <div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span><span class="comment"> * Race state:</span></div>
 <div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span><span class="comment"> * - ::TrackRaceOverlaySource connects live race systems to ::RaceOverlay.</span></div>
@@ -540,7 +540,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span><span class="comment"> * - Import, replay, edit, and custom notification buttons can show feedback through ::NotificationManager.</span></div>
 <div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span><span class="comment"> * Editor:</span></div>
-<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span><span class="comment"> * - ::LevelEditorManager edits a temporary LevelMap copy and validates before saving or replacing.</span></div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span><span class="comment"> * - ::LevelEditorManager edits a temporary levelMap copy and validates before saving or replacing.</span></div>
 <div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span><span class="comment"> * ----------------------------------------------------------------------</span></div>
 <div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span><span class="comment"> * @section ui_performance Performance and GC</span></div>
@@ -573,7 +573,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span><span class="comment"> * - Check console output for generation exceptions.</span></div>
 <div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span><span class="comment"> * Blank preview:</span></div>
-<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span><span class="comment"> * - Check that the LevelMap is non-null and has positive dimensions.</span></div>
+<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span><span class="comment"> * - Check that the levelMap is non-null and has positive dimensions.</span></div>
 <div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span><span class="comment"> * - Check that the RawImage target is assigned in ::LevelPreviewer.</span></div>
 <div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span><span class="comment"> * - Check that ShowPreviewAsync is called after UI layout exists.</span></div>
 <div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span><span class="comment"> *</span></div>
@@ -627,7 +627,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('_docs___ui_8cs
 <div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span><span class="comment"> * @details</span></div>
 <div class="line"><a id="l00508" name="l00508"></a><span class="lineno">  508</span><span class="comment"> * The Level UI group contains UI components focused specifically on saved custom levels.</span></div>
-<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span><span class="comment"> * These components display saved ::LevelMap data, best times, day/night icons, preview textures,</span></div>
+<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span><span class="comment"> * These components display saved ::levelMap data, best times, day/night icons, preview textures,</span></div>
 <div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span><span class="comment"> * and list-level actions such as select, rename, export, and remove.</span></div>
 <div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span><span class="comment"> */</span></div>
 </div><!-- fragment --></div><!-- contents -->

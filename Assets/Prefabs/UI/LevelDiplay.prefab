@@ -846,7 +846,7 @@ MonoBehaviour:
     rgba: 4284045657
   start:
     serializedVersion: 2
-    rgba: 4291921468
+    rgba: 4287688336
   finish:
     serializedVersion: 2
     rgba: 4278190335
@@ -886,7 +886,7 @@ MonoBehaviour:
       CheckpointCountPerLap: 0
       RoadTileCount: 0
       IsDayTrack: 0
-      tilesFlat: 
+      tilesFlatRLEString: 
     Time: 0
     CheckpointTimeSplits: []
     BestReplay:

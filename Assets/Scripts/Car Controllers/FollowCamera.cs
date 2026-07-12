@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 /// <summary>
 /// Third-person follow camera for a racing vehicle.
 /// </summary>

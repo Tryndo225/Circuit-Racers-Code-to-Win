@@ -115,11 +115,34 @@ var group__level__gen =
       [ "Values", "class_string_track_piece_dictionary.html#a66b3af338ff68456c5f5d786de11b1a2", null ]
     ] ],
     [ "TrackPiece", "struct_track_piece.html", [
-      [ "TrackPiece", "struct_track_piece.html#afa1cf838e1192a3d56033460fd1626fa", null ],
+      [ "TrackPiece", "struct_track_piece.html#a4c94bff12123e6ac3ac077b3f61b1823", null ],
+      [ "PatternKey", "struct_track_piece.html#acabd1e980f7da8aa3a610b55a2ba54a2", null ],
       [ "Position", "struct_track_piece.html#abcb3eaef528f4769bf544f7de1890ce1", null ],
       [ "Prefab", "struct_track_piece.html#acf9b0991dba02e4097786419de5fd0bf", null ],
       [ "Rotation", "struct_track_piece.html#a30b6e00bb4654d120eb3cfb71d1b6409", null ],
       [ "Size", "struct_track_piece.html#a24cc4183e4c7922e1467271edfc1a418", null ]
+    ] ],
+    [ "TrackPieceRule", "class_track_piece_rule.html", [
+      [ "TrackPieceRule", "class_track_piece_rule.html#a9412dfbfad78aeff82b858d6effd1475", null ],
+      [ "TrackPieceRule", "class_track_piece_rule.html#a0269bc83f8bdebb066e97413fe5bc34a", null ],
+      [ "NormalizePatternLength", "class_track_piece_rule.html#ab97029e1cd748ac8bb3da384625b6b26", null ],
+      [ "ToPatternKey", "class_track_piece_rule.html#a31eb36ac75a5b186299bc20300c8b0bc", null ],
+      [ "ToTrackPiece", "class_track_piece_rule.html#aa00de3cf749db49a66cb4081bfe5066a", null ],
+      [ "Name", "class_track_piece_rule.html#a8b37fdaabe3df023c3fd059f3123e6ca", null ],
+      [ "Pattern", "class_track_piece_rule.html#a6a8c793160bb732bd3bd32b840b31d23", null ],
+      [ "PositionOffset", "class_track_piece_rule.html#a10a56f438e378f704ba0a873abf26fda", null ],
+      [ "Prefab", "class_track_piece_rule.html#ae8c945b26a5dca892df1a214fefbf10f", null ],
+      [ "RotationEuler", "class_track_piece_rule.html#a91cb650ecddbcc3f438ae16ded3c04dd", null ],
+      [ "Size", "class_track_piece_rule.html#a67c06bc2e964e41168f7da0a6e4084b4", null ]
+    ] ],
+    [ "TrackPieceRuleDrawer", "class_track_piece_rule_drawer.html", [
+      [ "GetPropertyHeight", "class_track_piece_rule_drawer.html#acfc2d47d22b46499383d9c8f5c4e894e", null ],
+      [ "OnGUI", "class_track_piece_rule_drawer.html#a9fc0e268dd6d2fd4f890a054d20013de", null ]
+    ] ],
+    [ "TrackPatternCell", "group__level__gen.html#ga38ed0c1b5b067e658834da58a4223fbe", [
+      [ "TrackPatternCell.Empty", "group__level__gen.html#gga38ed0c1b5b067e658834da58a4223fbeace2c8aed9c2fa0cfbed56cbda4d8bf07", null ],
+      [ "TrackPatternCell.Track", "group__level__gen.html#gga38ed0c1b5b067e658834da58a4223fbea92ea731d3af6677905303c88689f5d55", null ],
+      [ "TrackPatternCell.Checkpoint", "group__level__gen.html#gga38ed0c1b5b067e658834da58a4223fbeaef41311079c448d0beb06ec07db0bf8c", null ]
     ] ],
     [ "LevelCheckPointMaker.GenerateCheckPoints", "group__level__gen.html#ga62e10e573f8e506a8faa4f94db07236f", null ]
 ];

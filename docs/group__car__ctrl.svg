@@ -22,7 +22,7 @@
 <!-- Node1 -->
 <g id="Node000001" class="node">
 <title>Node1</title>
-<g id="a_Node000001"><a xlink:title="Modular four&#45;wheel car stack: input, drivetrain, transmission, audio, lights, VFX,...">
+<g id="a_Node000001"><a xlink:title="Modular vehicle&#45;control stack supporting configurable wheel counts, input, drivetrain,...">
 <polygon fill="#999999" stroke="#666666" points="173,-20 91,-20 91,0 173,0 173,-20"/>
 <text xml:space="preserve" text-anchor="middle" x="132" y="-6.5" font-family="Helvetica,sans-Serif" font-size="10.00">Vehicle Control</text>
 </a>

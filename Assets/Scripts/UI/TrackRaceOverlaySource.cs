@@ -21,6 +21,11 @@ public class TrackRaceOverlaySource : RaceOverlaySource
 	[SerializeField] private TrackManager trackManager;
 
 	/// <summary>
+	/// Best time achieved on track before current attemp. Used for final time difference calculation.
+	/// </summary>
+	[ReadOnly, SerializeField] private float previousBestTime;
+
+	/// <summary>
 	/// Editor-time validation that backfills <see cref="trackManager"/> from the scene singleton when possible.
 	/// </summary>
 	private void OnValidate()
@@ -40,6 +45,8 @@ public class TrackRaceOverlaySource : RaceOverlaySource
 		{
 			trackManager = TrackManager.Instance;
 		}
+
+		previousBestTime = GameDataManager.Instance.CurrentGameData.GetBestLevelTime(GameDataManager.Instance.CurrentLevelMap);
 	}
 
 	/// <summary>
@@ -80,7 +87,20 @@ public class TrackRaceOverlaySource : RaceOverlaySource
 		state.CheckpointCounterText = $"{trackManager.CurrentCheckPointIndex}/{totalCheckpoints}";
 
 		state.IsFinished = trackManager.IsRaceFinished;
-		state.FinalText = $"Final Time: {RaceOverlay.FormatTime(RaceTimeManager.Instance.RaceEndTime)}";
+
+		if (trackManager.IsRaceFinished)
+		{
+			if (previousBestTime != float.MaxValue)
+			{
+				float timeDiff = RaceTimeManager.Instance.RaceEndTime - previousBestTime;
+				char diffSign = timeDiff > 0 ? '+' : '-';
+				state.FinalText = $"Final Time: {RaceOverlay.FormatTime(RaceTimeManager.Instance.RaceEndTime)} ({diffSign}{RaceOverlay.FormatTime(Mathf.Abs(timeDiff))})";
+			}
+			else
+			{
+				state.FinalText = $"Final Time: {RaceOverlay.FormatTime(RaceTimeManager.Instance.RaceEndTime)}";
+			}
+		}
 
 		return true;
 	}

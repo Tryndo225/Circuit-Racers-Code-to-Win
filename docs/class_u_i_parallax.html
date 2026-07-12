@@ -134,23 +134,30 @@ Collaboration diagram for UIParallax:</div>
 </div>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Pointer-driven UI parallax controller for layered RectTransforms. </p>
-<p>Applies smooth anchored-position offsets (and optional Z-tilt) to a set of RectTransforms based on the pointer position within a reference Canvas.</p>
+<p>Applies smooth anchored-position offsets and optional Z-tilt to a set of RectTransforms based on the pointer position within a reference Canvas.</p>
 <p>Coordinate space:</p><ul>
-<li>Works in the canvas local space; supports ScreenSpaceOverlay and world/screen camera modes.</li>
+<li>Works in the canvas local space.</li>
+<li>Supports ScreenSpaceOverlay and camera-based canvas render modes.</li>
 </ul>
 <p>Motion model:</p><ul>
-<li>Pointer position is normalized to [-1,1] over the canvas rect. Each layer uses its UIParallaxLayer.Strength to scale a maximum pixel offset derived from maxOffset and the canvas Canvas.scaleFactor. Motion is eased toward the target each frame using exponential smoothing controlled by damping.</li>
+<li>The raw pointer position is converted into normalized canvas coordinates in the range [-1,1].</li>
+<li>The normalized pointer value is smoothed with pointerSmoothTime and limited by maxPointerSpeed to avoid sudden jumps when the mouse moves quickly.</li>
+<li>Each layer scales the smoothed pointer by its UIParallaxLayer.Strength and by maxOffset.</li>
+<li>Layer transforms are eased toward their target positions each frame using exponential smoothing controlled by damping.</li>
+<li>Optional Z-tilt is based on the smoothed horizontal pointer value.</li>
 </ul>
 <p>Threading:</p><ul>
-<li>Unity main thread only (reads Input.mousePosition and manipulates transforms).</li>
+<li>Unity main thread only. This component reads Input.mousePosition and modifies UI transforms.</li>
 </ul>
 <p>Usage:</p><ul>
-<li>Assign a reference canvas (or leave null to auto-find in parents on Awake).</li>
-<li>Populate layers with RectTransforms and per-layer parameters.</li>
-<li>Tune maxOffset and damping for the desired feel. </li>
+<li>Assign a reference canvas, or leave it empty to auto-find a parent canvas in Awake.</li>
+<li>Populate layers with RectTransforms and per-layer movement settings.</li>
+<li>Tune maxOffset for movement distance.</li>
+<li>Tune pointerSmoothTime and maxPointerSpeed to reduce fast mouse jumps.</li>
+<li>Tune damping to control how quickly the UI layers follow the smoothed pointer target. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="_u_i_parallax_8cs_source.html#l00075">75</a> of file <a class="el" href="_u_i_parallax_8cs_source.html">UIParallax.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_u_i_parallax_8cs_source.html#l00082">82</a> of file <a class="el" href="_u_i_parallax_8cs_source.html">UIParallax.cs</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="_u_i_parallax_8cs_source.html">UIParallax.cs</a></li>
 </ul>

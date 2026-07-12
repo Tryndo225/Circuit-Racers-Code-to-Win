@@ -442,7 +442,7 @@ public class TrackManager : Generic.SceneSingleton<TrackManager>
 		}
 		else
 		{
-			Debug.LogWarning("[TrackManager] Car spawn point not assigned, using TrackManager position.");
+			Debug.Log("[TrackManager] Car spawn point not assigned, using TrackManager position.");
 			_carStartPosition = transform.position;
 			_carStartRotation = transform.rotation;
 		}

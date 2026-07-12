@@ -238,7 +238,7 @@
  * - SceneAssetHelper fields are useful for Inspector-configured menu buttons.
  *
  * Game data:
- * - Gameplay scene buttons may choose day or night scene helpers based on ::LevelMap::IsDayTrack.
+ * - Gameplay scene buttons may choose day or night scene helpers based on ::levelMap::IsDayTrack.
  * - ::GameDataManager::GoToSelectedLevel can also route into scene loading.
  *
  * Audio:

@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('group__car__ct
 </div><!--header-->
 <div class="contents">
 
-<p>Modular four-wheel car stack: input, drivetrain, transmission, audio, lights, VFX, collision SFX, and camera follow.  
+<p>Modular vehicle-control stack supporting configurable wheel counts, input, drivetrain, transmission, audio, lights, VFX, collision SFX, and camera follow.  
 <a href="#details">More...</a></p>
 <div class="dynheader">
 Collaboration diagram for Vehicle Control:</div>
@@ -152,7 +152,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serializable wheel specification used by VehicleController.  <a href="struct_wheel_spec.html#details">More...</a><br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Modular four-wheel car stack: input, drivetrain, transmission, audio, lights, VFX, collision SFX, and camera follow. </p>
+<div class="textblock"><p>Modular vehicle-control stack supporting configurable wheel counts, input, drivetrain, transmission, audio, lights, VFX, collision SFX, and camera follow. </p>
 <p>The Vehicle Control subsystem is composed of small, focused MonoBehaviours:</p><ul>
 <li><a class="el" href="class_vehicle_controller.html" title="High-level vehicle controller that connects player input to vehicle subsystems.">VehicleController</a> orchestrates input, reads saved assists, delegates to drivetrain/transmission, and wires audio/lights.</li>
 <li><a class="el" href="class_drive_train_controller.html" title="Handles drivetrain, steering, braking, grip modifiers, and wheel visuals for a four-wheel vehicle.">DriveTrainController</a> applies steering, motor torque, braking, reverse logic, ABS, traction control, limited-slip differential approximation, anti-roll, dynamic grip, grip-circle coupling, and wheel-mesh sync.</li>
