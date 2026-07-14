@@ -94,11 +94,11 @@ public class TrackRaceOverlaySource : RaceOverlaySource
 			{
 				float timeDiff = RaceTimeManager.Instance.RaceEndTime - previousBestTime;
 				char diffSign = timeDiff > 0 ? '+' : '-';
-				state.FinalText = $"Final Time: {RaceOverlay.FormatTime(RaceTimeManager.Instance.RaceEndTime)} ({diffSign}{RaceOverlay.FormatTime(Mathf.Abs(timeDiff))})";
+				state.FinalText = $"Final Time:\n{RaceOverlay.FormatTime(RaceTimeManager.Instance.RaceEndTime)} ({diffSign}{RaceOverlay.FormatTime(Mathf.Abs(timeDiff))})";
 			}
 			else
 			{
-				state.FinalText = $"Final Time: {RaceOverlay.FormatTime(RaceTimeManager.Instance.RaceEndTime)}";
+				state.FinalText = $"Final Time:\n{RaceOverlay.FormatTime(RaceTimeManager.Instance.RaceEndTime)}";
 			}
 		}
 

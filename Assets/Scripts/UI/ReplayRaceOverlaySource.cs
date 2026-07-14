@@ -69,7 +69,7 @@ public class ReplayRaceOverlaySource : RaceOverlaySource
 		state.CheckpointCounterText = "";
 
 		state.IsFinished = replayPreviewer.IsReplayFinished;
-		state.FinalText = $"Replay Finished: {RaceOverlay.FormatTime(replayPreviewer.ReplayDuration)}";
+		state.FinalText = $"Replay Finished:\n{RaceOverlay.FormatTime(replayPreviewer.ReplayDuration)}";
 
 		return true;
 	}
