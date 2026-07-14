@@ -230,9 +230,20 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	public int[] GetFlatTiles()
 	{
 		if (Tiles == null)
-			UnityEngine.Debug.LogError("Tiles is null when trying to flatten. Ensure Tiles is initialized before serialization.");
+		{
+			UnityEngine.Debug.LogError("Tiles are null when trying to flatten. Ensure Tiles is initialized before serialization.");
+			return Array.Empty<int>();
+		}
+
+		if (Tiles.GetLength(0) == 0 || Tiles.GetLength(1) == 0 || Tiles.GetLength(0) != Width || Tiles.GetLength(1) != Height)
+		{
+			UnityEngine.Debug.LogError("Tiles are empty or do not match the Width or Height when trying to flatten.");
+			return Array.Empty<int>();
+		}
 
 		int[] flatTiles = new int[Width * Height];
+
+
 		for (int y = 0; y < Height; y++)
 			for (int x = 0; x < Width; x++)
 				flatTiles[y * Width + x] = Tiles[x, y];
@@ -262,7 +273,10 @@ public class LevelMap : ISerializable, UnityEngine.ISerializationCallbackReceive
 	public static int[,] GetUnflattenedTiles(int[] flatTiles, int height, int width)
 	{
 		if (width <= 0 || height <= 0 || flatTiles == null)
+		{
 			UnityEngine.Debug.LogError("Invalid dimensions or tilesFlat is null when trying to unflatten. Ensure Width, Height, and tilesFlat are properly initialized before deserialization.");
+			return new int[0, 0];
+		}
 
 		int[,] Tiles = new int[width, height];
 		for (int y = 0; y < height; y++)
