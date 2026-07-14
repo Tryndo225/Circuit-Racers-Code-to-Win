@@ -273,7 +273,7 @@ MonoBehaviour:
   offset: {x: 0, y: 25, z: 0}
   relativeOffset: {x: -10, y: 0, z: 0}
   useFlatTargetDirection: 1
-  positionSmoothTime: 0.5
+  positionSmoothTime: 0.25
   rotationSpeed: 1
   followTargetRotation: 1
 --- !u!1 &24639436

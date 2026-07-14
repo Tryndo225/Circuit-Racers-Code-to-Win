@@ -339,9 +339,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78f0636ae86fb8849a7da06a6e7004b9, type: 3}
+  m_Script: {fileID: 11500000, guid: fb7165f096b988546b743ae9cbc09f80, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::FollowCamera
   target: {fileID: 0}
   targetRb: {fileID: 0}
   offset: {x: 0, y: 5, z: -12}
